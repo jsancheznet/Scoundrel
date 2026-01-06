@@ -1,0 +1,11 @@
+-/libraries
+-*.exe
+-*.obj
+-*.ilk
+-*.rdi
+-*.dll
+-*.pdb
+
+! compile build.bat
+
+:project-name TextRender
