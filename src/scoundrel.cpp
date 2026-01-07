@@ -11,21 +11,21 @@ renderer Renderer;
 
 i32 main(i32 Argc, char **Argv)
 {
+    // TODO(Jsanchez): Import Miniaud.io, play SFX and song
     // TODO(Jsanchez): Create simple logging system
-    // TODO(Jsanchez): Windowed fullscreen
+    // TODO(Jsanchez): Windowed fullscreen toggle on ALT+ENTER
 
     Application.Init();
     Application.CreateWindow("Scoundrel", 1366, 768);
 
-    Renderer.Init();
+    Renderer.Init(Application.Window);
 
     while(Application.IsRunning)
     {
         Application.ProcessEvents();
 
         Renderer.ClearScreen(ORANGE);
-
-        Application.EndFrame();
+        Renderer.EndFrame();
     }
 
     Application.Quit();

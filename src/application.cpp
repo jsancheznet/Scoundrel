@@ -33,11 +33,6 @@ void application::Quit()
     SDL_Quit();
 }
 
-void application::EndFrame()
-{
-    SDL_GL_SwapWindow(Window);
-}
-
 void application::ProcessEvents()
 {
     SDL_Event Event;
