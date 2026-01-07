@@ -6,7 +6,7 @@
 #include "typedefs.h"
 
 #define HOT_PINK color{1.0f, 0.0f, 1.0f, 0.0f}
-#define ORANGE color{1.0f, 0.647f, 0.0f, 0.0f}
+#define ORANGE   color{1.0f, 0.647f, 0.0f, 0.0f}
 
 struct color
 {
@@ -18,12 +18,16 @@ struct renderer
     SDL_Window* Window;
 
     u32 MainVAO;
-    u32 TriangleVBO;
 
     void Init(SDL_Window *SDLWindow);
-    bool CompileShader();
+
+    u32 CompileShader(const char *Filename);
+    u32 CreateBuffer(u32 Size, u32 Stride, void *Data);
+
+    void UseShader(u32 Shader);
     void ClearScreen(color Color);
     void EndFrame();
+
 
 private:
 
