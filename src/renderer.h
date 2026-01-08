@@ -13,6 +13,17 @@ struct color
     f32 r, g, b, a;
 };
 
+struct gl_buffer
+{
+    u32 Id;
+    u32 Size;
+    u32 Stride;
+    u32 BindingIndex;
+    u32 AttributeIndex;
+    u32 Offset;
+    u32 VertexSize;
+};
+
 struct renderer
 {
     SDL_Window* Window;
