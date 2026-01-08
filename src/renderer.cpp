@@ -98,20 +98,26 @@ u32 renderer::CreateBuffer(u32 Size, u32 Stride, void *Data)
 {
     u32 Buffer;
 
+    u32 BindingIndex = 0;
+    u32 Offset = 0;
+    u32 VertexSize = 3; // 3 floats
+    u32 AttributeIndex = 0;
+
     glCreateBuffers(1, &Buffer);
 
     // Allocates buffer storage
     glNamedBufferStorage(Buffer, Size, Data, GL_DYNAMIC_STORAGE_BIT);
-    glVertexArrayVertexBuffer(MainVAO, 0, Buffer, 0, Stride);
 
-    glEnableVertexArrayAttrib(MainVAO, 0);
+    // Binds a buffer to a vertex binding point
+    glVertexArrayVertexBuffer(MainVAO, BindingIndex, Buffer, Offset, Stride);
 
-    // TODO(Jsanchez):
+    // Enable the vertex attribute array on Binding Index
+    glEnableVertexArrayAttrib(MainVAO, BindingIndex);
 
-    // TODO(Jsanchez): Que hago con este 3, lo tengo que pasar por parametro!, falta la ; aca para saber por donde seguir
-    glVertexArrayAttribFormat(MainVAO, 0, 3, GL_FLOAT, GL_FALSE, 0)
+    // Specify the organization of vertex arrays
+    glVertexArrayAttribFormat(MainVAO, AttributeIndex, VertexSize, GL_FLOAT, GL_FALSE, Offset);
 
-    glVertexArrayAttribBinding(MainVAO, 0, 0);
+    glVertexArrayAttribBinding(MainVAO, AttributeIndex, BindingIndex);
 
     return Buffer;
 }
