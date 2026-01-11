@@ -3,37 +3,53 @@
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
 
+#include <glm/glm.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "typedefs.h"
 
 #define HOT_PINK color{1.0f, 0.0f, 1.0f, 0.0f}
 #define ORANGE   color{1.0f, 0.647f, 0.0f, 0.0f}
+
+using namespace glm;
 
 struct color
 {
     f32 r, g, b, a;
 };
 
-struct gl_buffer
+struct triangle
 {
+    vec3 Position;
+    vec3 Scale;
+    f32 Rotation;
+
     u32 Id;
-    u32 Size;
-    u32 Stride;
-    u32 BindingIndex;
-    u32 AttributeIndex;
-    u32 Offset;
-    u32 VertexSize;
 };
 
 struct renderer
 {
     SDL_Window* Window;
+    u32 ViewportWidth;
+    u32 ViewportHeight;
 
     u32 MainVAO;
 
-    void Init(SDL_Window *SDLWindow);
+    u32 CurrentShader;
+
+    // TODO(Jsanchez): Pull these out once we have a proper camera
+    mat4 View;
+    mat4 Projection;
+
+    void Init(SDL_Window *SDLWindow, u32 Width, u32 Height);
 
     u32 CompileShader(const char *Filename);
-    u32 CreateBuffer(u32 Size, u32 Stride, void *Data);
+
+    void UpdateCameraUniforms();
+
+    triangle CreateTriangle();
+    void DrawTriangle(triangle Triangle);
 
     void UseShader(u32 Shader);
     void ClearScreen(color Color);
