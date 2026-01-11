@@ -2,9 +2,11 @@
 
 #include "renderer.h"
 
-void renderer::Init(SDL_Window* SDLWindow)
+void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 {
     Window = SDLWindow;
+    ViewportWidth = Width;
+    ViewportHeight = Height;
 
     gladLoadGL();
 
@@ -13,14 +15,27 @@ void renderer::Init(SDL_Window* SDLWindow)
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(DebugCallback, nullptr);
 
+    glViewport(0, 0, ViewportWidth, ViewportHeight);
+
     // TODO(Jsanchez): Configure blend mode
     // glEnable(GL_BLEND);
     // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glCreateVertexArrays(1, &MainVAO);
-    printf("MainVAO: %d\n", MainVAO);
-
     glBindVertexArray(MainVAO);
+
+    CurrentShader = 0;
+
+    vec3 CameraPos = vec3(0.0f, 0.0f, -1.0f);
+    vec3 CameraTarget = vec3(0.0f);
+    vec3 CameraUp = vec3(0.0f, 1.0f, 0.0f);
+    View = glm::lookAt(CameraPos, CameraTarget, CameraUp);
+
+    f32 Fov = 90.0f;
+    f32 CameraNear = 0.01f;
+    f32 CameraFar = 1000.0f;
+    f32 AspectRatio = (f32) ViewportWidth / (f32)ViewportHeight;
+    Projection = glm::perspective(glm::radians(Fov), AspectRatio, CameraNear, CameraFar);
 }
 
 void renderer::ClearScreen(color Color)
@@ -94,10 +109,22 @@ u32 renderer::CompileShader(const char *Filename)
     return CompiledShader;
 }
 
-u32 renderer::CreateBuffer(u32 Size, u32 Stride, void *Data)
+triangle renderer::CreateTriangle()
 {
-    u32 Buffer;
+    triangle Result;
 
+    f32 Vertices[] =
+    {
+        0.0f,  0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f
+    };
+
+    Result.Position = glm::vec3(0.0f);
+    Result.Scale = glm::vec3(1.0f);
+    Result.Rotation = 0.0f;
+
+    u32 Buffer;
     u32 BindingIndex = 0;
     u32 Offset = 0;
     u32 VertexSize = 3; // 3 floats
@@ -106,10 +133,10 @@ u32 renderer::CreateBuffer(u32 Size, u32 Stride, void *Data)
     glCreateBuffers(1, &Buffer);
 
     // Allocates buffer storage
-    glNamedBufferStorage(Buffer, Size, Data, GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferStorage(Buffer, sizeof(Vertices), Vertices, GL_DYNAMIC_STORAGE_BIT);
 
     // Binds a buffer to a vertex binding point
-    glVertexArrayVertexBuffer(MainVAO, BindingIndex, Buffer, Offset, Stride);
+    glVertexArrayVertexBuffer(MainVAO, BindingIndex, Buffer, Offset, sizeof(f32) * 3);
 
     // Enable the vertex attribute array on Binding Index
     glEnableVertexArrayAttrib(MainVAO, BindingIndex);
@@ -119,12 +146,41 @@ u32 renderer::CreateBuffer(u32 Size, u32 Stride, void *Data)
 
     glVertexArrayAttribBinding(MainVAO, AttributeIndex, BindingIndex);
 
-    return Buffer;
+    Result.Id = Buffer;
+
+    return Result;
+}
+
+void renderer::DrawTriangle(triangle Triangle)
+{
+    // TODO(Jsanchez): Create something more performant that doing 1 draw call per object
+
+    u32 UniformModelId = glGetUniformLocation(CurrentShader, "Model");
+
+    mat4 Model = glm::mat4(1.0f);
+    Model = glm::scale(Model, Triangle.Scale);
+    vec3 RotationAxis = glm::vec3(0.0f, 0.0f, 1.0f);
+    Model = glm::rotate(Model, Triangle.Rotation, RotationAxis);
+    Model = glm::translate(Model, Triangle.Position);
+
+    glUniformMatrix4fv(UniformModelId, 1, GL_FALSE, value_ptr(Model));
+
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void renderer::UseShader(u32 Shader)
 {
+    CurrentShader = Shader;
     glUseProgram(Shader);
+}
+
+void renderer::UpdateCameraUniforms()
+{
+    u32 ViewId = glGetUniformLocation(CurrentShader, "View");
+    glUniformMatrix4fv(ViewId, 1, GL_FALSE, value_ptr(View));
+
+    u32 ProjectionId = glGetUniformLocation(CurrentShader, "Projection");
+    glUniformMatrix4fv(ProjectionId, 1, GL_FALSE, value_ptr(Projection));
 }
 
 void renderer::DebugCallback(GLenum Source, GLenum Type, GLuint Id,  GLenum Severity, GLsizei Length, GLchar const *Message, void const *UserParam)

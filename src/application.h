@@ -11,8 +11,11 @@ struct application
     SDL_Window *Window;
     SDL_GLContext GLContext;
 
+    u32 WindowWidth;
+    u32 WindowHeight;
+
     void Init();
-    void CreateWindow(const char *Title, i32 Width, i32 Height);
+    void CreateWindow(const char *Title, u32 Width, u32 Height);
     void Quit();
 
     void EndFrame();

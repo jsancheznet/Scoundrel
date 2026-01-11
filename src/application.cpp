@@ -22,10 +22,12 @@ void application::Init()
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 }
 
-void application::CreateWindow(const char *Title, i32 Width, i32 Height)
+void application::CreateWindow(const char *Title, u32 Width, u32 Height)
 {
     Window = SDL_CreateWindow(Title, Width, Height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
     GLContext = SDL_GL_CreateContext(Window);
+    WindowWidth = Width;
+    WindowHeight = Height;
 }
 
 void application::Quit()
