@@ -19,7 +19,9 @@ i32 main(i32 Argc, char **Argv)
     Renderer.Init(Application.Window, 1366, 768);
 
     // RECORDATORIO: No irme por las ramas!
-    // TODO: Lo mismo para Quads!
+    // TODO: Cargar una textura!
+    // TODO: Textured Quads!
+    // TODO: DrawTexture(MyTexture, Pos, Size, ...)
     // TODO: Implementar una camara para poder mover y rotar mis triangulos
 
     u32 HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
@@ -29,6 +31,8 @@ i32 main(i32 Argc, char **Argv)
     Renderer.UseShader(HelloWorldShader);
 
     Renderer.UpdateCameraUniforms();
+
+    texture AwesomeFace = Renderer.CreateTexture("assets/awesomeface.png");
 
     while(Application.IsRunning)
     {

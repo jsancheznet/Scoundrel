@@ -28,6 +28,13 @@ struct triangle
     u32 Id;
 };
 
+struct texture
+{
+    u32 Id;
+    i32 Width;
+    i32 Height;
+};
+
 struct renderer
 {
     SDL_Window* Window;
@@ -49,6 +56,8 @@ struct renderer
     void UpdateCameraUniforms();
 
     triangle CreateTriangle();
+    texture  CreateTexture(const char* File);
+
     void DrawTriangle(triangle Triangle);
 
     void UseShader(u32 Shader);
