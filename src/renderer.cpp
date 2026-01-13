@@ -272,5 +272,5 @@ void renderer::DebugCallback(GLenum Source, GLenum Type, GLuint Id,  GLenum Seve
             break;
     }
 
-    printf("%d: %s of %s severity, raised from %s: %s\n", Id, _Type, _Severity, _Source, Message);
+    printf("[OPENGL DEBUG]: %d: %s of %s severity, raised from %s: %s\n", Id, _Type, _Severity, _Source, Message);
 }

@@ -26,6 +26,12 @@ echo BUILDING...
 echo.
 
 REM This builds in debug mode for now
-clang-cl /Zi /Od /WX ..\src\scoundrel.cpp ..\src\application.cpp ..\src\renderer.cpp ..\libraries\glad\src\glad.c %GLADInclude%  %IncludeDirectories% /link /LIBPATH:"..\libraries\SDL3-3.2.10\build\Debug" -SUBSYSTEM:CONSOLE SDL3.lib
+clang-cl /Zi /Od /WX ^
+	 ..\src\scoundrel.cpp ^
+	 ..\src\log.cpp ^
+	 ..\src\application.cpp ^
+	 ..\src\renderer.cpp ^
+	 ..\libraries\glad\src\glad.c ^
+	 %GLADInclude%  %IncludeDirectories% /link /LIBPATH:"..\libraries\SDL3-3.2.10\build\Debug" -SUBSYSTEM:CONSOLE SDL3.lib
 
 popd
