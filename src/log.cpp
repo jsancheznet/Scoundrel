@@ -12,21 +12,21 @@ void Log(log_category Category, const char *Fmt, ...)
     {
         case Info:
         {
-            CategoryString = "Info";
+            CategoryString = "INFO";
         } break;
         case Warning:
         {
-            CategoryString = "Warning";
+            CategoryString = "WARNING";
             Color = "\x1b[33m";
         } break;
         case Error:
         {
-            CategoryString = "Error";
+            CategoryString = "ERROR";
             Color = "\x1b[31m";
         } break;
         default:
         {
-            CategoryString = "Invalid Category";
+            CategoryString = "INVALID CATEGORY";
         }
     }
 
