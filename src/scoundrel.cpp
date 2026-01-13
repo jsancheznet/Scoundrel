@@ -1,4 +1,5 @@
 #include "typedefs.h"
+#include "log.h"
 #include "application.h"
 #include "renderer.h"
 

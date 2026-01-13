@@ -1,4 +1,5 @@
 #include "application.h"
+#include "log.h"
 
 #include <glad/glad.h>
 
@@ -28,6 +29,8 @@ void application::CreateWindow(const char *Title, u32 Width, u32 Height)
     GLContext = SDL_GL_CreateContext(Window);
     WindowWidth = Width;
     WindowHeight = Height;
+
+    Log(Info, "application::CreateWindow() - Created Window, Width: %d, Height: %d", Width, Height);
 }
 
 void application::Quit()
