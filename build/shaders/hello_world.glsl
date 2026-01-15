@@ -19,12 +19,14 @@ void main()
 
 #ifdef FRAGMENT_SHADER
 
+uniform sampler2D Texture;
+
 in vec2 Uv;
 out vec4 FragColor;
 
 void main()
 {
-    FragColor = vec4(0.0, Uv.x, Uv.y, 1.0);
+    FragColor = texture(Texture, Uv);
 }
 
 #endif
