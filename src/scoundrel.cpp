@@ -24,9 +24,10 @@ i32 main(i32 Argc, char **Argv)
     // TODO: DrawTexture(MyTexture, Pos, Size, ...)
     // TODO: Implementar una camara para poder mover y rotar mis triangulos
 
-    u32 HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
+    // 1- Crear Vertices, junto con TextureCoordinates
+    // 2- Subir esos vertices a un VBO
 
-    triangle Triangle = Renderer.CreateTriangle();
+    u32 HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
 
     Renderer.UseShader(HelloWorldShader);
 
@@ -38,11 +39,9 @@ i32 main(i32 Argc, char **Argv)
     {
         Application.ProcessEvents();
 
-        Triangle.Rotation += 0.01f;
-
         Renderer.ClearScreen(ORANGE);
 
-        Renderer.DrawTriangle(Triangle);
+        Renderer.DrawTexture(AwesomeFace, glm::vec3(0.0f), 0.0f, 1.0f);
 
         Renderer.EndFrame();
     }

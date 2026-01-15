@@ -5,7 +5,6 @@
 
 #include "renderer.h"
 
-
 void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 {
     Window = SDLWindow;
@@ -40,6 +39,37 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
     f32 CameraFar = 1000.0f;
     f32 AspectRatio = (f32) ViewportWidth / (f32)ViewportHeight;
     Projection = glm::perspective(glm::radians(Fov), AspectRatio, CameraNear, CameraFar);
+
+    { // Upload Quad Data
+
+        float Vertices[] =
+        {
+            // positions         // texture coords
+            0.5f,  0.5f, 0.0f,   1.0f, 1.0f,   // top right
+            0.5f, -0.5f, 0.0f,   1.0f, 0.0f,   // bottom right
+            -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,   // bottom left
+            -0.5f,  0.5f, 0.0f,  0.0f, 1.0f    // top left
+        };
+
+
+        // Create and allocate Buffer Storage
+        glCreateBuffers(1, &QuadVBO);
+        glNamedBufferStorage(QuadVBO, sizeof(Vertices), Vertices, GL_DYNAMIC_STORAGE_BIT);
+
+        // Bind the recently created VBO to binding point 0
+        u32 BindingPoint = 0;
+        glVertexArrayVertexBuffer(MainVAO, BindingPoint, QuadVBO, 0, sizeof(f32) * 5); // 5 floats
+
+        // Vertex Attribute - Configure Vertex Attribute 0 (Position) from the interleaved buffer data
+        glEnableVertexArrayAttrib(MainVAO, 0);
+        glVertexArrayAttribFormat(MainVAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
+        glVertexArrayAttribBinding(MainVAO, 0, 0);
+
+        // UV Attribute - Configure Vertex Attribute 1 (UV) from the interleaved buffer data
+        glEnableVertexArrayAttrib(MainVAO, 1);
+        glVertexArrayAttribFormat(MainVAO, 1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 3);
+        glVertexArrayAttribBinding(MainVAO, 1, 0);
+    }
 }
 
 void renderer::ClearScreen(color Color)
@@ -113,48 +143,6 @@ u32 renderer::CompileShader(const char *Filename)
     return CompiledShader;
 }
 
-triangle renderer::CreateTriangle()
-{
-    triangle Result;
-
-    f32 Vertices[] =
-    {
-        0.0f,  0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f
-    };
-
-    Result.Position = glm::vec3(0.0f);
-    Result.Scale = glm::vec3(1.0f);
-    Result.Rotation = 0.0f;
-
-    u32 Buffer;
-    u32 BindingIndex = 0;
-    u32 Offset = 0;
-    u32 VertexSize = 3; // 3 floats
-    u32 AttributeIndex = 0;
-
-    glCreateBuffers(1, &Buffer);
-
-    // Allocates buffer storage
-    glNamedBufferStorage(Buffer, sizeof(Vertices), Vertices, GL_DYNAMIC_STORAGE_BIT);
-
-    // Binds a buffer to a vertex binding point
-    glVertexArrayVertexBuffer(MainVAO, BindingIndex, Buffer, Offset, sizeof(f32) * 3);
-
-    // Enable the vertex attribute array on Binding Index
-    glEnableVertexArrayAttrib(MainVAO, BindingIndex);
-
-    // Specify the organization of vertex arrays
-    glVertexArrayAttribFormat(MainVAO, AttributeIndex, VertexSize, GL_FLOAT, GL_FALSE, Offset);
-
-    glVertexArrayAttribBinding(MainVAO, AttributeIndex, BindingIndex);
-
-    Result.Id = Buffer;
-
-    return Result;
-}
-
 texture renderer::CreateTexture(const char *File)
 {
     texture Result;
@@ -183,22 +171,22 @@ texture renderer::CreateTexture(const char *File)
     return Result;
 }
 
-void renderer::DrawTriangle(triangle Triangle)
+void renderer::DrawTexture(texture Texture, vec3 Position, f32 Rotation, f32 Scale)
 {
-    // TODO(Jsanchez): Create something more performant that doing 1 draw call per object
-
-    u32 UniformModelId = glGetUniformLocation(CurrentShader, "Model");
+    u32 ModelMatrixUniformId = glGetUniformLocation(CurrentShader, "Model");
 
     mat4 Model = glm::mat4(1.0f);
-    Model = glm::scale(Model, Triangle.Scale);
+
+    Model = glm::scale(Model, glm::vec3(Scale));
     vec3 RotationAxis = glm::vec3(0.0f, 0.0f, 1.0f);
-    Model = glm::rotate(Model, Triangle.Rotation, RotationAxis);
-    Model = glm::translate(Model, Triangle.Position);
+    Model = glm::rotate(Model, Rotation, RotationAxis);
+    Model = glm::translate(Model, Position);
 
-    glUniformMatrix4fv(UniformModelId, 1, GL_FALSE, value_ptr(Model));
+    glUniformMatrix4fv(ModelMatrixUniformId, 1, GL_FALSE, value_ptr(Model));
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
+
 
 void renderer::UseShader(u32 Shader)
 {

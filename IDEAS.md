@@ -1,0 +1,1 @@
+- Facilidad para generar mods usando chatgpt, ejemplo: gameplay code en lua, un markdown con las cosas a saber, y que la gente le de de comer ese prompt a un llm con sus cambios deseados y que compile
