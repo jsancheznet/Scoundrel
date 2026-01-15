@@ -31,6 +31,7 @@ clang-cl /Zi /Od /WX ^
 	 ..\src\log.cpp ^
 	 ..\src\application.cpp ^
 	 ..\src\renderer.cpp ^
+	 ..\src\camera.cpp ^
 	 ..\libraries\glad\src\glad.c ^
 	 %GLADInclude%  %IncludeDirectories% /link /LIBPATH:"..\libraries\SDL3-3.2.10\build\Debug" -SUBSYSTEM:CONSOLE SDL3.lib
 
