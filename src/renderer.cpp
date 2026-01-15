@@ -29,16 +29,16 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
     CurrentShader = 0;
 
-    vec3 CameraPos = vec3(0.0f, 0.0f, -1.0f);
-    vec3 CameraTarget = vec3(0.0f);
-    vec3 CameraUp = vec3(0.0f, 1.0f, 0.0f);
-    View = glm::lookAt(CameraPos, CameraTarget, CameraUp);
-
-    f32 Fov = 90.0f;
-    f32 CameraNear = 0.01f;
-    f32 CameraFar = 1000.0f;
-    f32 AspectRatio = (f32) ViewportWidth / (f32)ViewportHeight;
-    Projection = glm::perspective(glm::radians(Fov), AspectRatio, CameraNear, CameraFar);
+    // TODO(Jsanchez): Delete this
+    // vec3 CameraPos = vec3(0.0f, 0.0f, 1.0f);
+    // vec3 CameraTarget = vec3(0.0f);
+    // vec3 CameraUp = vec3(0.0f, 1.0f, 0.0f);
+    // View = glm::lookAt(CameraPos, CameraTarget, CameraUp);
+    // f32 Fov = 90.0f;
+    // f32 CameraNear = 0.01f;
+    // f32 CameraFar = 1000.0f;
+    // f32 AspectRatio = (f32) ViewportWidth / (f32)ViewportHeight;
+    // Projection = glm::perspective(glm::radians(Fov), AspectRatio, CameraNear, CameraFar);
 
     { // Upload Quad Data
 
@@ -198,13 +198,13 @@ void renderer::UseShader(u32 Shader)
     glUseProgram(Shader);
 }
 
-void renderer::UpdateCameraUniforms()
+void renderer::UpdateCameraUniforms(camera Camera)
 {
     u32 ViewId = glGetUniformLocation(CurrentShader, "View");
-    glUniformMatrix4fv(ViewId, 1, GL_FALSE, value_ptr(View));
+    glUniformMatrix4fv(ViewId, 1, GL_FALSE, value_ptr(Camera.View));
 
     u32 ProjectionId = glGetUniformLocation(CurrentShader, "Projection");
-    glUniformMatrix4fv(ProjectionId, 1, GL_FALSE, value_ptr(Projection));
+    glUniformMatrix4fv(ProjectionId, 1, GL_FALSE, value_ptr(Camera.Projection));
 }
 
 void renderer::DebugCallback(GLenum Source, GLenum Type, GLuint Id,  GLenum Severity, GLsizei Length, GLchar const *Message, void const *UserParam)

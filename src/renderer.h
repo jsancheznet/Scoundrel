@@ -9,6 +9,8 @@
 
 #include "typedefs.h"
 
+#include "camera.h"
+
 #define HOT_PINK color{1.0f, 0.0f, 1.0f, 0.0f}
 #define ORANGE   color{1.0f, 0.647f, 0.0f, 0.0f}
 
@@ -38,15 +40,11 @@ struct renderer
 
     u32 CurrentShader;
 
-    // TODO(Jsanchez): Pull these out once we have a proper camera
-    mat4 View;
-    mat4 Projection;
-
     void Init(SDL_Window *SDLWindow, u32 Width, u32 Height);
 
     u32 CompileShader(const char *Filename);
 
-    void UpdateCameraUniforms();
+    void UpdateCameraUniforms(camera Camera);
 
     texture  CreateTexture(const char* File);
 

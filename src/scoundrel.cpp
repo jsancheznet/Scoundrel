@@ -2,6 +2,7 @@
 #include "log.h"
 #include "application.h"
 #include "renderer.h"
+#include "camera.h"
 
 #include <stdio.h>
 
@@ -19,21 +20,16 @@ i32 main(i32 Argc, char **Argv)
     Renderer.Init(Application.Window, 1366, 768);
 
     // RECORDATORIO: No irme por las ramas!
-    // TODO: Cargar una textura!
-    // TODO: Textured Quads!
-    // TODO: DrawTexture(MyTexture, Pos, Size, ...)
-    // TODO: Implementar una camara para poder mover y rotar mis triangulos
 
-    // 1- Crear Vertices, junto con TextureCoordinates
-    // 2- Subir esos vertices a un VBO
+    // TODO: Implementar una camara para poder mover y rotar mis texturas
 
     u32 HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
 
     Renderer.UseShader(HelloWorldShader);
 
-    Renderer.UpdateCameraUniforms();
-
     texture AwesomeFace = Renderer.CreateTexture("assets/awesomeface.png");
+
+    camera Camera = CreateCamera();
 
     while(Application.IsRunning)
     {
@@ -41,7 +37,9 @@ i32 main(i32 Argc, char **Argv)
 
         Renderer.ClearScreen(ORANGE);
 
-        Renderer.DrawTexture(AwesomeFace, glm::vec3(0.0f), 0.0f, 1.0f);
+        Renderer.UpdateCameraUniforms(Camera);
+
+        Renderer.DrawTexture(AwesomeFace, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, 1.0f);
 
         Renderer.EndFrame();
     }
