@@ -19,15 +19,6 @@ struct color
     f32 r, g, b, a;
 };
 
-struct triangle
-{
-    vec3 Position;
-    vec3 Scale;
-    f32 Rotation;
-
-    u32 Id;
-};
-
 struct texture
 {
     u32 Id;
@@ -43,6 +34,8 @@ struct renderer
 
     u32 MainVAO;
 
+    u32 QuadVBO;
+
     u32 CurrentShader;
 
     // TODO(Jsanchez): Pull these out once we have a proper camera
@@ -55,10 +48,9 @@ struct renderer
 
     void UpdateCameraUniforms();
 
-    triangle CreateTriangle();
     texture  CreateTexture(const char* File);
 
-    void DrawTriangle(triangle Triangle);
+    void DrawTexture(texture Texture, vec3 Position, f32 Rotation, f32 Scale);
 
     void UseShader(u32 Shader);
     void ClearScreen(color Color);
