@@ -20,9 +20,9 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
     glViewport(0, 0, ViewportWidth, ViewportHeight);
 
-    // TODO(Jsanchez): Configure blend mode
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // Configure Blend Mode
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glCreateVertexArrays(1, &MainVAO);
     glBindVertexArray(MainVAO);
@@ -44,11 +44,10 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
         float Vertices[] =
         {
-            // positions         // texture coords
-            0.5f,  0.5f, 0.0f,   1.0f, 1.0f,   // top right
-            0.5f, -0.5f, 0.0f,   1.0f, 0.0f,   // bottom right
-            -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,   // bottom left
-            -0.5f,  0.5f, 0.0f,  0.0f, 1.0f    // top left
+            -0.5f,  0.5f, 0.0f,  0.0f, 1.0f, // top left
+            -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, // bottom left
+            0.5f,  0.5f, 0.0f,  1.0f, 1.0f, // top right
+            0.5f, -0.5f, 0.0f,  1.0f, 0.0f  // bottom right
         };
 
 
@@ -183,6 +182,11 @@ void renderer::DrawTexture(texture Texture, vec3 Position, f32 Rotation, f32 Sca
     Model = glm::translate(Model, Position);
 
     glUniformMatrix4fv(ModelMatrixUniformId, 1, GL_FALSE, value_ptr(Model));
+
+    // Texture stuff
+    glBindTextureUnit(0, Texture.Id);
+
+    glUniform1i(glGetUniformLocation(CurrentShader, "Texture"), 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
