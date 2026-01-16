@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "application.h"
+#include "log.h"
 
 extern application Application;
 
@@ -20,6 +21,8 @@ camera CreateCamera()
     Camera.AspectRatio = (f32)Application.WindowWidth / (f32)Application.WindowHeight;
 
     Camera.Projection = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
+
+    Log(Info, "CreateCamera() - Created Camera with default values");
 
     return Camera;
 }
