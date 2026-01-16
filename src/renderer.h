@@ -10,6 +10,7 @@
 #include "typedefs.h"
 
 #include "camera.h"
+#include "texture.h"
 
 #define HOT_PINK color{1.0f, 0.0f, 1.0f, 0.0f}
 #define ORANGE   color{1.0f, 0.647f, 0.0f, 0.0f}
@@ -19,13 +20,6 @@ using namespace glm;
 struct color
 {
     f32 r, g, b, a;
-};
-
-struct texture
-{
-    u32 Id;
-    i32 Width;
-    i32 Height;
 };
 
 struct renderer
@@ -45,8 +39,6 @@ struct renderer
     u32 CompileShader(const char *Filename);
 
     void UpdateCameraUniforms(camera Camera);
-
-    texture  CreateTexture(const char* File);
 
     void DrawTexture(texture Texture, vec3 Position, f32 Rotation, f32 Scale);
 

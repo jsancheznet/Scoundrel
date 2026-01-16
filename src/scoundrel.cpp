@@ -3,6 +3,7 @@
 #include "application.h"
 #include "renderer.h"
 #include "camera.h"
+#include "texture.h"
 
 #include <stdio.h>
 
@@ -27,7 +28,7 @@ i32 main(i32 Argc, char **Argv)
 
     Renderer.UseShader(HelloWorldShader);
 
-    texture AwesomeFace = Renderer.CreateTexture("assets/awesomeface.png");
+    texture AwesomeFace = CreateTexture("assets/awesomeface.png");
 
     camera Camera = CreateCamera();
 

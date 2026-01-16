@@ -18,7 +18,5 @@ struct application
     void CreateWindow(const char *Title, u32 Width, u32 Height);
     void Quit();
 
-    void EndFrame();
-
     void ProcessEvents();
 };
