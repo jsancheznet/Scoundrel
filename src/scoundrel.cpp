@@ -4,6 +4,8 @@
 #include "renderer.h"
 #include "camera.h"
 #include "texture.h"
+#include "keyboard.h"
+#include "mouse.h"
 
 #include <stdio.h>
 
@@ -11,6 +13,8 @@
 
 application Application;
 renderer    Renderer;
+mouse       Mouse;
+keyboard    Keyboard;
 
 i32 main(i32 Argc, char **Argv)
 {
@@ -18,23 +22,46 @@ i32 main(i32 Argc, char **Argv)
 
     Application.CreateWindow("Scoundrel", 1366, 768);
 
+    Keyboard.Init();
+
     Renderer.Init(Application.Window, 1366, 768);
 
     // RECORDATORIO: No irme por las ramas!
 
-    // TODO: Implementar una camara para poder mover y rotar mis texturas
+    // TODO: Mover la camara con las teclas!, Tal vez tenga que implementar input
+
+    // TODO: Implementar un UBO para la camara, meter todo ahi, actualizarlo una vez por frame o cuando la camara cambie
+
+    // Despues de eso podria traer miniaud.io, cargar y reproducir algun sonido
+    // Tambien podria batchear llamadas de drawtexture todas juntas
+    // Podria directamente dibujar una carta!, hacer un modelo de la carta y dibujar eso?
+    // Handle Window/Viewport Resizing correctly, unreal engine client always mantains the aspect ratio when resized, that's easy!
+    // Podria crear un arena allocator "GameInstance" allocator y meter mis globales ahi
 
     u32 HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
 
     Renderer.UseShader(HelloWorldShader);
 
     texture AwesomeFace = CreateTexture("assets/awesomeface.png");
-
     camera Camera = CreateCamera();
 
     while(Application.IsRunning)
     {
         Application.ProcessEvents();
+
+        Mouse.Update();
+        Keyboard.Update();
+
+
+        if(Keyboard.IsPressed(SDL_SCANCODE_A))
+        {
+            Log(Success, "A IS PRESSED!");
+        }
+
+        if(Keyboard.IsReleased(SDL_SCANCODE_A))
+        {
+            Log(Success, "A IS RELEASED!");
+        }
 
         Renderer.ClearScreen(ORANGE);
 

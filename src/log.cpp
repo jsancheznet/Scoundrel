@@ -14,6 +14,11 @@ void Log(log_category Category, const char *Fmt, ...)
         {
             CategoryString = "INFO";
         } break;
+        case Success:
+        {
+            CategoryString = "SUCCESS";
+            Color = "\x1b[32m";
+        } break;
         case Warning:
         {
             CategoryString = "WARNING";

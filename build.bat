@@ -33,6 +33,8 @@ clang-cl /Zi /Od /WX ^
 	 ..\src\renderer.cpp ^
 	 ..\src\camera.cpp ^
 	 ..\src\texture.cpp ^
+	 ..\src\mouse.cpp ^
+	 ..\src\keyboard.cpp ^
 	 ..\libraries\glad\src\glad.c ^
 	 %GLADInclude%  %IncludeDirectories% /link /LIBPATH:"..\libraries\SDL3-3.2.10\build\Debug" -SUBSYSTEM:CONSOLE SDL3.lib
 
