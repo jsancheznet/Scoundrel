@@ -31,7 +31,7 @@ texture CreateTexture(const char* File)
 
     stbi_image_free(ImageData);
 
-    Log(Info, "CreateTexture - Successfully created texture, %s with Id %d", File, Result.Id);
+    Log(Info, "CreateTexture() - Successfully created texture, %s with Id %d", File, Result.Id);
 
     return Result;
 }

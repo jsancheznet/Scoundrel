@@ -2,6 +2,9 @@
 
 #include <cstdint>
 #include <cassert>
+#include <stdlib.h>
+
+#include <SDL3/SDL.h>
 
 typedef uint8_t   u8;
 typedef uint16_t u16;
