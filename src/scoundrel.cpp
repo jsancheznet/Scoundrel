@@ -28,11 +28,12 @@ i32 main(i32 Argc, char **Argv)
 
     // RECORDATORIO: No irme por las ramas!
 
-    // TODO: Mover la camara con las teclas!, Tal vez tenga que implementar input
+    // Despues de eso podria traer miniaud.io, cargar y reproducir algun sonido
 
+    // TODO: Mover la camara con las teclas!
     // TODO: Implementar un UBO para la camara, meter todo ahi, actualizarlo una vez por frame o cuando la camara cambie
 
-    // Despues de eso podria traer miniaud.io, cargar y reproducir algun sonido
+	// TODO: Buscar manera de medir performance, asi puedo ver la diferencia entre batched textures o no
     // Tambien podria batchear llamadas de drawtexture todas juntas
     // Podria directamente dibujar una carta!, hacer un modelo de la carta y dibujar eso?
     // Handle Window/Viewport Resizing correctly, unreal engine client always mantains the aspect ratio when resized, that's easy!
@@ -42,7 +43,7 @@ i32 main(i32 Argc, char **Argv)
 
     Renderer.UseShader(HelloWorldShader);
 
-    texture AwesomeFace = CreateTexture("assets/awesomeface.png");
+    texture AwesomeFace = CreateTexture("assets/Scoundrel-Clubs-2.jpg");
     camera Camera = CreateCamera();
 
     while(Application.IsRunning)
@@ -52,19 +53,8 @@ i32 main(i32 Argc, char **Argv)
         Mouse.Update();
         Keyboard.Update();
 
-
-        if(Keyboard.IsPressed(SDL_SCANCODE_A))
-        {
-            Log(Success, "A IS PRESSED!");
-        }
-
-        if(Keyboard.IsReleased(SDL_SCANCODE_A))
-        {
-            Log(Success, "A IS RELEASED!");
-        }
-
         Renderer.ClearScreen(ORANGE);
-
+a
         Renderer.UpdateCameraUniforms(Camera);
 
         Renderer.DrawTexture(AwesomeFace, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, 1.0f);
