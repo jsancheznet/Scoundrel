@@ -54,7 +54,7 @@ i32 main(i32 Argc, char **Argv)
         Keyboard.Update();
 
         Renderer.ClearScreen(ORANGE);
-a
+
         Renderer.UpdateCameraUniforms(Camera);
 
         Renderer.DrawTexture(AwesomeFace, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, 1.0f);
