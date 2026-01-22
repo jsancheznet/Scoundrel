@@ -13,13 +13,10 @@ set IncludeDirectories= %SDLInclude% %GLADInclude% %GLMInclude% %STBInclude% %JS
 
 echo.
 echo COPYING ASSETS TO BUILD DIRECTORY...
+xcopy /S /E /D /Y "..\assets" "assets\"
 echo.
-
-IF NOT EXIST "assets" MKDIR "assets"
-COPY /Y "..\assets\*.*" "assets\"
-
-IF NOT EXIST "shaders" MKDIR "shaders"
-COPY /Y "..\shaders\*.*" "shaders\"
+echo COPYING SHADERS TO BUILD DIRECTORY...
+xcopy /S /E /D /Y "..\shaders" "shaders\"
 
 echo.
 echo BUILDING...
