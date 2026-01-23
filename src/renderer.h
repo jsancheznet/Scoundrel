@@ -35,6 +35,7 @@ struct renderer
     u32 CurrentShader;
 
     void Init(SDL_Window *SDLWindow, u32 Width, u32 Height);
+    void UpdateViewport(i32 Width, i32 Height);
 
     u32 CompileShader(const char *Filename);
 
@@ -44,7 +45,7 @@ struct renderer
 
     void UseShader(u32 Shader);
     void ClearScreen(color Color);
-    void EndFrame();
+    void SwapBuffers();
 
 
 private:

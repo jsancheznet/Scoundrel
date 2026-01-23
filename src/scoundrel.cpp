@@ -27,11 +27,13 @@ i32 main(i32 Argc, char **Argv)
     Renderer.Init(Application.Window, 1366, 768);
 
     // RECORDATORIO: No irme por las ramas!
-
+    // TODO: Es mas importante actualizar linkedin y el CV
+    // TODO: Aplicar x5 este fin de semana!
     // Reproducir sonidos con SDL, y una cancion de fondo, muy bajita
-
+    // Hacer un resize que mantenga el aspect ratio
     // TODO: Implementar un UBO para la camara, meter todo ahi, actualizarlo una vez por frame o cuando la camara cambie
-
+    // TODO: Dibujar una carta con sus dimensiones correctas
+    // TODO: Redondear los bordes de la carta, podria hacer un modelo con doble cara y bordes redondeados
 	// TODO: Buscar manera de medir performance, asi puedo ver la diferencia entre batched textures o no
     // Tambien podria batchear llamadas de drawtexture todas juntas
     // Podria directamente dibujar una carta!, hacer un modelo de la carta y dibujar eso?
@@ -47,6 +49,8 @@ i32 main(i32 Argc, char **Argv)
 
     while(Application.IsRunning)
     {
+        Application.BeginFrame();
+
         Application.ProcessEvents();
 
         Mouse.Update();
@@ -66,12 +70,11 @@ i32 main(i32 Argc, char **Argv)
         }
 
         Renderer.ClearScreen(ORANGE);
-
         Renderer.UpdateCamera(Camera);
-
         Renderer.DrawTexture(AwesomeFace, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, 1.0f);
+        Renderer.SwapBuffers();
 
-        Renderer.EndFrame();
+        Application.EndFrame();
     }
 
     Application.Quit();
