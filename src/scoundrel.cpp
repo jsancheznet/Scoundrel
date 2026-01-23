@@ -28,9 +28,8 @@ i32 main(i32 Argc, char **Argv)
 
     // RECORDATORIO: No irme por las ramas!
 
-    // Despues de eso podria traer miniaud.io, cargar y reproducir algun sonido
+    // Reproducir sonidos con SDL, y una cancion de fondo, muy bajita
 
-    // TODO: Mover la camara con las teclas!
     // TODO: Implementar un UBO para la camara, meter todo ahi, actualizarlo una vez por frame o cuando la camara cambie
 
 	// TODO: Buscar manera de medir performance, asi puedo ver la diferencia entre batched textures o no
@@ -43,7 +42,7 @@ i32 main(i32 Argc, char **Argv)
 
     Renderer.UseShader(HelloWorldShader);
 
-    texture AwesomeFace = CreateTexture("assets/Scoundrel-Clubs-2.jpg");
+    texture AwesomeFace = CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
     camera Camera = CreateCamera();
 
     while(Application.IsRunning)
@@ -53,9 +52,22 @@ i32 main(i32 Argc, char **Argv)
         Mouse.Update();
         Keyboard.Update();
 
+        if(Keyboard.IsPressed(SDL_SCANCODE_D))
+        {
+            Camera.Position.x += 0.1f;
+        }
+        if(Keyboard.IsPressed(SDL_SCANCODE_A))
+        {
+            Camera.Position.x -= 0.1f;
+        }
+        if(Keyboard.IsPressed(SDL_SCANCODE_SPACE))
+        {
+            Camera.Position.x = 0.0f;
+        }
+
         Renderer.ClearScreen(ORANGE);
 
-        Renderer.UpdateCameraUniforms(Camera);
+        Renderer.UpdateCamera(Camera);
 
         Renderer.DrawTexture(AwesomeFace, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, 1.0f);
 
