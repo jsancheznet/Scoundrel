@@ -8,7 +8,16 @@
 
 texture CreateTexture(const char* File)
 {
-    texture Result;
+    Assert(File);
+
+    texture Result = {};
+
+    b32 FileExists = SDL_GetPathInfo(File, NULL);
+    if(!FileExists)
+    {
+        Log(Error, "CreateTexture(%s), File does not exist!", File);
+        return Result;
+    }
 
     i32 ChannelCount;
 

@@ -19,7 +19,6 @@ camera CreateCamera()
     Camera.Far = 1000.0f;
 
     Camera.AspectRatio = (f32)Application.WindowWidth / (f32)Application.WindowHeight;
-
     Camera.Projection = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
 
     Log(Info, "CreateCamera() - Created Camera with default values");

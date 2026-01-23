@@ -38,7 +38,7 @@ struct renderer
 
     u32 CompileShader(const char *Filename);
 
-    void UpdateCameraUniforms(camera Camera);
+    void UpdateCamera(camera Camera);
 
     void DrawTexture(texture Texture, vec3 Position, f32 Rotation, f32 Scale);
 

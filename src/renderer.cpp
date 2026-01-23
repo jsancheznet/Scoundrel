@@ -156,8 +156,11 @@ void renderer::UseShader(u32 Shader)
     glUseProgram(Shader);
 }
 
-void renderer::UpdateCameraUniforms(camera Camera)
+void renderer::UpdateCamera(camera Camera)
 {
+    Camera.View = glm::lookAt(Camera.Position, Camera.Target, Camera.Up);
+    Camera.Projection = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
+
     u32 ViewId = glGetUniformLocation(CurrentShader, "View");
     glUniformMatrix4fv(ViewId, 1, GL_FALSE, value_ptr(Camera.View));
 
