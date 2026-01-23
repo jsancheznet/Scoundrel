@@ -31,6 +31,14 @@ void application::CreateWindow(const char *Title, u32 Width, u32 Height)
     WindowHeight = Height;
 
     Log(Info, "application::CreateWindow() - Created Window, Width: %d, Height: %d", Width, Height);
+
+    // Disable Vsync
+    i32 Interval = 1;
+    bool VSyncConfigured = SDL_GL_SetSwapInterval(Interval);
+    if(!VSyncConfigured)
+    {
+        Log(Error, "application::Init - Failed to configure Vsync, SDL_GL_SetSwapInterval(%d), %s", Interval, SDL_GetError());
+    }
 }
 
 void application::Quit()
@@ -48,17 +56,40 @@ void application::ProcessEvents()
             case SDL_EVENT_QUIT:
             {
                 IsRunning = false;
-                break;
-            }
+            } break;
             case SDL_EVENT_KEY_DOWN:
             {
                 if(Event.key.key == SDLK_ESCAPE)
                 {
                     IsRunning = false;
                 }
-
-                break;
-            }
+            } break;
+            case SDL_EVENT_WINDOW_RESIZED:
+            {
+                i32 Width = Event.window.data1;
+                i32 Height = Event.window.data2;
+                Renderer.UpdateViewport(Width, Height);
+                Log(Info, "Window Resized, Width: %d, Height %d", Width, Height);
+            } break;
+            default:
+            {
+            } break;
         }
     }
+}
+
+
+void application::BeginFrame()
+{
+    FrameBeginTime = SDL_GetPerformanceCounter();
+
+    // char TitleBuffer[1024];
+    // snprintf(TitleBuffer, sizeof(TitleBuffer), "Scoundrel - FPS: %d", (u32)(1.0f / DeltaTime));
+    // SDL_SetWindowTitle(Window, (const char*)&TitleBuffer);
+}
+
+void application::EndFrame()
+{
+    FrameEndTime = SDL_GetPerformanceCounter();
+    DeltaTime = ((f64)FrameEndTime - (f64)FrameBeginTime) / (f64)SDL_GetPerformanceFrequency();
 }

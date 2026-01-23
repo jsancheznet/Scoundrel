@@ -57,13 +57,20 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
     }
 }
 
+void renderer::UpdateViewport(i32 Width, i32 Height)
+{
+    ViewportWidth = Width;
+    ViewportHeight = Height;
+    glViewport(0, 0, Width, Height);
+}
+
 void renderer::ClearScreen(color Color)
 {
     glClearColor(Color.r, Color.g, Color.b, Color.a);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void renderer::EndFrame()
+void renderer::SwapBuffers()
 {
     SDL_GL_SwapWindow(Window);
 }
