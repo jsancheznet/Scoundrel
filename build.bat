@@ -15,6 +15,7 @@ echo.
 echo COPYING ASSETS TO BUILD DIRECTORY...
 xcopy /S /E /D /Y "..\assets" "assets\"
 echo.
+
 echo COPYING SHADERS TO BUILD DIRECTORY...
 xcopy /S /E /D /Y "..\shaders" "shaders\"
 
@@ -32,6 +33,7 @@ clang-cl /Zi /Od /WX ^
 	 ..\src\texture.cpp ^
 	 ..\src\mouse.cpp ^
 	 ..\src\keyboard.cpp ^
+	 ..\src\audio.cpp ^
 	 ..\libraries\glad\src\glad.c ^
 	 %GLADInclude%  %IncludeDirectories% /link /LIBPATH:"..\libraries\SDL3-3.2.10\build\Debug" -SUBSYSTEM:CONSOLE SDL3.lib
 
