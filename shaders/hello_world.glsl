@@ -3,15 +3,20 @@
 layout (location = 0) in vec3 Position;
 layout (location = 1) in vec2 UV;
 
+layout (std140, binding = 50) uniform CameraMatrices
+{
+    mat4 Perspective;
+    mat4 Orthographic;
+    mat4 View;
+};
+
 uniform mat4 Model;
-uniform mat4 View;
-uniform mat4 Projection;
 
 out vec2 Uv;
 
 void main()
 {
-    gl_Position =  Projection * View * Model * vec4(Position, 1.0);
+    gl_Position =  Perspective * View * Model * vec4(Position, 1.0);
     Uv = UV;
 }
 

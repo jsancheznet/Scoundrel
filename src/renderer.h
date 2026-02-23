@@ -32,6 +32,8 @@ struct renderer
 
     u32 QuadVBO;
 
+    u32 CameraUBO;
+
     u32 CurrentShader;
 
     void Init(SDL_Window *SDLWindow, u32 Width, u32 Height);

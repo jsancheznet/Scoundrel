@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "renderer.h"
+#include "log.h"
 
 void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 {
@@ -9,6 +10,11 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
     ViewportHeight = Height;
 
     gladLoadGL();
+
+    // Log OpenGL info
+    i32 MaxUniformBufferBindings = -1;
+    glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &MaxUniformBufferBindings);
+    Log(Info, "OpenGL Max Uniform Buffer Bindings: %d", MaxUniformBufferBindings);
 
     // Enable Debug Mode
     glEnable(GL_DEBUG_OUTPUT);
@@ -54,6 +60,15 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
         glEnableVertexArrayAttrib(MainVAO, 1);
         glVertexArrayAttribFormat(MainVAO, 1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 3);
         glVertexArrayAttribBinding(MainVAO, 1, 0);
+    }
+
+    { // Camera UBO setup
+
+        // Create the Camera UBO and bind it to index 50
+
+        glCreateBuffers(1, &CameraUBO);
+        glNamedBufferData(CameraUBO, sizeof(glm::mat4) * 3, nullptr, GL_DYNAMIC_DRAW);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 50, CameraUBO);
     }
 }
 
@@ -168,11 +183,12 @@ void renderer::UpdateCamera(camera Camera)
     Camera.View = glm::lookAt(Camera.Position, Camera.Target, Camera.Up);
     Camera.Projection = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
 
-    u32 ViewId = glGetUniformLocation(CurrentShader, "View");
-    glUniformMatrix4fv(ViewId, 1, GL_FALSE, value_ptr(Camera.View));
+    glNamedBufferSubData(CameraUBO, 0                    , sizeof(glm::mat4), glm::value_ptr(Camera.Projection));
 
-    u32 ProjectionId = glGetUniformLocation(CurrentShader, "Projection");
-    glUniformMatrix4fv(ProjectionId, 1, GL_FALSE, value_ptr(Camera.Projection));
+    // TODO(Jsanchez): Create and upload the orthographic projection
+    // glNamedBufferSubData(CameraUBO, sizeof(glm::mat4)    , sizeof(glm::mat4), glm::value_ptr(Camera.Projection));
+
+    glNamedBufferSubData(CameraUBO, sizeof(glm::mat4) * 2, sizeof(glm::mat4), glm::value_ptr(Camera.View));
 }
 
 void renderer::DebugCallback(GLenum Source, GLenum Type, GLuint Id,  GLenum Severity, GLsizei Length, GLchar const *Message, void const *UserParam)

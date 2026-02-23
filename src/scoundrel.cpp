@@ -2,19 +2,21 @@
 #include "log.h"
 #include "application.h"
 #include "renderer.h"
-#include "camera.h"
-#include "texture.h"
+#include "audio.h"
 #include "keyboard.h"
 #include "mouse.h"
+#include "camera.h"
+#include "texture.h"
 
 #include <stdio.h>
 
 #include <SDL3/SDL.h>
 
-application Application;
-renderer    Renderer;
-mouse       Mouse;
-keyboard    Keyboard;
+application  Application;
+renderer     Renderer;
+mouse        Mouse;
+keyboard     Keyboard;
+audio_system Audio;
 
 i32 main(i32 Argc, char **Argv)
 {
@@ -27,25 +29,32 @@ i32 main(i32 Argc, char **Argv)
     Renderer.Init(Application.Window, 1366, 768);
 
     // RECORDATORIO: No irme por las ramas!
-    // TODO: Es mas importante actualizar linkedin y el CV
-    // TODO: Aplicar x5 este fin de semana!
+
     // Reproducir sonidos con SDL, y una cancion de fondo, muy bajita
-    // Hacer un resize que mantenga el aspect ratio
-    // TODO: Implementar un UBO para la camara, meter todo ahi, actualizarlo una vez por frame o cuando la camara cambie
+    //    - SDL_OpenAudioDevice() es la primera funcion que debo usar
+
+    // TODO: Leer la parte de UBO's
+    //     - https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
+    //     - https://wikis.khronos.org/opengl/Uniform_Buffer_Object
+    //     - Subir las matrices de la camara al UBO
+
     // TODO: Dibujar una carta con sus dimensiones correctas
     // TODO: Redondear los bordes de la carta, podria hacer un modelo con doble cara y bordes redondeados
 	// TODO: Buscar manera de medir performance, asi puedo ver la diferencia entre batched textures o no
+    // TODO: Dibujar 100000 cartas en diferentes ubicaciones
     // Tambien podria batchear llamadas de drawtexture todas juntas
     // Podria directamente dibujar una carta!, hacer un modelo de la carta y dibujar eso?
-    // Handle Window/Viewport Resizing correctly, unreal engine client always mantains the aspect ratio when resized, that's easy!
     // Podria crear un arena allocator "GameInstance" allocator y meter mis globales ahi
 
     u32 HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
-
-    Renderer.UseShader(HelloWorldShader);
-
     texture AwesomeFace = CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
     camera Camera = CreateCamera();
+
+    Audio.Init();
+    Audio.SetVolume(1.0f);
+    sound MyTestSound = CreateSound("assets/Sounds/music.wav");
+
+    Renderer.UseShader(HelloWorldShader);
 
     while(Application.IsRunning)
     {
@@ -68,6 +77,11 @@ i32 main(i32 Argc, char **Argv)
         {
             Camera.Position.x = 0.0f;
         }
+
+        // if(Keyboard.IsPressed(SDL_SCANCODE_A))
+        // {
+        //     Audio.PlaySound(MyTestSound);
+        // }
 
         Renderer.ClearScreen(ORANGE);
         Renderer.UpdateCamera(Camera);
