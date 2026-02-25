@@ -34,13 +34,15 @@ struct renderer
     u32 ViewportWidth;
     u32 ViewportHeight;
 
+    // Buffers
     u32 MainVAO;
-
     u32 SpritesVBO;
-
     u32 CameraUBO;
 
+    // Shaders
     u32 CurrentShader;
+
+    std::vector<vertex> BatchedVertices;
 
     void Init(SDL_Window *SDLWindow, u32 Width, u32 Height);
     void UpdateViewport(i32 Width, i32 Height);

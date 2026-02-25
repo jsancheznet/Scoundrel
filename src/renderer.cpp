@@ -32,11 +32,14 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
     CurrentShader = 0;
 
-    { // Upload Quad Data
+    { // Create VBO that will hold the Sprites Vertices
+
+        i32 AllocationSize = sizeof(vertex) * 4000;
 
         // Create and allocate Buffer Storage
         glCreateBuffers(1, &SpritesVBO);
-        glNamedBufferStorage(SpritesVBO, sizeof(vertex) * 100, NULL, GL_DYNAMIC_STORAGE_BIT);
+        glNamedBufferStorage(SpritesVBO, AllocationSize, NULL, GL_DYNAMIC_STORAGE_BIT);
+        Log(Info, "OPENGL, Allocating %d bytes to SpritesVBO", AllocationSize);
 
         // Bind the recently created VBO to binding point 0
         u32 BindingPoint = 0;
@@ -159,15 +162,20 @@ void renderer::DrawTexture(texture Texture, vec3 Position, f32 Rotation, f32 Sca
 
     float Vertices[] =
     {
-        -0.5f,  0.5f, 0.0f,  0.0f, 1.0f, // top left
-        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, // bottom left
-        0.5f,  0.5f, 0.0f,  1.0f, 1.0f, // top right
-        0.5f, -0.5f, 0.0f,  1.0f, 0.0f  // bottom right
+        // First Triangle
+        0.5f,  0.5f, 0.0f, 1.0f, 1.0f,  // top right
+        0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  // bottom right
+        -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, // top left
+
+        // Second Triangle
+        0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f, 0.0f, 1.0f  // top left
     };
 
     glNamedBufferSubData(SpritesVBO, 0, sizeof(Vertices), Vertices);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 
