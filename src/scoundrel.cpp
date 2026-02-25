@@ -29,7 +29,6 @@ i32 main(i32 Argc, char **Argv)
     Renderer.Init(Application.Window, 1366, 768);
 
     // RECORDATORIO: No irme por las ramas!
-
     // Reproducir sonidos con SDL, y una cancion de fondo, muy bajita
     //    - SDL_OpenAudioDevice() es la primera funcion que debo usar
     // TODO: Dibujar una carta con sus dimensiones correctas
