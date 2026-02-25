@@ -34,22 +34,13 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
     { // Upload Quad Data
 
-        float Vertices[] =
-        {
-            -0.5f,  0.5f, 0.0f,  0.0f, 1.0f, // top left
-            -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, // bottom left
-            0.5f,  0.5f, 0.0f,  1.0f, 1.0f, // top right
-            0.5f, -0.5f, 0.0f,  1.0f, 0.0f  // bottom right
-        };
-
-
         // Create and allocate Buffer Storage
-        glCreateBuffers(1, &QuadVBO);
-        glNamedBufferStorage(QuadVBO, sizeof(Vertices), Vertices, GL_DYNAMIC_STORAGE_BIT);
+        glCreateBuffers(1, &SpritesVBO);
+        glNamedBufferStorage(SpritesVBO, sizeof(vertex) * 100, NULL, GL_DYNAMIC_STORAGE_BIT);
 
         // Bind the recently created VBO to binding point 0
         u32 BindingPoint = 0;
-        glVertexArrayVertexBuffer(MainVAO, BindingPoint, QuadVBO, 0, sizeof(f32) * 5); // 5 floats
+        glVertexArrayVertexBuffer(MainVAO, BindingPoint, SpritesVBO, 0, sizeof(f32) * 5); // 5 floats
 
         // Vertex Attribute - Configure Vertex Attribute 0 (Position) from the interleaved buffer data
         glEnableVertexArrayAttrib(MainVAO, 0);
@@ -63,8 +54,6 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
     }
 
     { // Camera UBO setup
-
-        // Create the Camera UBO and bind it to index 50
 
         glCreateBuffers(1, &CameraUBO);
         glNamedBufferData(CameraUBO, sizeof(glm::mat4) * 3, nullptr, GL_DYNAMIC_DRAW);
@@ -168,6 +157,16 @@ void renderer::DrawTexture(texture Texture, vec3 Position, f32 Rotation, f32 Sca
 
     glUniform1i(glGetUniformLocation(CurrentShader, "Texture"), 0);
 
+    float Vertices[] =
+    {
+        -0.5f,  0.5f, 0.0f,  0.0f, 1.0f, // top left
+        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, // bottom left
+        0.5f,  0.5f, 0.0f,  1.0f, 1.0f, // top right
+        0.5f, -0.5f, 0.0f,  1.0f, 0.0f  // bottom right
+    };
+
+    glNamedBufferSubData(SpritesVBO, 0, sizeof(Vertices), Vertices);
+
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
@@ -184,10 +183,6 @@ void renderer::UpdateCamera(camera Camera)
     Camera.Projection = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
 
     glNamedBufferSubData(CameraUBO, 0                    , sizeof(glm::mat4), glm::value_ptr(Camera.Projection));
-
-    // TODO(Jsanchez): Create and upload the orthographic projection
-    // glNamedBufferSubData(CameraUBO, sizeof(glm::mat4)    , sizeof(glm::mat4), glm::value_ptr(Camera.Projection));
-
     glNamedBufferSubData(CameraUBO, sizeof(glm::mat4) * 2, sizeof(glm::mat4), glm::value_ptr(Camera.View));
 }
 
