@@ -22,6 +22,12 @@ struct color
     f32 r, g, b, a;
 };
 
+struct vertex
+{
+    vec3 Position;
+    vec2 Uv;
+};
+
 struct renderer
 {
     SDL_Window* Window;
@@ -30,7 +36,7 @@ struct renderer
 
     u32 MainVAO;
 
-    u32 QuadVBO;
+    u32 SpritesVBO;
 
     u32 CameraUBO;
 

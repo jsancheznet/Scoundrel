@@ -32,12 +32,6 @@ i32 main(i32 Argc, char **Argv)
 
     // Reproducir sonidos con SDL, y una cancion de fondo, muy bajita
     //    - SDL_OpenAudioDevice() es la primera funcion que debo usar
-
-    // TODO: Leer la parte de UBO's
-    //     - https://learnopengl.com/Advanced-OpenGL/Advanced-GLSL
-    //     - https://wikis.khronos.org/opengl/Uniform_Buffer_Object
-    //     - Subir las matrices de la camara al UBO
-
     // TODO: Dibujar una carta con sus dimensiones correctas
     // TODO: Redondear los bordes de la carta, podria hacer un modelo con doble cara y bordes redondeados
 	// TODO: Buscar manera de medir performance, asi puedo ver la diferencia entre batched textures o no
