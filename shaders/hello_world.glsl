@@ -1,7 +1,11 @@
 #ifdef VERTEX_SHADER
 
-layout (location = 0) in vec3 Position;
+layout (location = 0) in vec3 Position; // TODO(Jsanchez): Rename this variable to VertexLocalPosition
 layout (location = 1) in vec2 UV;
+
+layout(location = 2) in vec3 WorldPosition;
+layout(location = 3) in vec3 Scale;
+layout(location = 4) in float Rotation;
 
 layout (std140, binding = 50) uniform CameraMatrices
 {

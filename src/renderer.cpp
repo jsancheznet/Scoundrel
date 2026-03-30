@@ -32,18 +32,25 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
     CurrentShader = 0;
 
-    { // Create VBO that will hold the Sprites Vertices
+    { // Create the quad mesh
 
-        i32 AllocationSize = sizeof(vertex) * 4000;
+        float Vertices[] =
+        {
+            // x     y     z      u     v
+            -0.5f, -0.5f, 0.0f,  0.0f,  0.0f,  // bottom-left
+            0.5f, -0.5f, 0.0f,  1.0f,  0.0f,  // bottom-right
+            0.5f,  0.5f, 0.0f,  1.0f,  1.0f,  // top-right
+            -0.5f,  0.5f, 0.0f,  0.0f,  1.0f   // top-left
+        };
 
         // Create and allocate Buffer Storage
-        glCreateBuffers(1, &SpritesVBO);
-        glNamedBufferStorage(SpritesVBO, AllocationSize, NULL, GL_DYNAMIC_STORAGE_BIT);
-        Log(Info, "OPENGL, Allocating %d bytes to SpritesVBO", AllocationSize);
+        glCreateBuffers(1, &QuadVBO);
+        glNamedBufferStorage(QuadVBO, sizeof(Vertices), Vertices, GL_DYNAMIC_STORAGE_BIT);
+        Log(Info, "OPENGL, Allocating %d bytes to QuadVBO", sizeof(Vertices));
 
         // Bind the recently created VBO to binding point 0
         u32 BindingPoint = 0;
-        glVertexArrayVertexBuffer(MainVAO, BindingPoint, SpritesVBO, 0, sizeof(f32) * 5); // 5 floats
+        glVertexArrayVertexBuffer(MainVAO, BindingPoint, QuadVBO, 0, sizeof(f32) * 5); // 5 floats
 
         // Vertex Attribute - Configure Vertex Attribute 0 (Position) from the interleaved buffer data
         glEnableVertexArrayAttrib(MainVAO, 0);
@@ -54,6 +61,34 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
         glEnableVertexArrayAttrib(MainVAO, 1);
         glVertexArrayAttribFormat(MainVAO, 1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 3);
         glVertexArrayAttribBinding(MainVAO, 1, 0);
+    }
+
+    { // CardsVBO
+
+        glCreateBuffers(1, &CardsVBO);
+        u32 BufferSize = sizeof(instance_data) * 10000;
+        glNamedBufferStorage(CardsVBO, BufferSize, NULL, GL_DYNAMIC_STORAGE_BIT);
+        Log(Info, "OPENGL, Allocating %d bytes to CardsVBO", BufferSize);
+
+        u32 BindingPoint = 3;
+        glVertexArrayVertexBuffer(MainVAO, BindingPoint, CardsVBO, 0, sizeof(instance_data));
+
+        // Position
+        glEnableVertexArrayAttrib(MainVAO, 2);
+        glVertexArrayAttribFormat(MainVAO, 2, 3, GL_FLOAT, GL_FALSE, 0);
+        glVertexArrayAttribBinding(MainVAO, 2, BindingPoint);
+
+        // Scale
+        glEnableVertexArrayAttrib(MainVAO, 3);
+        glVertexArrayAttribFormat(MainVAO, 3, 3, GL_FLOAT, GL_FALSE, offsetof(instance_data, Scale));
+        glVertexArrayAttribBinding(MainVAO, 3, BindingPoint);
+
+        // Rotation
+        glEnableVertexArrayAttrib(MainVAO, 4);
+        glVertexArrayAttribFormat(MainVAO, 4, 1, GL_FLOAT, GL_FALSE, offsetof(instance_data, Rotation));
+        glVertexArrayAttribBinding(MainVAO, 4, BindingPoint);
+
+        glVertexArrayBindingDivisor(MainVAO, 3, 1);
     }
 
     { // Camera UBO setup
@@ -77,12 +112,13 @@ void renderer::ClearScreen(color Color)
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void renderer::SwapBuffers()
+void renderer::EndFrame()
 {
+    DrawSpriteCount = 0;
     SDL_GL_SwapWindow(Window);
 }
 
-u32 renderer::CompileShader(const char *Filename)
+u32 renderer::CompileShader(const char *Filename) //
 {
     Assert(Filename);
 
@@ -142,40 +178,49 @@ u32 renderer::CompileShader(const char *Filename)
     return CompiledShader;
 }
 
-void renderer::DrawTexture(texture Texture, vec3 Position, f32 Rotation, f32 Scale)
+void renderer::DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation)
 {
-    u32 ModelMatrixUniformId = glGetUniformLocation(CurrentShader, "Model");
+    // Texture stuff
+    glBindTextureUnit(0, Texture.Id); // TODO(Jsanchez): Do i need to bind the texture here?
+    glUniform1i(glGetUniformLocation(CurrentShader, "Texture"), 0);
+
+    {
+        instance_data SpriteInstanceData = {};
+
+        SpriteInstanceData.Position = Position;
+        SpriteInstanceData.Scale = glm::vec3(Scale);
+        SpriteInstanceData.Rotation = Rotation;
+
+        u32 Offset = sizeof(instance_data) * DrawSpriteCount;
+
+        glNamedBufferSubData(CardsVBO, Offset, sizeof(instance_data), &SpriteInstanceData);
+
+        DrawSpriteCount++;
+    }
+
+
+    glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, DrawSpriteCount);
+}
+
+void renderer::DrawTextureSlow(texture Texture, vec3 Position, f32 Scale, f32 Rotation)
+{
+    // Create Model Matrix
+    i32 ModelMatrixUniformId = glGetUniformLocation(CurrentShader, "Model");
+    GLenum Error = glGetError();
 
     mat4 Model = glm::mat4(1.0f);
-
-    Model = glm::scale(Model, glm::vec3(Scale));
     vec3 RotationAxis = glm::vec3(0.0f, 0.0f, 1.0f);
-    Model = glm::rotate(Model, Rotation, RotationAxis);
     Model = glm::translate(Model, Position);
+    Model = glm::rotate(Model, glm::radians(Rotation), RotationAxis);
+    Model = glm::scale(Model, glm::vec3(Scale));
 
     glUniformMatrix4fv(ModelMatrixUniformId, 1, GL_FALSE, value_ptr(Model));
 
     // Texture stuff
-    glBindTextureUnit(0, Texture.Id);
-
+    glBindTextureUnit(0, Texture.Id); // TODO(Jsanchez): Do i need to bind the texture everytime i call draw? Maybe i could do it once when using shader
     glUniform1i(glGetUniformLocation(CurrentShader, "Texture"), 0);
 
-    float Vertices[] =
-    {
-        // First Triangle
-        0.5f,  0.5f, 0.0f, 1.0f, 1.0f,  // top right
-        0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  // bottom right
-        -0.5f,  0.5f, 0.0f, 0.0f, 1.0f, // top left
-
-        // Second Triangle
-        0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
-        -0.5f,  0.5f, 0.0f, 0.0f, 1.0f  // top left
-    };
-
-    glNamedBufferSubData(SpritesVBO, 0, sizeof(Vertices), Vertices);
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
 

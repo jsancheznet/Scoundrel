@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
 
@@ -22,10 +24,11 @@ struct color
     f32 r, g, b, a;
 };
 
-struct vertex
+struct instance_data
 {
-    vec3 Position;
-    vec2 Uv;
+    glm::vec3 Position;
+    glm::vec3 Scale;
+    f32 Rotation;
 };
 
 struct renderer
@@ -36,13 +39,14 @@ struct renderer
 
     // Buffers
     u32 MainVAO;
-    u32 SpritesVBO;
+    u32 QuadVBO;
+    u32 CardsVBO;
     u32 CameraUBO;
 
     // Shaders
     u32 CurrentShader;
 
-    std::vector<vertex> BatchedVertices;
+    u32 DrawSpriteCount;
 
     void Init(SDL_Window *SDLWindow, u32 Width, u32 Height);
     void UpdateViewport(i32 Width, i32 Height);
@@ -51,11 +55,12 @@ struct renderer
 
     void UpdateCamera(camera Camera);
 
-    void DrawTexture(texture Texture, vec3 Position, f32 Rotation, f32 Scale);
+    void DrawTextureSlow(texture Texture, vec3 Position, f32 Scale, f32 Rotation);
+    void DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation);
 
     void UseShader(u32 Shader);
     void ClearScreen(color Color);
-    void SwapBuffers();
+    void EndFrame();
 
 
 private:

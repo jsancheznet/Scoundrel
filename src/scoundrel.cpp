@@ -28,7 +28,19 @@ i32 main(i32 Argc, char **Argv)
 
     Renderer.Init(Application.Window, 1366, 768);
 
+    // Plan Renderer
+    //
+    // - Usar instancing, no transformar vertices en CPU, no mandar datos como posicion, etc.. como vertex attribute
+    //
+    // - Crear un VBO para las instancias, en este vbo subir la model matrix, position, rotation, scale
+    // - Usar glVertexAttribDiviros para los atributos de instancias y dibujar con glDrawArraysInstance
+    // - Subir una model matrix y lo que se precise para dibujar una sola textura, asegurarme que funciona
+    // - Modificar el codigo para que se puedan dibujar dos
+    // - Una vez que se puedan dibujar muchas, pensar en como hacer para que DrawTexture en vez de llamar a opengl draw command, meta la data necesaria en un buffer
+
+
     // RECORDATORIO: No irme por las ramas!
+
     // Reproducir sonidos con SDL, y una cancion de fondo, muy bajita
     //    - SDL_OpenAudioDevice() es la primera funcion que debo usar
     // TODO: Dibujar una carta con sus dimensiones correctas
@@ -60,11 +72,11 @@ i32 main(i32 Argc, char **Argv)
 
         if(Keyboard.IsPressed(SDL_SCANCODE_D))
         {
-            Camera.Position.x += 0.1f;
+            Camera.Position.x += 0.05f;
         }
         if(Keyboard.IsPressed(SDL_SCANCODE_A))
         {
-            Camera.Position.x -= 0.1f;
+            Camera.Position.x -= 0.05f;
         }
         if(Keyboard.IsPressed(SDL_SCANCODE_SPACE))
         {
@@ -78,8 +90,11 @@ i32 main(i32 Argc, char **Argv)
 
         Renderer.ClearScreen(ORANGE);
         Renderer.UpdateCamera(Camera);
-        Renderer.DrawTexture(AwesomeFace, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, 1.0f);
-        Renderer.SwapBuffers();
+        Renderer.DrawTextureSlow(AwesomeFace, glm::vec3(0.5f, 0.0f, 0.f), 1.0f, 45.0f);
+        Renderer.DrawTextureSlow(AwesomeFace, glm::vec3(-0.5f, 0.0f, 0.f), 1.0f, 0.785398f);
+        // Renderer.DrawTextureSlow(AwesomeFace, glm::vec3(0.3f, 0.0f, 0.f), 1.0f, 0.0f);
+        // Renderer.DrawTextureSlow(AwesomeFace, glm::vec3(0.6f, 0.0f, 0.f), 1.0f, 0.0f);
+        Renderer.EndFrame();
 
         Application.EndFrame();
     }
