@@ -18,4 +18,6 @@ typedef float    f32;
 typedef double   f64;
 typedef i32      b32;
 
+typedef u32 shader;
+
 #define Assert(Expr) assert(Expr)

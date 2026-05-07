@@ -24,7 +24,7 @@ struct color
     f32 r, g, b, a;
 };
 
-struct instance_data
+struct sprite_instance
 {
     glm::vec3 Position;
     glm::vec3 Scale;
@@ -37,7 +37,7 @@ struct renderer
     u32 ViewportWidth;
     u32 ViewportHeight;
 
-    // Buffers
+    // GL Buffers
     u32 MainVAO;
     u32 QuadVBO;
     u32 CardsVBO;
@@ -46,12 +46,14 @@ struct renderer
     // Shaders
     u32 CurrentShader;
 
+    texture MainTexture;
+
     u32 DrawSpriteCount;
 
     void Init(SDL_Window *SDLWindow, u32 Width, u32 Height);
     void UpdateViewport(i32 Width, i32 Height);
 
-    u32 CompileShader(const char *Filename);
+    shader CompileShader(const char *Filename);
 
     void UpdateCamera(camera Camera);
 

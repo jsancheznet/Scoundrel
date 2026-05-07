@@ -7,6 +7,7 @@
 #include "mouse.h"
 #include "camera.h"
 #include "texture.h"
+#include "random.h"
 
 #include <stdio.h>
 
@@ -28,18 +29,13 @@ i32 main(i32 Argc, char **Argv)
 
     Renderer.Init(Application.Window, 1366, 768);
 
-    // Plan Renderer
-    //
-    // - Usar instancing, no transformar vertices en CPU, no mandar datos como posicion, etc.. como vertex attribute
-    //
-    // - Crear un VBO para las instancias, en este vbo subir la model matrix, position, rotation, scale
-    // - Usar glVertexAttribDiviros para los atributos de instancias y dibujar con glDrawArraysInstance
-    // - Subir una model matrix y lo que se precise para dibujar una sola textura, asegurarme que funciona
-    // - Modificar el codigo para que se puedan dibujar dos
-    // - Una vez que se puedan dibujar muchas, pensar en como hacer para que DrawTexture en vez de llamar a opengl draw command, meta la data necesaria en un buffer
-
+    Audio.Init();
+    Audio.SetVolume(1.0f);
 
     // RECORDATORIO: No irme por las ramas!
+
+    // TODO: Do Claude suggested fixes and fix GL Error in logs
+    // TODO: Draw 10000 cards and check performance, is instancing doing anything at all?
 
     // Reproducir sonidos con SDL, y una cancion de fondo, muy bajita
     //    - SDL_OpenAudioDevice() es la primera funcion que debo usar
@@ -51,13 +47,16 @@ i32 main(i32 Argc, char **Argv)
     // Podria directamente dibujar una carta!, hacer un modelo de la carta y dibujar eso?
     // Podria crear un arena allocator "GameInstance" allocator y meter mis globales ahi
 
-    u32 HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
+
+    shader HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
     texture AwesomeFace = CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
+
+    Renderer.MainTexture = CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
+
     camera Camera = CreateCamera();
 
-    Audio.Init();
-    Audio.SetVolume(1.0f);
     sound MyTestSound = CreateSound("assets/Sounds/music.wav");
+
 
     Renderer.UseShader(HelloWorldShader);
 
@@ -83,19 +82,29 @@ i32 main(i32 Argc, char **Argv)
             Camera.Position.x = 0.0f;
         }
 
-        // if(Keyboard.IsPressed(SDL_SCANCODE_A))
-        // {
-        //     Audio.PlaySound(MyTestSound);
-        // }
-
         Renderer.ClearScreen(ORANGE);
         Renderer.UpdateCamera(Camera);
-        Renderer.DrawTextureSlow(AwesomeFace, glm::vec3(0.5f, 0.0f, 0.f), 1.0f, 45.0f);
-        Renderer.DrawTextureSlow(AwesomeFace, glm::vec3(-0.5f, 0.0f, 0.f), 1.0f, 0.785398f);
-        // Renderer.DrawTextureSlow(AwesomeFace, glm::vec3(0.3f, 0.0f, 0.f), 1.0f, 0.0f);
-        // Renderer.DrawTextureSlow(AwesomeFace, glm::vec3(0.6f, 0.0f, 0.f), 1.0f, 0.0f);
-        Renderer.EndFrame();
 
+        Renderer.DrawTexture(AwesomeFace, glm::vec3(0.5f, 0.0f, 0.f), 1.0f, 45.0f);
+        Renderer.DrawTexture(AwesomeFace, glm::vec3(-0.5f, 0.0f, 0.f), 1.0f, 0.0f);
+
+        for(int i = 0; i < 10000;  i++)
+        {
+            f32 x = RandomBetween(-1.0f, 1.0f);
+            f32 y = RandomBetween(-1.0f, 1.0f);
+            f32 Rot = RandomBetween(0.0, 365.0f);
+            Renderer.DrawTexture(AwesomeFace, glm::vec3(x, y, 0.f), 1.0f, Rot);
+        }
+
+        { // DEBUG
+            char Buff[200];
+            snprintf(Buff, sizeof(Buff), "Scoundrel - %.0fps", 1.0f / Application.DeltaTime);
+            const char *Ptr = &Buff[0];
+            SDL_SetWindowTitle(Application.Window, Ptr);
+        }
+
+
+        Renderer.EndFrame();
         Application.EndFrame();
     }
 
