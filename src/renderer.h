@@ -17,6 +17,8 @@
 #define HOT_PINK color{1.0f, 0.0f, 1.0f, 0.0f}
 #define ORANGE   color{1.0f, 0.647f, 0.0f, 0.0f}
 
+#define MAX_SPRITE_COUNT 10000
+
 using namespace glm;
 
 struct color
@@ -48,7 +50,7 @@ struct renderer
 
     texture MainTexture;
 
-    u32 DrawSpriteCount;
+    std::vector<sprite_instance> SpriteList;
 
     void Init(SDL_Window *SDLWindow, u32 Width, u32 Height);
     void UpdateViewport(i32 Width, i32 Height);

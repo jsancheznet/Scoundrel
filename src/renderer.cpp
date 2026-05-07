@@ -32,9 +32,9 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
     CurrentShader = 0;
 
-    DrawSpriteCount = 0;
+    SpriteList.reserve(MAX_SPRITE_COUNT);
 
-    { // Create the quad mesh
+    { // Create mesh that holds the card
 
         float Vertices[] =
         {
@@ -68,7 +68,7 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
     { // CardsVBO
 
         glCreateBuffers(1, &CardsVBO);
-        u32 BufferSize = sizeof(sprite_instance) * 100000;
+        u32 BufferSize = sizeof(sprite_instance) * MAX_SPRITE_COUNT;
         glNamedBufferStorage(CardsVBO, BufferSize, NULL, GL_DYNAMIC_STORAGE_BIT);
         Log(Info, "OPENGL, Allocating %d bytes to CardsVBO", BufferSize);
 
@@ -123,9 +123,12 @@ void renderer::EndFrame()
     glBindTextureUnit(0, MainTexture.Id);
     glUniform1i(glGetUniformLocation(CurrentShader, "Texture"), 0);
 
-    glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, DrawSpriteCount);
+    glNamedBufferSubData(CardsVBO, 0, SpriteList.size(), &SpriteList[0]);
 
-    DrawSpriteCount = 0;
+    glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, SpriteList.size());
+
+    SpriteList.clear();
+
     SDL_GL_SwapWindow(Window);
 }
 
@@ -191,17 +194,14 @@ shader renderer::CompileShader(const char *Filename)
 
 void renderer::DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation)
 {
-    sprite_instance SpriteInstanceData = {};
+    sprite_instance Sprite = {};
 
-    SpriteInstanceData.Position = Position;
-    SpriteInstanceData.Scale = glm::vec3(Scale);
-    SpriteInstanceData.Rotation = Rotation;
+    Sprite.Position = Position;
+    Sprite.Scale = glm::vec3(Scale);
+    Sprite.Rotation = Rotation;
 
-    u32 Offset = sizeof(sprite_instance) * DrawSpriteCount;
+    SpriteList.push_back(Sprite);
 
-    glNamedBufferSubData(CardsVBO, Offset, sizeof(sprite_instance), &SpriteInstanceData);
-
-    DrawSpriteCount++;
 }
 
 void renderer::DrawTextureSlow(texture Texture, vec3 Position, f32 Scale, f32 Rotation)
