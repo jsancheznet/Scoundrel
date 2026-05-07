@@ -88,7 +88,7 @@ i32 main(i32 Argc, char **Argv)
         Renderer.DrawTexture(AwesomeFace, glm::vec3(0.5f, 0.0f, 0.f), 1.0f, 45.0f);
         Renderer.DrawTexture(AwesomeFace, glm::vec3(-0.5f, 0.0f, 0.f), 1.0f, 0.0f);
 
-        for(int i = 0; i < 10000;  i++)
+        for(int i = 0; i < MAX_SPRITE_COUNT - 2;  i++)
         {
             f32 x = RandomBetween(-1.0f, 1.0f);
             f32 y = RandomBetween(-1.0f, 1.0f);
