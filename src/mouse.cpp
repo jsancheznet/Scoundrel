@@ -8,7 +8,7 @@ void mouse::Update()
 {
     PrevButtonState = ButtonState;
     // NOTE: SDL_GetRelativeMouseState,returns x,y accumulated since last call
-    ButtonState = SDL_GetMouseState(&X, &X);
+    ButtonState = SDL_GetMouseState(&X, &Y);
 }
 
 b32 mouse::IsButtonPressed(u32 Button)

@@ -32,6 +32,8 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
     CurrentShader = 0;
 
+    DrawSpriteCount = 0;
+
     { // Create the quad mesh
 
         float Vertices[] =
@@ -66,12 +68,12 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
     { // CardsVBO
 
         glCreateBuffers(1, &CardsVBO);
-        u32 BufferSize = sizeof(instance_data) * 10000;
+        u32 BufferSize = sizeof(sprite_instance) * 100000;
         glNamedBufferStorage(CardsVBO, BufferSize, NULL, GL_DYNAMIC_STORAGE_BIT);
         Log(Info, "OPENGL, Allocating %d bytes to CardsVBO", BufferSize);
 
         u32 BindingPoint = 3;
-        glVertexArrayVertexBuffer(MainVAO, BindingPoint, CardsVBO, 0, sizeof(instance_data));
+        glVertexArrayVertexBuffer(MainVAO, BindingPoint, CardsVBO, 0, sizeof(sprite_instance));
 
         // Position
         glEnableVertexArrayAttrib(MainVAO, 2);
@@ -80,12 +82,12 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
         // Scale
         glEnableVertexArrayAttrib(MainVAO, 3);
-        glVertexArrayAttribFormat(MainVAO, 3, 3, GL_FLOAT, GL_FALSE, offsetof(instance_data, Scale));
+        glVertexArrayAttribFormat(MainVAO, 3, 3, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Scale));
         glVertexArrayAttribBinding(MainVAO, 3, BindingPoint);
 
         // Rotation
         glEnableVertexArrayAttrib(MainVAO, 4);
-        glVertexArrayAttribFormat(MainVAO, 4, 1, GL_FLOAT, GL_FALSE, offsetof(instance_data, Rotation));
+        glVertexArrayAttribFormat(MainVAO, 4, 1, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Rotation));
         glVertexArrayAttribBinding(MainVAO, 4, BindingPoint);
 
         glVertexArrayBindingDivisor(MainVAO, 3, 1);
@@ -113,12 +115,21 @@ void renderer::ClearScreen(color Color)
 }
 
 void renderer::EndFrame()
+
 {
+    // In here we can split things up according to teir material requirements, bind things and call draw
+
+    // Bind Main Textura Atlas
+    glBindTextureUnit(0, MainTexture.Id);
+    glUniform1i(glGetUniformLocation(CurrentShader, "Texture"), 0);
+
+    glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, DrawSpriteCount);
+
     DrawSpriteCount = 0;
     SDL_GL_SwapWindow(Window);
 }
 
-u32 renderer::CompileShader(const char *Filename) //
+shader renderer::CompileShader(const char *Filename)
 {
     Assert(Filename);
 
@@ -180,26 +191,17 @@ u32 renderer::CompileShader(const char *Filename) //
 
 void renderer::DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation)
 {
-    // Texture stuff
-    glBindTextureUnit(0, Texture.Id); // TODO(Jsanchez): Do i need to bind the texture here?
-    glUniform1i(glGetUniformLocation(CurrentShader, "Texture"), 0);
+    sprite_instance SpriteInstanceData = {};
 
-    {
-        instance_data SpriteInstanceData = {};
+    SpriteInstanceData.Position = Position;
+    SpriteInstanceData.Scale = glm::vec3(Scale);
+    SpriteInstanceData.Rotation = Rotation;
 
-        SpriteInstanceData.Position = Position;
-        SpriteInstanceData.Scale = glm::vec3(Scale);
-        SpriteInstanceData.Rotation = Rotation;
+    u32 Offset = sizeof(sprite_instance) * DrawSpriteCount;
 
-        u32 Offset = sizeof(instance_data) * DrawSpriteCount;
+    glNamedBufferSubData(CardsVBO, Offset, sizeof(sprite_instance), &SpriteInstanceData);
 
-        glNamedBufferSubData(CardsVBO, Offset, sizeof(instance_data), &SpriteInstanceData);
-
-        DrawSpriteCount++;
-    }
-
-
-    glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, DrawSpriteCount);
+    DrawSpriteCount++;
 }
 
 void renderer::DrawTextureSlow(texture Texture, vec3 Position, f32 Scale, f32 Rotation)
@@ -217,7 +219,7 @@ void renderer::DrawTextureSlow(texture Texture, vec3 Position, f32 Scale, f32 Ro
     glUniformMatrix4fv(ModelMatrixUniformId, 1, GL_FALSE, value_ptr(Model));
 
     // Texture stuff
-    glBindTextureUnit(0, Texture.Id); // TODO(Jsanchez): Do i need to bind the texture everytime i call draw? Maybe i could do it once when using shader
+    glBindTextureUnit(0, Texture.Id);
     glUniform1i(glGetUniformLocation(CurrentShader, "Texture"), 0);
 
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
