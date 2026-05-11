@@ -34,6 +34,12 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
     SpriteList.reserve(MAX_SPRITE_COUNT);
 
+    // Load Default Textures
+    MainTexture = CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
+
+    // Bind Default Textures
+    glBindTextureUnit(0, MainTexture.ID);
+
     { // Create mesh that holds the card
 
         float Vertices[] =
@@ -94,7 +100,6 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
     }
 
     { // Camera UBO setup
-
         glCreateBuffers(1, &CameraUBO);
         glNamedBufferData(CameraUBO, sizeof(glm::mat4) * 3, nullptr, GL_DYNAMIC_DRAW);
         glBindBufferBase(GL_UNIFORM_BUFFER, 50, CameraUBO);
@@ -115,20 +120,12 @@ void renderer::ClearScreen(color Color)
 }
 
 void renderer::EndFrame()
-
 {
     // In here we can split things up according to teir material requirements, bind things and call draw
-
-    // Bind Main Textura Atlas
-    glBindTextureUnit(0, MainTexture.Id);
-    glUniform1i(glGetUniformLocation(CurrentShader, "Texture"), 0);
-
     glNamedBufferSubData(CardsVBO, 0, SpriteList.size(), &SpriteList[0]);
-
     glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, SpriteList.size());
 
     SpriteList.clear();
-
     SDL_GL_SwapWindow(Window);
 }
 
@@ -219,7 +216,7 @@ void renderer::DrawTextureSlow(texture Texture, vec3 Position, f32 Scale, f32 Ro
     glUniformMatrix4fv(ModelMatrixUniformId, 1, GL_FALSE, value_ptr(Model));
 
     // Texture stuff
-    glBindTextureUnit(0, Texture.Id);
+    glBindTextureUnit(0, Texture.ID);
     glUniform1i(glGetUniformLocation(CurrentShader, "Texture"), 0);
 
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -230,6 +227,7 @@ void renderer::UseShader(u32 Shader)
 {
     CurrentShader = Shader;
     glUseProgram(Shader);
+    glUniform1i(glGetUniformLocation(CurrentShader, "Texture"), 0);
 }
 
 void renderer::UpdateCamera(camera Camera)
@@ -329,6 +327,10 @@ void renderer::DebugCallback(GLenum Source, GLenum Type, GLuint Id,  GLenum Seve
             _Severity = "UNKNOWN";
             break;
     }
+
+    // 131185: OTHER of NOTIFICATION severity, raised from API: Buffer detailed info: Buffer object 2 (bound to GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING_ARB (3), usage hint is GL_DYNAMIC_DRAW) will use VIDEO memory as the source for buffer object operations
+    if(Id == 131185)
+        return;
 
     printf("[OPENGL DEBUG]: %d: %s of %s severity, raised from %s: %s\n", Id, _Type, _Severity, _Source, Message);
 }

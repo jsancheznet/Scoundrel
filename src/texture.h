@@ -4,7 +4,7 @@
 
 struct texture
 {
-    u32 Id;
+    u32 ID;
     i32 Width;
     i32 Height;
 };

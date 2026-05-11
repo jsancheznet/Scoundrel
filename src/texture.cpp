@@ -25,22 +25,22 @@ texture CreateTexture(const char* File)
 
     u8 *ImageData = stbi_load(File, &Result.Width, &Result.Height, &ChannelCount, 4);
 
-    glCreateTextures(GL_TEXTURE_2D, 1, &Result.Id);
+    glCreateTextures(GL_TEXTURE_2D, 1, &Result.ID);
 
-    glTextureParameteri(Result.Id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(Result.Id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(Result.Id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTextureParameteri(Result.Id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTextureParameteri(Result.ID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(Result.ID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(Result.ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(Result.ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTextureStorage2D(Result.Id, 1, GL_RGBA8, Result.Width, Result.Height);
+    glTextureStorage2D(Result.ID, 1, GL_RGBA8, Result.Width, Result.Height);
 
-    glTextureSubImage2D(Result.Id, 0, 0, 0, Result.Width, Result.Height, GL_RGBA, GL_UNSIGNED_BYTE, ImageData);
+    glTextureSubImage2D(Result.ID, 0, 0, 0, Result.Width, Result.Height, GL_RGBA, GL_UNSIGNED_BYTE, ImageData);
 
-    glGenerateTextureMipmap(Result.Id);
+    glGenerateTextureMipmap(Result.ID);
 
     stbi_image_free(ImageData);
 
-    Log(Info, "CreateTexture() - Successfully created texture, %s with Id %d", File, Result.Id);
+    Log(Info, "CreateTexture() - Successfully created texture, %s with Id %d", File, Result.ID);
 
     return Result;
 }

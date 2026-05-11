@@ -1,7 +1,7 @@
 #ifdef VERTEX_SHADER
 
-layout (location = 0) in vec3 LocalVertexPosition;
-layout (location = 1) in vec2 UV;
+layout(location = 0) in vec3 LocalVertexPosition;
+layout(location = 1) in vec2 UV;
 layout(location = 2) in vec3 InstanceWorldPosition;
 layout(location = 3) in vec3 InstanceWorldScale;
 layout(location = 4) in float InstanceWorldRotation;
@@ -16,7 +16,6 @@ layout (std140, binding = 50) uniform CameraMatrices
 uniform mat4 Model;
 
 out vec2 Uv;
-
 
 mat4 CreateModelMatrix(vec3 Pos, vec3 Scale, float Rotation)
 {

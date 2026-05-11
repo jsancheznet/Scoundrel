@@ -34,9 +34,6 @@ i32 main(i32 Argc, char **Argv)
 
     // RECORDATORIO: No irme por las ramas!
 
-    // TODO: Do Claude suggested fixes and fix GL Error in logs
-    // TODO: Draw 10000 cards and check performance, is instancing doing anything at all?
-
     // Reproducir sonidos con SDL, y una cancion de fondo, muy bajita
     //    - SDL_OpenAudioDevice() es la primera funcion que debo usar
     // TODO: Dibujar una carta con sus dimensiones correctas
@@ -51,11 +48,9 @@ i32 main(i32 Argc, char **Argv)
     shader HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
     texture AwesomeFace = CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
 
-    Renderer.MainTexture = CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
-
     camera Camera = CreateCamera();
 
-    sound MyTestSound = CreateSound("assets/Sounds/music.wav");
+    sound TestSong = CreateSound("assets/Sounds/music.wav");
 
 
     Renderer.UseShader(HelloWorldShader);
@@ -80,6 +75,11 @@ i32 main(i32 Argc, char **Argv)
         if(Keyboard.IsPressed(SDL_SCANCODE_SPACE))
         {
             Camera.Position.x = 0.0f;
+        }
+
+        if(Keyboard.IsPressed(SDL_SCANCODE_O))
+        {
+            Audio.Play(TestSong);
         }
 
         Renderer.ClearScreen(ORANGE);
