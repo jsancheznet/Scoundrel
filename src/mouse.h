@@ -8,8 +8,8 @@ struct mouse
     u32 PrevButtonState;
 
     // These two coords start on the top left corner
-    float X;
-    float Y;
+    f32 X;
+    f32 Y;
 
     void Update(); // This needs to be called after all events have been pumped
 

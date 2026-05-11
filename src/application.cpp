@@ -32,7 +32,7 @@ void application::CreateWindow(const char *Title, u32 Width, u32 Height)
     Log(Info, "application::CreateWindow() - Created Window, Width: %d, Height: %d", Width, Height);
 
     // Disable Vsync
-    i32 Interval = 1;
+    i32 Interval = 0;
     bool VSyncConfigured = SDL_GL_SetSwapInterval(Interval);
     if(!VSyncConfigured)
     {
