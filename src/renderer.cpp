@@ -18,7 +18,6 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
     // Enable Debug Mode
     glEnable(GL_DEBUG_OUTPUT);
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(DebugCallback, nullptr);
 
     glViewport(0, 0, ViewportWidth, ViewportHeight);
@@ -122,7 +121,7 @@ void renderer::ClearScreen(color Color)
 void renderer::EndFrame()
 {
     // In here we can split things up according to teir material requirements, bind things and call draw
-    glNamedBufferSubData(CardsVBO, 0, SpriteList.size(), &SpriteList[0]);
+    glNamedBufferSubData(CardsVBO, 0, SpriteList.size() * sizeof(sprite_instance), &SpriteList[0]);
     glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, SpriteList.size());
 
     SpriteList.clear();
@@ -198,7 +197,6 @@ void renderer::DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotati
     Sprite.Rotation = Rotation;
 
     SpriteList.push_back(Sprite);
-
 }
 
 void renderer::DrawTextureSlow(texture Texture, vec3 Position, f32 Scale, f32 Rotation)

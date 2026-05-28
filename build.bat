@@ -1,7 +1,6 @@
-@echo off
+echo off
 
 pushd build
-
 
 set SDLInclude=-I"..\libraries\SDL3-3.2.10\include"
 set GLADInclude=-I"..\libraries\glad\include"
