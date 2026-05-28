@@ -21,6 +21,7 @@ audio_system Audio;
 
 i32 main(i32 Argc, char **Argv)
 {
+    Argc;Argv;
     Application.Init();
 
     Application.CreateWindow("Scoundrel", 1366, 768);
@@ -34,8 +35,6 @@ i32 main(i32 Argc, char **Argv)
 
     // RECORDATORIO: No irme por las ramas!
 
-    // Reproducir sonidos con SDL, y una cancion de fondo, muy bajita
-    //    - SDL_OpenAudioDevice() es la primera funcion que debo usar
     // TODO: Dibujar una carta con sus dimensiones correctas
     // TODO: Redondear los bordes de la carta, podria hacer un modelo con doble cara y bordes redondeados
 	// TODO: Buscar manera de medir performance, asi puedo ver la diferencia entre batched textures o no
@@ -44,14 +43,12 @@ i32 main(i32 Argc, char **Argv)
     // Podria directamente dibujar una carta!, hacer un modelo de la carta y dibujar eso?
     // Podria crear un arena allocator "GameInstance" allocator y meter mis globales ahi
 
-
     shader HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
     texture AwesomeFace = CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
 
     camera Camera = CreateCamera();
 
-    sound TestSong = CreateSound("assets/Sounds/music.wav");
-
+    sound TestSong = Audio.CreateSound("assets/Sounds/music.wav");
 
     Renderer.UseShader(HelloWorldShader);
 
@@ -79,7 +76,11 @@ i32 main(i32 Argc, char **Argv)
 
         if(Keyboard.IsPressed(SDL_SCANCODE_O))
         {
-            Audio.Play(TestSong);
+            SDL_ResumeAudioDevice(Audio.DeviceID);
+        }
+        if(Keyboard.IsPressed(SDL_SCANCODE_P))
+        {
+            SDL_PauseAudioDevice(Audio.DeviceID);
         }
 
         Renderer.ClearScreen(ORANGE);

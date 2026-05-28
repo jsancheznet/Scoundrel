@@ -13,12 +13,13 @@ void audio_system::Init()
         Log(Info, "\tDevice %d: %s", i, SDL_GetAudioDeviceName(Devices[i]));
     }
 
-    SDL_AudioSpec AudioSpec = {};
-    SDL_GetAudioDeviceFormat(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &AudioSpec, NULL);
-    DeviceID = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &AudioSpec);
+    SDL_GetAudioDeviceFormat(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &DeviceSpec, NULL);
+    DeviceID = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &DeviceSpec);
+}
 
-    // TODO(Jsanchez): SDL_CreateAudioStream, SDL_BindAudioStream
-
+void audio_system::Play(sound Sound)
+{
+    Log(Info, "audio::system::Play(Sound)");
 }
 
 void audio_system::Pause()
@@ -42,7 +43,7 @@ void audio_system::SetVolume(f32 Volume)
     SDL_SetAudioDeviceGain(DeviceID, Volume);
 }
 
-sound CreateSound(const char* Path)
+sound audio_system::CreateSound(const char* Path)
 {
     sound Result = {};
 
@@ -54,6 +55,10 @@ sound CreateSound(const char* Path)
         Log(Error, "Failed to load wave file: %s, Error: %s", Path, SDL_GetError());
         return Result;
     }
+
+    Channel.Stream = SDL_CreateAudioStream(&Result.Spec, &DeviceSpec);
+    SDL_BindAudioStream(DeviceID, Channel.Stream);
+    SDL_PutAudioStreamData(Channel.Stream, Result.Buffer, Result.Length);
 
     return Result;
 }

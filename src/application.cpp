@@ -7,6 +7,10 @@ void application::Init()
 {
     IsRunning = true;
 
+    // Wayland compositors enforce vsync at the compositor level and ignore SDL_GL_SetSwapInterval(0).
+    // Force X11/XWayland so the swap interval is respected during development.
+    SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11");
+
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);

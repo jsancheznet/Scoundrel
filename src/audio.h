@@ -11,20 +11,6 @@ struct audio_channel
     SDL_AudioStream* Stream;
 };
 
-struct audio_system
-{
-    SDL_AudioDeviceID DeviceID;
-
-    audio_channel Channels;
-
-    void Init();
-
-    void Pause();
-    void Resume();
-
-    void SetVolume(f32 Volume);
-};
-
 struct sound
 {
     SDL_AudioSpec Spec;
@@ -32,4 +18,22 @@ struct sound
     u32 Length;
 };
 
-sound CreateSound(const char* Path);
+struct audio_system
+{
+    SDL_AudioDeviceID DeviceID;
+
+    SDL_AudioSpec DeviceSpec;
+
+    audio_channel Channel;
+
+    void Init();
+
+    void Play(sound Sound);
+
+    void Pause();
+    void Resume();
+
+    void SetVolume(f32 Volume);
+
+    sound CreateSound(const char* Path);
+};
