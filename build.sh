@@ -26,7 +26,7 @@ echo "BUILDING..."
 echo
 
 # Debug build
-clang++ -g -O0 -Wall -Wextra -Werror \
+clang++ -g -O0 -Wall -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter -Wno-unused-value\
     ../src/scoundrel.cpp \
     ../src/log.cpp \
     ../src/application.cpp \
@@ -38,7 +38,7 @@ clang++ -g -O0 -Wall -Wextra -Werror \
     ../src/audio.cpp \
     -x c ../libraries/glad/src/glad.c \
     $IncludeDirectories \
-    #-L../libraries/SDL3-3.2.10/build \
+    -L../libraries/SDL-release-3.4.8 \
     -lSDL3 \
     -o scoundrel
 

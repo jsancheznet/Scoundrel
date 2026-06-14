@@ -2,3 +2,5 @@
 *.ilk
 *.rdi
 
+build/
+
