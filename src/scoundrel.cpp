@@ -21,7 +21,6 @@ audio_system Audio;
 
 i32 main(i32 Argc, char **Argv)
 {
-    Argc;Argv;
     Application.Init();
 
     Application.CreateWindow("Scoundrel", 1366, 768);
@@ -33,8 +32,6 @@ i32 main(i32 Argc, char **Argv)
     Audio.Init();
     Audio.SetVolume(1.0f);
 
-    // RECORDATORIO: No irme por las ramas!
-
     // TODO: Dibujar una carta con sus dimensiones correctas
     // TODO: Redondear los bordes de la carta, podria hacer un modelo con doble cara y bordes redondeados
 	// TODO: Buscar manera de medir performance, asi puedo ver la diferencia entre batched textures o no
@@ -42,6 +39,27 @@ i32 main(i32 Argc, char **Argv)
     // Tambien podria batchear llamadas de drawtexture todas juntas
     // Podria directamente dibujar una carta!, hacer un modelo de la carta y dibujar eso?
     // Podria crear un arena allocator "GameInstance" allocator y meter mis globales ahi
+    // TODO: Dibujar texto
+
+    // PERFORMANCE: el cuello de botella NO son las draw calls (las 10k cartas salen en un
+    // solo glDrawArraysInstanced). Es overdraw con blending a 8x MSAA. Camara en z=1, FOV 90,
+    // cartas en z=0 -> rango visible y[-1,1] (2 unidades). Cada carta escala 1.0 cubre media
+    // pantalla, 10k encimadas = ~1400x overdraw, ~1.5B fragmentos/frame.
+    // Resultado tras 1-3: 41 fps (24.4 ms) -> 430 fps (2.3 ms), ~10x. Fixes por impacto:
+    // HECHO 1. Quitar MSAA (application.cpp, SAMPLES/BUFFERS a 0). 8x multiplicaba el ancho
+    //          de banda del ROP/blend ~8x, casi no aporta visualmente en sprites 2D.
+    // HECHO 2. Apagar blending (renderer.cpp, glDisable(GL_BLEND)). El JPG es opaco; el blend
+    //          obligaba read-modify-write por fragmento.
+    // HECHO 3. Depth buffer + depth test (DEPTH_SIZE 24, glEnable(GL_DEPTH_TEST), limpiar
+    //          GL_DEPTH_BUFFER_BIT). Con GL_LESS, aun con todas las cartas en z=0, el early-Z
+    //          descarta las capas ocultas (gana la primera por pixel). (Opaco+depth y
+    //          alpha-blend son excluyentes por objeto: blendear solo las que necesiten alpha.)
+    // TODO: 4. Test realista: escala 1.0 = cartas gigantes. Cartas reales son chicas -> mucho
+    //          menos overdraw por si solo.
+    // TODO: 5. (Menor, CPU) Dejar de regenerar la SpriteList cada frame (scoundrel.cpp,
+    //          ~30k RNG + push_back + re-upload). Generar el layout una vez, subir solo si cambia.
+    // TODO: 6. Desactivar el debug GL context + glDebugMessageCallback en release (ver TODO en
+    //          application.cpp, y renderer.cpp).
 
     shader HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
     texture AwesomeFace = CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");

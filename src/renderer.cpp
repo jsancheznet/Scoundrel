@@ -17,14 +17,21 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
     Log(Info, "OpenGL Max Uniform Buffer Bindings: %d", MaxUniformBufferBindings);
 
     // Enable Debug Mode
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(DebugCallback, nullptr);
+    // glEnable(GL_DEBUG_OUTPUT);
+    // glDebugMessageCallback(DebugCallback, nullptr);
 
     glViewport(0, 0, ViewportWidth, ViewportHeight);
 
-    // Configure Blend Mode
-    glEnable(GL_BLEND);
+    // PERF: Opaque sprites draw with blending OFF (the card JPGs have no alpha) and with
+    // depth testing ON, so occluded fragments are discarded by early-Z instead of being
+    // read-modify-written. This collapses the per-pixel overdraw from ~hundreds down to ~1.
+    // The blend func stays configured; re-enable GL_BLEND per-batch for translucent sprites /
+    // SDF text, drawn after the opaque pass (ideally with glDepthMask(GL_FALSE)).
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_BLEND);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     glCreateVertexArrays(1, &MainVAO);
     glBindVertexArray(MainVAO);
@@ -115,7 +122,7 @@ void renderer::UpdateViewport(i32 Width, i32 Height)
 void renderer::ClearScreen(color Color)
 {
     glClearColor(Color.r, Color.g, Color.b, Color.a);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void renderer::EndFrame()
