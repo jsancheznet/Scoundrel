@@ -15,11 +15,11 @@ IncludeDirectories="$SDLInclude $GLADInclude $GLMInclude $STBInclude $JSONInclud
 
 echo
 echo "COPYING ASSETS TO BUILD DIRECTORY..."
-cp -ru ../assets ./assets
+cp -ru ../assets/. ./assets/
 echo
 
 echo "COPYING SHADERS TO BUILD DIRECTORY..."
-cp -ru ../shaders ./shaders
+cp -ru ../shaders/. ./shaders/
 echo
 
 echo "BUILDING..."
