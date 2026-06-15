@@ -38,9 +38,13 @@ texture CreateTexture(const char* File)
 
     glGenerateTextureMipmap(Result.ID);
 
+    Result.Handle = glGetTextureHandleARB(Result.ID);
+
+    glMakeTextureHandleResidentARB(Result.Handle);
+
     stbi_image_free(ImageData);
 
-    Log(Info, "CreateTexture() - Successfully created texture, %s with Id %d", File, Result.ID);
+    Log(Info, "CreateTexture() - Successfully created texture %s, Id %d, Handle %ld", File, Result.ID, Result.Handle);
 
     return Result;
 }

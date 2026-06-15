@@ -28,7 +28,7 @@ void application::Init()
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 
     // TODO(Jsanchez): Disable this on release builds
-    // SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 }
 
 void application::CreateWindow(const char *Title, u32 Width, u32 Height)

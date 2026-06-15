@@ -21,7 +21,8 @@ camera CreateCamera()
     Camera.AspectRatio = (f32)Application.WindowWidth / (f32)Application.WindowHeight;
     Camera.Projection = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
 
-    Log(Info, "CreateCamera() - Created Camera with default values");
+    Log(Info, "CreateCamera() - Created Camera, Position: %.2f %.2f, %.2f, Target: %.2f %.2f, %.2f",
+	Camera.Position.x, Camera.Position.y, Camera.Position.z, Camera.Target.x, Camera.Target.y, Camera.Target.z);
 
     return Camera;
 }

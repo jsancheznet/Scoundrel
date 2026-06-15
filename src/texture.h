@@ -5,6 +5,7 @@
 struct texture
 {
     u32 ID;
+    u64 Handle;
     i32 Width;
     i32 Height;
 };

@@ -11,14 +11,28 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
     gladLoadGL();
 
+    // List extensions
+    if (0)
+    {
+        i32 ExtensionCount = 0;
+        glGetIntegerv(GL_NUM_EXTENSIONS, &ExtensionCount);
+        for (i32 i = 0; i < ExtensionCount; i++)
+        {
+            const GLubyte *Name = glGetStringi(GL_EXTENSIONS, i);
+            printf("%s ", Name);
+        }
+        printf("\n");
+    }
+
+
     // Log OpenGL info
     i32 MaxUniformBufferBindings = -1;
     glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &MaxUniformBufferBindings);
     Log(Info, "OpenGL Max Uniform Buffer Bindings: %d", MaxUniformBufferBindings);
 
     // Enable Debug Mode
-    // glEnable(GL_DEBUG_OUTPUT);
-    // glDebugMessageCallback(DebugCallback, nullptr);
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(DebugCallback, nullptr);
 
     glViewport(0, 0, ViewportWidth, ViewportHeight);
 
@@ -39,12 +53,6 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
     CurrentShader = 0;
 
     SpriteList.reserve(MAX_SPRITE_COUNT);
-
-    // Load Default Textures
-    MainTexture = CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
-
-    // Bind Default Textures
-    glBindTextureUnit(0, MainTexture.ID);
 
     { // Create mesh that holds the card
 
@@ -101,6 +109,11 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
         glEnableVertexArrayAttrib(MainVAO, 4);
         glVertexArrayAttribFormat(MainVAO, 4, 1, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Rotation));
         glVertexArrayAttribBinding(MainVAO, 4, BindingPoint);
+
+        // Texture Handle
+        glEnableVertexArrayAttrib(MainVAO, 5);
+        glVertexArrayAttribIFormat(MainVAO, 5, 2, GL_UNSIGNED_INT, offsetof(sprite_instance, TextureHandle));
+        glVertexArrayAttribBinding(MainVAO, 5, BindingPoint);
 
         glVertexArrayBindingDivisor(MainVAO, 3, 1);
     }
@@ -202,31 +215,10 @@ void renderer::DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotati
     Sprite.Position = Position;
     Sprite.Scale = glm::vec3(Scale);
     Sprite.Rotation = Rotation;
+    Sprite.TextureHandle = Texture.Handle;
 
     SpriteList.push_back(Sprite);
 }
-
-void renderer::DrawTextureSlow(texture Texture, vec3 Position, f32 Scale, f32 Rotation)
-{
-    // Create Model Matrix
-    i32 ModelMatrixUniformId = glGetUniformLocation(CurrentShader, "Model");
-    GLenum Error = glGetError();
-
-    mat4 Model = glm::mat4(1.0f);
-    vec3 RotationAxis = glm::vec3(0.0f, 0.0f, 1.0f);
-    Model = glm::translate(Model, Position);
-    Model = glm::rotate(Model, glm::radians(Rotation), RotationAxis);
-    Model = glm::scale(Model, glm::vec3(Scale));
-
-    glUniformMatrix4fv(ModelMatrixUniformId, 1, GL_FALSE, value_ptr(Model));
-
-    // Texture stuff
-    glBindTextureUnit(0, Texture.ID);
-    glUniform1i(glGetUniformLocation(CurrentShader, "Texture"), 0);
-
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-}
-
 
 void renderer::UseShader(u32 Shader)
 {

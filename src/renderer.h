@@ -31,6 +31,7 @@ struct sprite_instance
     glm::vec3 Position;
     glm::vec3 Scale;
     f32 Rotation;
+    u64 TextureHandle;
 };
 
 struct renderer
@@ -48,8 +49,6 @@ struct renderer
     // Shaders
     u32 CurrentShader;
 
-    texture MainTexture;
-
     std::vector<sprite_instance> SpriteList;
 
     void Init(SDL_Window *SDLWindow, u32 Width, u32 Height);
@@ -59,7 +58,6 @@ struct renderer
 
     void UpdateCamera(camera Camera);
 
-    void DrawTextureSlow(texture Texture, vec3 Position, f32 Scale, f32 Rotation);
     void DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation);
 
     void UseShader(u32 Shader);
