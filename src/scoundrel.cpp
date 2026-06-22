@@ -22,10 +22,15 @@ audio_system Audio;
 i32 main(i32 Argc, char **Argv)
 {
     // TODO
-    //
-    // 1- Implementar bindless textures, el programa deberia funcionar asi como esta en este momento
-    // 2- Dibujar varias cartas diferentes usando el parametro Texture en DrawTexture
-    // 2- En DrawTexture, generar un nuevo parametro para SrcRect, poner valores por defecto en la definicion para dibujar toda la textura
+    // - Implementar Tinting
+    //   - Agregar un tint color a sprite_instance | 5
+    //   - Agregar ese tint color en rendere_init cuando se crea el VBO | 5
+    //   - GLSL, usar Mix con un tint hardcodeado para verificar que todo funciona, comentar que usamos mix y no aditivo, si queremos bloom aditivo es mejor | 10
+    //   - Agregar el tint parameter en DrawTexture con un default que no de tint | 10
+    //   - Probar que todo funciona | 10
+    // - Implementar deteccion de mouse over sobre una carta, tinteando la seleccionada
+    //   - Investigar generalmente se hace, que algoritmo, tal vez pueda estrenar el libro, hablar con claude o buscar blogs
+    //   - Clickear sobre la carta tintea de otro color!
 
     Application.Init();
 
@@ -41,6 +46,8 @@ i32 main(i32 Argc, char **Argv)
     shader HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
     texture Card = CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
     texture AwesomeFace = CreateTexture("assets/Textures/awesomeface.png");
+    texture Spades5 = CreateTexture("assets/Textures/Scoundrel-Spades-5.jpg");
+    texture TestingTexture = CreateTexture("assets/Textures/Scoundrel-Spades-9.jpg");
 
     camera Camera = CreateCamera();
 
@@ -68,6 +75,15 @@ i32 main(i32 Argc, char **Argv)
         if(Keyboard.IsPressed(SDL_SCANCODE_SPACE))
         {
             Camera.Position.x = 0.0f;
+            Camera.Position.y = 0.0f;
+        }
+        if(Keyboard.IsPressed(SDL_SCANCODE_W))
+        {
+            Camera.Position.y += 0.05f;
+        }
+        if(Keyboard.IsPressed(SDL_SCANCODE_S))
+        {
+            Camera.Position.y -= 0.05f;
         }
 
         if(Keyboard.IsPressed(SDL_SCANCODE_O))
@@ -82,16 +98,11 @@ i32 main(i32 Argc, char **Argv)
         Renderer.ClearScreen(ORANGE);
         Renderer.UpdateCamera(Camera);
 
-        Renderer.DrawTexture(AwesomeFace, glm::vec3(0.5f, 0.0f, 0.f), 1.0f, 45.0f);
+        //Renderer.DrawTexture(AwesomeFace, glm::vec3(0.5f, 0.0f, 0.f), 1.0f, 45.0f);
         Renderer.DrawTexture(Card, glm::vec3(-0.5f, 0.0f, 0.f), 1.0f, 0.0f);
-
-        // for(int i = 0; i < MAX_SPRITE_COUNT - 2;  i++)
-        // {
-        //     f32 x = RandomBetween(-1.0f, 1.0f);
-        //     f32 y = RandomBetween(-1.0f, 1.0f);
-        //     f32 Rot = RandomBetween(0.0, 365.0f);
-        //     Renderer.DrawTexture(AwesomeFace, glm::vec3(x, y, 0.f), 1.0f, Rot);
-        // }
+        Renderer.DrawTexture(TestingTexture, glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 0.0f);
+        rect SrcRect = {0.0f, 0.0, 1.0f, 1.0f};
+        Renderer.DrawTexture(Spades5, glm::vec3(0.5f, 0.0f, 0.f), 1.0f, 0.0f, SrcRect);
 
         { // DEBUG
             char Buff[200];

@@ -26,12 +26,18 @@ struct color
     f32 r, g, b, a;
 };
 
+struct rect
+{
+    f32 x0, y0, x1, y1;
+};
+
 struct sprite_instance
 {
     glm::vec3 Position;
     glm::vec3 Scale;
-    f32 Rotation;
+    rect SrcRect;
     u64 TextureHandle;
+    f32 Rotation;
 };
 
 struct renderer
@@ -43,7 +49,7 @@ struct renderer
     // GL Buffers
     u32 MainVAO;
     u32 QuadVBO;
-    u32 CardsVBO;
+    u32 SpritesVBO;
     u32 CameraUBO;
 
     // Shaders
@@ -58,14 +64,14 @@ struct renderer
 
     void UpdateCamera(camera Camera);
 
-    void DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation);
+    void DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f});
 
     void UseShader(u32 Shader);
     void ClearScreen(color Color);
     void EndFrame();
 
 
-private:
+  private:
 
     static void DebugCallback(GLenum Source, GLenum Type, GLuint Id,  GLenum Severity, GLsizei Length, GLchar const *Message, void const *UserParam);
 };

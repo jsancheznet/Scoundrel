@@ -85,15 +85,15 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
         glVertexArrayAttribBinding(MainVAO, 1, 0);
     }
 
-    { // CardsVBO
+    { // SpritesVBO
 
-        glCreateBuffers(1, &CardsVBO);
+        glCreateBuffers(1, &SpritesVBO);
         u32 BufferSize = sizeof(sprite_instance) * MAX_SPRITE_COUNT;
-        glNamedBufferStorage(CardsVBO, BufferSize, NULL, GL_DYNAMIC_STORAGE_BIT);
-        Log(Info, "OPENGL, Allocating %d bytes to CardsVBO", BufferSize);
+        glNamedBufferStorage(SpritesVBO, BufferSize, NULL, GL_DYNAMIC_STORAGE_BIT);
+        Log(Info, "OPENGL, Allocating %d bytes to SpritesVBO", BufferSize);
 
         u32 BindingPoint = 3;
-        glVertexArrayVertexBuffer(MainVAO, BindingPoint, CardsVBO, 0, sizeof(sprite_instance));
+        glVertexArrayVertexBuffer(MainVAO, BindingPoint, SpritesVBO, 0, sizeof(sprite_instance));
 
         // Position
         glEnableVertexArrayAttrib(MainVAO, 2);
@@ -114,6 +114,11 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
         glEnableVertexArrayAttrib(MainVAO, 5);
         glVertexArrayAttribIFormat(MainVAO, 5, 2, GL_UNSIGNED_INT, offsetof(sprite_instance, TextureHandle));
         glVertexArrayAttribBinding(MainVAO, 5, BindingPoint);
+
+        // Src Rect
+        glEnableVertexArrayAttrib(MainVAO, 6);
+        glVertexArrayAttribFormat(MainVAO, 6, 4, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, SrcRect));
+        glVertexArrayAttribBinding(MainVAO, 6, BindingPoint);
 
         glVertexArrayBindingDivisor(MainVAO, 3, 1);
     }
@@ -141,7 +146,7 @@ void renderer::ClearScreen(color Color)
 void renderer::EndFrame()
 {
     // In here we can split things up according to teir material requirements, bind things and call draw
-    glNamedBufferSubData(CardsVBO, 0, SpriteList.size() * sizeof(sprite_instance), &SpriteList[0]);
+    glNamedBufferSubData(SpritesVBO, 0, SpriteList.size() * sizeof(sprite_instance), &SpriteList[0]);
     glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, SpriteList.size());
 
     SpriteList.clear();
@@ -208,7 +213,7 @@ shader renderer::CompileShader(const char *Filename)
     return CompiledShader;
 }
 
-void renderer::DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation)
+void renderer::DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect)
 {
     sprite_instance Sprite = {};
 
@@ -216,6 +221,7 @@ void renderer::DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotati
     Sprite.Scale = glm::vec3(Scale);
     Sprite.Rotation = Rotation;
     Sprite.TextureHandle = Texture.Handle;
+    Sprite.SrcRect = SrcRect;
 
     SpriteList.push_back(Sprite);
 }
