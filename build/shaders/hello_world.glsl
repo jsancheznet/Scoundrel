@@ -8,6 +8,7 @@ layout(location = 2) in vec3 InstanceWorldPosition;
 layout(location = 3) in vec3 InstanceWorldScale;
 layout(location = 4) in float InstanceWorldRotation;
 layout(location = 5) in uvec2 TextureHandle;
+layout(location = 6) in vec4 SrcRect;
 
 layout (std140, binding = 50) uniform CameraMatrices
 {
@@ -39,7 +40,7 @@ void main()
 {
     mat4 Model = CreateModelMatrix(InstanceWorldPosition, InstanceWorldScale, InstanceWorldRotation);
     gl_Position =  Perspective * View * Model * vec4(LocalVertexPosition, 1.0);
-    Uv = UV;
+    Uv = mix(SrcRect.xy, SrcRect.zw, UV);
     fsTextureHandle = TextureHandle;
 }
 
