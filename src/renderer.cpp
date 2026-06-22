@@ -97,7 +97,7 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
         // Position
         glEnableVertexArrayAttrib(MainVAO, 2);
-        glVertexArrayAttribFormat(MainVAO, 2, 3, GL_FLOAT, GL_FALSE, 0);
+        glVertexArrayAttribFormat(MainVAO, 2, 3, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Position));
         glVertexArrayAttribBinding(MainVAO, 2, BindingPoint);
 
         // Scale
@@ -119,6 +119,11 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
         glEnableVertexArrayAttrib(MainVAO, 6);
         glVertexArrayAttribFormat(MainVAO, 6, 4, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, SrcRect));
         glVertexArrayAttribBinding(MainVAO, 6, BindingPoint);
+
+        // Tint
+        glEnableVertexArrayAttrib(MainVAO, 7);
+        glVertexArrayAttribFormat(MainVAO, 7, 4, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Tint));
+        glVertexArrayAttribBinding(MainVAO, 7, BindingPoint);
 
         glVertexArrayBindingDivisor(MainVAO, 3, 1);
     }
@@ -213,7 +218,7 @@ shader renderer::CompileShader(const char *Filename)
     return CompiledShader;
 }
 
-void renderer::DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect)
+void renderer::DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect, glm::vec4 Tint)
 {
     sprite_instance Sprite = {};
 
@@ -222,6 +227,7 @@ void renderer::DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotati
     Sprite.Rotation = Rotation;
     Sprite.TextureHandle = Texture.Handle;
     Sprite.SrcRect = SrcRect;
+    Sprite.Tint = Tint;
 
     SpriteList.push_back(Sprite);
 }

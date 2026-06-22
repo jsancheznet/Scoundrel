@@ -9,6 +9,7 @@ layout(location = 3) in vec3 InstanceWorldScale;
 layout(location = 4) in float InstanceWorldRotation;
 layout(location = 5) in uvec2 TextureHandle;
 layout(location = 6) in vec4 SrcRect;
+layout(location = 7) in vec4 Tint;
 
 layout (std140, binding = 50) uniform CameraMatrices
 {
@@ -21,6 +22,7 @@ uniform mat4 Model;
 
 out vec2 Uv;
 flat out uvec2 fsTextureHandle;
+out vec4 TintColor;
 
 mat4 CreateModelMatrix(vec3 Pos, vec3 Scale, float Rotation)
 {
@@ -42,6 +44,7 @@ void main()
     gl_Position =  Perspective * View * Model * vec4(LocalVertexPosition, 1.0);
     Uv = mix(SrcRect.xy, SrcRect.zw, UV);
     fsTextureHandle = TextureHandle;
+    TintColor = Tint;
 }
 
 #endif
@@ -50,14 +53,15 @@ void main()
 
 #extension GL_ARB_bindless_texture : require
 
-in vec2 Uv;
 flat in uvec2 fsTextureHandle;
-
+in vec2 Uv;
+in vec4 TintColor;
 out vec4 FragColor;
 
 void main()
 {
-    FragColor = texture(sampler2D(fsTextureHandle), Uv);
+    vec4 TextureColor = texture(sampler2D(fsTextureHandle), Uv);
+    FragColor = mix(TextureColor, TintColor, TintColor.a);
     // FragColor = (fsTextureHandle == uvec2(0u)) ? vec4(1,0,0,1)   // RED  = handle is zero
     //                                            : vec4(0,1,0,1);  // GREEN = handle arrived
 }
