@@ -33,11 +33,12 @@ struct rect
 
 struct sprite_instance
 {
+    u64 TextureHandle;
     glm::vec3 Position;
     glm::vec3 Scale;
-    rect SrcRect;
-    u64 TextureHandle;
     f32 Rotation;
+    rect SrcRect;
+    glm::vec4 Tint;
 };
 
 struct renderer
@@ -64,7 +65,7 @@ struct renderer
 
     void UpdateCamera(camera Camera);
 
-    void DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f});
+    void DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f}, glm::vec4 Tint = {1.0f, 1.0f, 1.0f, 0.0f});
 
     void UseShader(u32 Shader);
     void ClearScreen(color Color);

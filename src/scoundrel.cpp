@@ -28,6 +28,7 @@ i32 main(i32 Argc, char **Argv)
     //   - GLSL, usar Mix con un tint hardcodeado para verificar que todo funciona, comentar que usamos mix y no aditivo, si queremos bloom aditivo es mejor | 10
     //   - Agregar el tint parameter en DrawTexture con un default que no de tint | 10
     //   - Probar que todo funciona | 10
+
     // - Implementar deteccion de mouse over sobre una carta, tinteando la seleccionada
     //   - Investigar generalmente se hace, que algoritmo, tal vez pueda estrenar el libro, hablar con claude o buscar blogs
     //   - Clickear sobre la carta tintea de otro color!
@@ -98,11 +99,11 @@ i32 main(i32 Argc, char **Argv)
         Renderer.ClearScreen(ORANGE);
         Renderer.UpdateCamera(Camera);
 
-        //Renderer.DrawTexture(AwesomeFace, glm::vec3(0.5f, 0.0f, 0.f), 1.0f, 45.0f);
+        // TODO(Jsanchez): Fix position, probably bad glsl alignment
         Renderer.DrawTexture(Card, glm::vec3(-0.5f, 0.0f, 0.f), 1.0f, 0.0f);
         Renderer.DrawTexture(TestingTexture, glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 0.0f);
         rect SrcRect = {0.0f, 0.0, 1.0f, 1.0f};
-        Renderer.DrawTexture(Spades5, glm::vec3(0.5f, 0.0f, 0.f), 1.0f, 0.0f, SrcRect);
+        Renderer.DrawTexture(Spades5, glm::vec3(0.5f, 0.0f, 0.f), 1.0f, 0.0f, SrcRect, {1.0f, 0.0f, 0.0f, 0.5f});
 
         { // DEBUG
             char Buff[200];
