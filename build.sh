@@ -32,7 +32,6 @@ clang++ -g -O0 -Wall -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter 
     ../src/application.cpp \
     ../src/renderer.cpp \
     ../src/camera.cpp \
-    ../src/texture.cpp \
     ../src/mouse.cpp \
     ../src/keyboard.cpp \
     ../src/audio.cpp \

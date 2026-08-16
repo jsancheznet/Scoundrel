@@ -6,7 +6,6 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "camera.h"
-#include "texture.h"
 #include "random.h"
 
 #include <stdio.h>
@@ -19,19 +18,46 @@ mouse        Mouse;
 keyboard     Keyboard;
 audio_system Audio;
 
+struct card
+{
+    f32 Rotation;
+    f32 Scale;
+    texture Texture;
+    glm::vec3 Position;
+    glm::vec4 Tint;
+};
+
+card CreateCard(texture Texture, glm::vec3 Position, f32 Rotation, f32 Scale, glm::vec4 Tint)
+{
+    card Result = {};
+
+    Result.Texture = Texture;
+    Result.Position = Position;
+    Result.Rotation = Rotation;
+    Result.Scale = Scale;
+    Result.Tint = Tint;
+
+    return Result;
+}
+
 i32 main(i32 Argc, char **Argv)
 {
     // TODO
-    // - Implementar Tinting
-    //   - Agregar un tint color a sprite_instance | 5
-    //   - Agregar ese tint color en rendere_init cuando se crea el VBO | 5
-    //   - GLSL, usar Mix con un tint hardcodeado para verificar que todo funciona, comentar que usamos mix y no aditivo, si queremos bloom aditivo es mejor | 10
-    //   - Agregar el tint parameter en DrawTexture con un default que no de tint | 10
-    //   - Probar que todo funciona | 10
+    // - Pasar el directorio de shaders dentro de src, asegurarse que se copie bien el build.sh, agregar todo en build.bat
+    // - Object picking usando un nuevo buffer de opengl
+    // - Pasar el create texture dentro de renderer
+    // - Hacer una prueba de concepto minima para reemplazar Renderer.DrawTexture -> Render::DrawTexture
 
-    // - Implementar deteccion de mouse over sobre una carta, tinteando la seleccionada
-    //   - Investigar generalmente se hace, que algoritmo, tal vez pueda estrenar el libro, hablar con claude o buscar blogs
-    //   - Clickear sobre la carta tintea de otro color!
+    // Object Picking
+    // DONE: 0- Hacer que todas las cartas tengan un id, el index de array Cards es el ID
+    // 1- Crear un framebuffer object para que contenga toda la info de la render pass
+    // 2- Crear el renderbuffer y attachearlo al FBO
+    // 3- Crear depthbuffer y attachearlo al FBO
+    // 4- Crear un vertex shader con input int32 ObjectID, y mat4 MVP
+    // 5- Fragment shader convierte el id en color y lo dibuja
+    // 6- Bindear el FB, enable depth test, clear los buffers
+    // 7- En draw texture agregar el id a otro array
+    // 8- Hacer el draw para esto
 
     Application.Init();
 
@@ -45,16 +71,24 @@ i32 main(i32 Argc, char **Argv)
     Audio.SetVolume(1.0f);
 
     shader HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
-    texture Card = CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
-    texture AwesomeFace = CreateTexture("assets/Textures/awesomeface.png");
-    texture Spades5 = CreateTexture("assets/Textures/Scoundrel-Spades-5.jpg");
-    texture TestingTexture = CreateTexture("assets/Textures/Scoundrel-Spades-9.jpg");
 
     camera Camera = CreateCamera();
-
     sound TestSong = Audio.CreateSound("assets/Sounds/music.wav");
 
+    texture TexClubs2           = Renderer.CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
+    texture AwesomeFaceTexture    = Renderer.CreateTexture("assets/Textures/awesomeface.png");
+    texture Spades5Texture        = Renderer.CreateTexture("assets/Textures/Scoundrel-Spades-5.jpg");
+
+    card Clubs2 = CreateCard(TexClubs2, glm::vec3(-0.5f, 0.0f, 0.f), 0.0f, 1.0f, glm::vec4(0.0f));
+    card AwesomeFace = CreateCard(AwesomeFaceTexture, glm::vec3(0.5f, 0.0f, 0.f), 0.0f, 1.0f, glm::vec4(0.1f));
+    card Spades5 = CreateCard(Spades5Texture, glm::vec3(0.0f, -1.0, 0.0f), 0.0f, 1.0f, glm::vec4(1.0f, 0.0f, 0.0f, 0.45f));
+
     Renderer.UseShader(HelloWorldShader);
+
+    std::vector<card> Cards;
+    Cards.push_back(Clubs2);
+    Cards.push_back(AwesomeFace);
+    Cards.push_back(Spades5);
 
     while(Application.IsRunning)
     {
@@ -99,11 +133,10 @@ i32 main(i32 Argc, char **Argv)
         Renderer.ClearScreen(ORANGE);
         Renderer.UpdateCamera(Camera);
 
-        // TODO(Jsanchez): Fix position, probably bad glsl alignment
-        Renderer.DrawTexture(Card, glm::vec3(-0.5f, 0.0f, 0.f), 1.0f, 0.0f);
-        Renderer.DrawTexture(TestingTexture, glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 0.0f);
+        Renderer.DrawTexture(Clubs2.Texture, Clubs2.Position, Clubs2.Scale, Clubs2.Rotation);
+        Renderer.DrawTexture(AwesomeFace.Texture, AwesomeFace.Position, AwesomeFace.Scale, AwesomeFace.Rotation);
         rect SrcRect = {0.0f, 0.0, 1.0f, 1.0f};
-        Renderer.DrawTexture(Spades5, glm::vec3(0.5f, 0.0f, 0.f), 1.0f, 0.0f, SrcRect, {1.0f, 0.0f, 0.0f, 0.5f});
+        Renderer.DrawTexture(Spades5.Texture, Spades5.Position, Spades5.Scale, Spades5.Rotation, SrcRect, Spades5.Tint);
 
         { // DEBUG
             char Buff[200];
