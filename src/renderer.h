@@ -12,7 +12,6 @@
 #include "typedefs.h"
 
 #include "camera.h"
-#include "texture.h"
 
 #define HOT_PINK color{1.0f, 0.0f, 1.0f, 0.0f}
 #define ORANGE   color{1.0f, 0.647f, 0.0f, 0.0f}
@@ -29,6 +28,14 @@ struct color
 struct rect
 {
     f32 x0, y0, x1, y1;
+};
+
+struct texture
+{
+    u32 ID;
+    u64 Handle;
+    i32 Width;
+    i32 Height;
 };
 
 struct sprite_instance
@@ -65,6 +72,7 @@ struct renderer
 
     void UpdateCamera(camera Camera);
 
+    texture CreateTexture(const char *File);
     void DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f}, glm::vec4 Tint = {1.0f, 1.0f, 1.0f, 0.0f});
 
     void UseShader(u32 Shader);
