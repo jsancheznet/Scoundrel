@@ -13,20 +13,16 @@ STBInclude="-I../libraries/stb"
 
 IncludeDirectories="$SDLInclude $GLADInclude $GLMInclude $STBInclude $JSONInclude"
 
-echo
 echo "COPYING ASSETS TO BUILD DIRECTORY..."
 cp -ru ../assets/. ./assets/
-echo
 
 echo "COPYING SHADERS TO BUILD DIRECTORY..."
-cp -ru ../shaders/. ./shaders/
-echo
+cp -ru ../src/shaders/. ./shaders/
 
 echo "BUILDING..."
-echo
 
 # Debug build
-clang++ -g -O0 -Wall -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter -Wno-unused-value\
+ clang++ -g -O0 -Wall -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter -Wno-unused-value -fsanitize=address,undefined,integer -fno-omit-frame-pointer\
     ../src/scoundrel.cpp \
     ../src/log.cpp \
     ../src/application.cpp \

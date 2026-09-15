@@ -1,5 +1,8 @@
 #include "log.h"
 
+// TODO(Jsanchez): Implement something that does not print logs when built for release!
+// TODO(Bugfix): Executing the following line crashes the game: Log(Info, "%s");
+
 void Log(log_category Category, const char *Fmt, ...)
 {
     va_list Args;

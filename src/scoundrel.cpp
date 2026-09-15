@@ -47,6 +47,9 @@ i32 main(i32 Argc, char **Argv)
     // - Object picking usando un nuevo buffer de opengl
     // - Pasar el create texture dentro de renderer
     // - Hacer una prueba de concepto minima para reemplazar Renderer.DrawTexture -> Render::DrawTexture
+    // - Hacer que el log escriba a un txt
+    // - Hacer que el log no se ejecute en release
+    // - Crear una carta que tenga reverso y se pueda rotar, tal vez usar blender!
 
     // Object Picking
     // DONE: 0- Hacer que todas las cartas tengan un id, el index de array Cards es el ID
@@ -68,14 +71,16 @@ i32 main(i32 Argc, char **Argv)
     Renderer.Init(Application.Window, 1366, 768);
 
     Audio.Init();
-    Audio.SetVolume(1.0f);
+    Audio.SetGlobalVolume(1.0f);
+    Audio.ResumeAll();
 
     shader HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
 
     camera Camera = CreateCamera();
-    sound TestSong = Audio.CreateSound("assets/Sounds/music.wav");
+    sound TestSong = Audio.CreateSound("assets/Sounds/music.wav", AudioChannel_Music, true);
+    sound TestSound = Audio.CreateSound("assets/Sounds/TestingSound.wav", AudioChannel_SFX, false);
 
-    texture TexClubs2           = Renderer.CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
+    texture TexClubs2             = Renderer.CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
     texture AwesomeFaceTexture    = Renderer.CreateTexture("assets/Textures/awesomeface.png");
     texture Spades5Texture        = Renderer.CreateTexture("assets/Textures/Scoundrel-Spades-5.jpg");
 
@@ -103,31 +108,42 @@ i32 main(i32 Argc, char **Argv)
         {
             Camera.Position.x += 0.05f;
         }
+
         if(Keyboard.IsPressed(SDL_SCANCODE_A))
         {
             Camera.Position.x -= 0.05f;
         }
+
         if(Keyboard.IsPressed(SDL_SCANCODE_SPACE))
         {
             Camera.Position.x = 0.0f;
             Camera.Position.y = 0.0f;
         }
+
         if(Keyboard.IsPressed(SDL_SCANCODE_W))
         {
             Camera.Position.y += 0.05f;
         }
+
         if(Keyboard.IsPressed(SDL_SCANCODE_S))
         {
             Camera.Position.y -= 0.05f;
         }
 
+
         if(Keyboard.IsPressed(SDL_SCANCODE_O))
         {
-            SDL_ResumeAudioDevice(Audio.DeviceID);
+            Audio.Play(TestSong);
         }
+
         if(Keyboard.IsPressed(SDL_SCANCODE_P))
         {
-            SDL_PauseAudioDevice(Audio.DeviceID);
+            Audio.Pause(TestSong);
+        }
+
+        if(Keyboard.IsReleased(SDL_SCANCODE_X))
+        {
+            Audio.DestroySound(TestSong);
         }
 
         Renderer.ClearScreen(ORANGE);
