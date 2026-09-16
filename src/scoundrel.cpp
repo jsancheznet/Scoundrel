@@ -68,8 +68,9 @@ i32 main(i32 Argc, char **Argv)
     shader HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
 
     camera Camera = CreateCamera();
-    sound TestSong = Audio.CreateSound("assets/Sounds/music.wav", Channel_Music, true);
-    sound TestSound = Audio.CreateSound("assets/Sounds/TestingSound.wav", Channel_SFX, false);
+    sound TestSong = Audio.CreateSound("assets/Sounds/music.wav", Channel_Music);
+    Audio.SetRepeat(TestSong, true);
+    sound TestSound = Audio.CreateSound("assets/Sounds/TestingSound.wav", Channel_SFX);
 
     texture TexClubs2             = Renderer.CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
     texture AwesomeFaceTexture    = Renderer.CreateTexture("assets/Textures/awesomeface.png");
@@ -121,7 +122,6 @@ i32 main(i32 Argc, char **Argv)
             Camera.Position.y -= 0.05f;
         }
 
-
         if(Keyboard.IsPressed(SDL_SCANCODE_O))
         {
             Audio.Play(TestSong);
@@ -129,12 +129,13 @@ i32 main(i32 Argc, char **Argv)
 
         if(Keyboard.IsPressed(SDL_SCANCODE_P))
         {
-            Audio.Pause(TestSong);
+            Audio.Play(TestSound);
         }
 
         if(Keyboard.IsReleased(SDL_SCANCODE_X))
         {
             Audio.DestroySound(TestSong);
+            // Audio.DestroySound(TestSound);
         }
 
         Renderer.ClearScreen(ORANGE);
