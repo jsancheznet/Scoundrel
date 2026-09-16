@@ -43,26 +43,55 @@ void audio_system::SetChannelVolume(audio_channel Channel, f32 Volume)
     SDL_SetAudioDeviceGain(Channels[Channel], Volume);
 }
 
-
-void audio_system::Play(sound Sound)
+void audio_system::Play(sound Handle)
 {
-    Log(Info, "audio::system::Play() - Playing sound %s", Sound.Name.c_str());
-    SDL_BindAudioStream(Channels[Sound.Channel], Sound.Stream);
+    sound_slot *Slot = ResolveHandle(Handle);
+    if(Slot == nullptr)
+        return;
+
+    Log(Info, "audio::system::Play() - Playing sound %s", Slot->Filename.c_str());
+    SDL_BindAudioStream(Channels[Slot->Channel], Slot->Stream);
 }
 
-void audio_system::Pause(sound Sound)
+void audio_system::Pause(sound Handle)
 {
-    Log(Info, "audio_system::Pause() - Pausing sound %s", Sound.Name.c_str());
-    SDL_UnbindAudioStream(Sound.Stream);
+    sound_slot *Slot = ResolveHandle(Handle);
+    if(Slot == nullptr)
+        return;
+
+    Log(Info, "audio_system::Pause() - Pausing sound %s", Slot->Filename.c_str());
+    SDL_UnbindAudioStream(Slot->Stream);
 }
 
-void audio_system::SetSoundVolume(sound Sound, f32 Volume)
+void audio_system::SetSoundVolume(sound Handle, f32 Volume)
 {
+    sound_slot *Slot = ResolveHandle(Handle);
+    if(Slot == nullptr)
+        return;
+
     Volume = glm::clamp(0.0f, 1.0f, Volume);
 
-    Log(Info, "audio_system::SetSoundVolume - Sound: %s, Volume: %f", Sound.Name.c_str(), Volume);
+    Log(Info, "audio_system::SetSoundVolume - Sound: %s, Volume: %f", Slot->Filename.c_str(), Volume);
 
-    SDL_SetAudioStreamGain(Sound.Stream, Volume);
+    SDL_SetAudioStreamGain(Slot->Stream, Volume);
+}
+
+void audio_system::SetRepeat(sound Handle, b32 ShouldRepeat)
+{
+    sound_slot *Slot = ResolveHandle(Handle);
+    if(Slot == nullptr)
+        return;
+
+    if(ShouldRepeat)
+    {
+        // Assign the callback that copies the audio again once it finishes
+        SDL_SetAudioStreamGetCallback(Slot->Stream, AudioStreamGetCallback, Slot);
+    }
+    else
+    {
+        // Turn off the callback
+        SDL_SetAudioStreamGetCallback(Slot->Stream, NULL, Slot);
+    }
 }
 
 void audio_system::PauseAll()
@@ -90,71 +119,116 @@ void audio_system::SetGlobalVolume(f32 Volume)
     SDL_SetAudioDeviceGain(Channels[Channel_SFX], Volume);
 }
 
-sound audio_system::CreateSound(const std::string &Path, audio_channel Channel, bool Repeats)
+sound audio_system::CreateSound(const std::string &Path, audio_channel Channel)
 {
-    sound Result = {};
-
     Log(Info, "audio_system::CreateSound()  - Creating sound %s, bound to Channel: %s", Path.c_str(), Channel == Channel_Music ? "Channel_Music" : "Channel_SFX");
 
-    bool Success = SDL_LoadWAV(Path.c_str(), &Result.Spec, &Result.Buffer, &Result.Length);
-    if(!Success)
+    // Look for a free slot
+    for(u32 Index = 0; Index < MaxSoundCount; ++Index)
     {
-        Log(Error, "Failed to load wave file: %s, Error: %s", Path.c_str(), SDL_GetError());
-        return Result;
+        sound_slot *Slot = &Sounds[Index];
+
+        if(Slot->InUse == false)
+        {
+            bool Success = SDL_LoadWAV(Path.c_str(), &Slot->Spec, &Slot->AudioDataBuffer, &Slot->AudioDataBufferLength);
+            if(!Success)
+            {
+                Log(Error, "Failed to load wave file: %s, Error: %s", Path.c_str(), SDL_GetError());
+
+                return InvalidHandle();
+            }
+
+            SDL_AudioSpec DeviceSpec;
+            SDL_GetAudioDeviceFormat(Channels[Channel], &DeviceSpec, NULL);
+
+            Slot->InUse = true;
+            Slot->Filename = Path;
+            Slot->Stream = SDL_CreateAudioStream(&Slot->Spec, &DeviceSpec);
+            Slot->Channel = Channel;
+
+            SDL_PutAudioStreamData(Slot->Stream, Slot->AudioDataBuffer, Slot->AudioDataBufferLength);
+
+            return CreateHandle(Index, Slot->Generation);
+        }
     }
 
-    SDL_AudioSpec DeviceSpec;
-    SDL_GetAudioDeviceFormat(Channels[Channel], &DeviceSpec, NULL);
-
-    Result.Name = Path;
-    Result.Repeats = Repeats;
-    Result.Stream = SDL_CreateAudioStream(&Result.Spec, &DeviceSpec);
-    Result.Channel = Channel;
-
-    SDL_PutAudioStreamData(Result.Stream, Result.Buffer, Result.Length);
-
-#if 0
-    if(Repeats)
-    {
-        b32 Success = SDL_SetAudioStreamGetCallback(Result.Stream, AudioStreamGetCallback, &Result);
-    }
-#endif
-
-    return Result;
+    return InvalidHandle();
 }
 
-void audio_system::DestroySound(sound &Sound)
+void audio_system::DestroySound(sound Handle)
 {
-    if(Sound.Stream == nullptr || Sound.Buffer == nullptr || Sound.Length == 0 || Sound.Channel == Channel_Invalid)
-    {
-        Log(Warning, "audio_system::DestroySound() - Trying to Destroy an already destroyed sound");
+    sound_slot *Slot = ResolveHandle(Handle);
+    if(Slot == nullptr)
         return;
-    }
 
-    Log(Info, "audio_system::DestroySound() - Destroying sound: %s", Sound.Name.c_str());
+    Log(Info, "audio_system::DestroySound() - Destroying sound: %s", Slot->Filename.c_str());
 
-    Sound.Name.clear();
-
-    SDL_DestroyAudioStream(Sound.Stream);
-    Sound.Stream = nullptr;
-
-    SDL_free(Sound.Buffer);
-    Sound.Buffer = 0;
-    Sound.Length = 0;
-
-    Sound.Channel = Channel_Invalid;
+    Slot->InUse = false;
+    Slot->Generation++;
+    Slot->Filename.clear();
+    Slot->Repeats = false;
+    Slot->Channel = Channel_Invalid;
+    Slot->Spec = {};
+    SDL_DestroyAudioStream(Slot->Stream);
+    Slot->Stream = nullptr;
+    SDL_free(Slot->AudioDataBuffer);
+    Slot->AudioDataBuffer = 0;
+    Slot->AudioDataBufferLength = 0;
 }
 
-#if 0
+//
+// Private
+//
+
+sound audio_system::CreateHandle(i16 Index, i16 Generation)
+{
+    return (Index << 16) | (Generation & 0xFFFF);
+}
+
+sound audio_system::InvalidHandle()
+{
+    return CreateHandle(-1, -1);
+}
+
+sound_slot *audio_system::ResolveHandle(sound Handle)
+{
+    i16 Index = Handle >> 16;
+    i16 Generation = Handle & 0xFFFF;
+
+    if(Index < 0 || Index > MaxSoundCount - 1)
+    {
+        Log(Warning, "audio_system::ResolveHandle() - Tried to use invalid sound handle!");
+        return nullptr;
+    }
+
+    if(Sounds[Index].Generation != Generation)
+    {
+        Log(Warning, "audio_system::ResolveHandle() - Tried to use invalid sound handle!");
+        return nullptr;
+    }
+
+    return &Sounds[Index];
+}
+
+i16 audio_system::GetIndexFromHandle(sound Handle)
+{
+    return Handle >> 16;
+}
+
+i16 audio_system::GetGenerationFromHandle(sound Handle)
+{
+    return Handle & 0xFFFF;
+}
+
+
 void SDLCALL AudioStreamGetCallback(void *UserData, SDL_AudioStream *Stream, int AdditionalAmount, int TotalAmount)
 {
-    sound *Sound = (sound*)UserData;
+    sound_slot *Slot = (sound_slot*)UserData;
 
     // Copy more data for sounds that are supposed to repeat
     int SoundBytesRemaining = SDL_GetAudioStreamAvailable(Stream);
     if(SoundBytesRemaining == 0)
     {
-        SDL_PutAudioStreamData(Stream, Sound->Buffer, Sound->Length);
+        SDL_PutAudioStreamData(Stream, Slot->AudioDataBuffer, Slot->AudioDataBufferLength);
     }
 }
-#endif
