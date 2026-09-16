@@ -42,15 +42,6 @@ card CreateCard(texture Texture, glm::vec3 Position, f32 Rotation, f32 Scale, gl
 
 i32 main(i32 Argc, char **Argv)
 {
-    // TODO
-    // - Pasar el directorio de shaders dentro de src, asegurarse que se copie bien el build.sh, agregar todo en build.bat
-    // - Object picking usando un nuevo buffer de opengl
-    // - Pasar el create texture dentro de renderer
-    // - Hacer una prueba de concepto minima para reemplazar Renderer.DrawTexture -> Render::DrawTexture
-    // - Hacer que el log escriba a un txt
-    // - Hacer que el log no se ejecute en release
-    // - Crear una carta que tenga reverso y se pueda rotar, tal vez usar blender!
-
     // Object Picking
     // DONE: 0- Hacer que todas las cartas tengan un id, el index de array Cards es el ID
     // 1- Crear un framebuffer object para que contenga toda la info de la render pass
@@ -77,8 +68,8 @@ i32 main(i32 Argc, char **Argv)
     shader HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
 
     camera Camera = CreateCamera();
-    sound TestSong = Audio.CreateSound("assets/Sounds/music.wav", AudioChannel_Music, true);
-    sound TestSound = Audio.CreateSound("assets/Sounds/TestingSound.wav", AudioChannel_SFX, false);
+    sound TestSong = Audio.CreateSound("assets/Sounds/music.wav", Channel_Music, true);
+    sound TestSound = Audio.CreateSound("assets/Sounds/TestingSound.wav", Channel_SFX, false);
 
     texture TexClubs2             = Renderer.CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
     texture AwesomeFaceTexture    = Renderer.CreateTexture("assets/Textures/awesomeface.png");
