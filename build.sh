@@ -22,6 +22,7 @@ cp -ru ../src/shaders/. ./shaders/
 echo "BUILDING..."
 
 # Debug build
+# -fsanitize=address,undefined,integer
  clang++ -g -O0 -Wall -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter -Wno-unused-value -fsanitize=address,undefined,integer -fno-omit-frame-pointer\
     ../src/scoundrel.cpp \
     ../src/log.cpp \
