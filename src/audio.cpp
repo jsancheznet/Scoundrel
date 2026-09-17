@@ -19,7 +19,7 @@ void audio_system::Init()
     Channels[Channel_SFX]   = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
 
     // Do not start playing sound at startup, unpause it manually
-    PauseAll();
+    PauseAllChannels();
 }
 
 void audio_system::PlayChannel(audio_channel Channel)
@@ -36,7 +36,7 @@ void audio_system::PauseChannel(audio_channel Channel)
 
 void audio_system::SetChannelVolume(audio_channel Channel, f32 Volume)
 {
-    Volume = glm::clamp(0.0f, 1.0f, Volume);
+    Volume = glm::clamp(Volume, 0.0f, 1.0f);
 
     Log(Info, "audio_system::SetChannelVolume - Channel: %d, Volume: %.2f", Channel, Volume);
 
@@ -45,63 +45,139 @@ void audio_system::SetChannelVolume(audio_channel Channel, f32 Volume)
 
 void audio_system::Play(sound Handle)
 {
-    sound_slot *Slot = ResolveHandle(Handle);
-    if(Slot == nullptr)
+    sound_asset *Asset = ResolveHandle(Handle);
+    if(Asset == nullptr)
         return;
 
-    Log(Info, "audio::system::Play() - Playing sound %s", Slot->Filename.c_str());
-    SDL_BindAudioStream(Channels[Slot->Channel], Slot->Stream);
+    Log(Info, "audio::system::Play() - Playing sound %s", Asset->Filename.c_str());
+
+    // Find a free stream
+    i32 Index = -1;
+    for(i32 i = 0; i < MaxConcurrentStreams; ++i)
+    {
+        i32 BytesLeft = SDL_GetAudioStreamAvailable(Asset->Streams[i]);
+        if(BytesLeft < 1)
+        {
+            Index = i;
+
+            // If the stream is not null, it means it has a sound that has ended, so clear it so we do not leak.
+            if(Asset->Streams[i] != nullptr)
+            {
+                SDL_ClearAudioStream(Asset->Streams[i]);
+                SDL_UnbindAudioStream(Asset->Streams[i]);
+            }
+
+            break;
+        }
+    }
+
+    if(Index < 0)
+    {
+        Log(Info, "audio_system::Play() - Could not find a free Audio Stream to use, try raising MaxConcurrentStreams");
+        return;
+    }
+
+    Log(Info, "audio_system::Play() - Creating sound stream using index: %d", Index);
+
+    SDL_AudioSpec DeviceSpec;
+    SDL_GetAudioDeviceFormat(Channels[Asset->Channel], &DeviceSpec, NULL);
+    Asset->Streams[Index] = SDL_CreateAudioStream(&Asset->AudioSpec, &DeviceSpec);
+    SDL_PutAudioStreamData(Asset->Streams[Index], Asset->DataBuffer, Asset->DataBufferLength);
+    SDL_BindAudioStream(Channels[Asset->Channel], Asset->Streams[Index]);
+    SDL_SetAudioStreamGain(Asset->Streams[Index], Asset->Volume);
+
+    if(Asset->Repeats)
+    {
+        // Set the callback
+        SDL_SetAudioStreamGetCallback(Asset->Streams[Index], AudioStreamGetCallback, Asset);
+    }
 }
 
 void audio_system::Pause(sound Handle)
 {
-    sound_slot *Slot = ResolveHandle(Handle);
-    if(Slot == nullptr)
+    sound_asset *Asset = ResolveHandle(Handle);
+    if(Asset == nullptr)
         return;
 
-    Log(Info, "audio_system::Pause() - Pausing sound %s", Slot->Filename.c_str());
-    SDL_UnbindAudioStream(Slot->Stream);
+    Log(Info, "audio_system::Pause() - Pausing all instances of sound %s", Asset->Filename.c_str());
+    SDL_UnbindAudioStreams(Asset->Streams, MaxConcurrentStreams);
+}
+
+
+void audio_system::Resume(sound Handle)
+{
+    sound_asset *Asset = ResolveHandle(Handle);
+    if(Asset == nullptr)
+        return;
+
+    Log(Info, "audio_system::Resume() - Resuming all instances of sound %s", Asset->Filename.c_str());
+
+    for(i32 i = 0; i < MaxConcurrentStreams; ++i)
+    {
+        if(Asset->Streams[i] != nullptr)
+        {
+            SDL_BindAudioStream(Channels[Asset->Channel], Asset->Streams[i]);
+        }
+    }
 }
 
 void audio_system::SetSoundVolume(sound Handle, f32 Volume)
 {
-    sound_slot *Slot = ResolveHandle(Handle);
-    if(Slot == nullptr)
+    sound_asset *Asset = ResolveHandle(Handle);
+    if(Asset == nullptr)
         return;
 
-    Volume = glm::clamp(0.0f, 1.0f, Volume);
+    Asset->Volume = glm::clamp(Volume, 0.0f, 1.0f);
 
-    Log(Info, "audio_system::SetSoundVolume - Sound: %s, Volume: %f", Slot->Filename.c_str(), Volume);
+    Log(Info, "audio_system::SetSoundVolume - Sound: %s, Volume: %f", Asset->Filename.c_str(), Asset->Volume);
 
-    SDL_SetAudioStreamGain(Slot->Stream, Volume);
+    for(i32 i = 0; i < MaxConcurrentStreams; ++i)
+    {
+        if(Asset->Streams[i] != nullptr)
+        {
+            SDL_SetAudioStreamGain(Asset->Streams[i], Asset->Volume);
+        }
+    }
 }
 
 void audio_system::SetRepeat(sound Handle, b32 ShouldRepeat)
 {
-    sound_slot *Slot = ResolveHandle(Handle);
-    if(Slot == nullptr)
+    sound_asset *Asset = ResolveHandle(Handle);
+    if(Asset == nullptr)
         return;
 
-    if(ShouldRepeat)
+    if(ShouldRepeat != Asset->Repeats)
     {
-        // Assign the callback that copies the audio again once it finishes
-        SDL_SetAudioStreamGetCallback(Slot->Stream, AudioStreamGetCallback, Slot);
-    }
-    else
-    {
-        // Turn off the callback
-        SDL_SetAudioStreamGetCallback(Slot->Stream, NULL, Slot);
+        Log(Info, "audio_system::SetRepeat() - Asset: %s, Repeat: %s", Asset->Filename.c_str(), ShouldRepeat ? "true" : "false");
+        Asset->Repeats = ShouldRepeat;
+
+        for(i32 i = 0; i < MaxConcurrentStreams; ++i)
+        {
+            if(Asset->Streams[i] != nullptr)
+            {
+                if(ShouldRepeat)
+                {
+                    // Assign the callback that copies the audio again once it finishes
+                    SDL_SetAudioStreamGetCallback(Asset->Streams[i], AudioStreamGetCallback, Asset);
+                }
+                else
+                {
+                    // Turn off the callback
+                    SDL_SetAudioStreamGetCallback(Asset->Streams[i], NULL, Asset);
+                }
+            }
+        }
     }
 }
 
-void audio_system::PauseAll()
+void audio_system::PauseAllChannels()
 {
     Log(Info, "AudioSystem::PauseAll - Pausing All Sound Devices");
     SDL_PauseAudioDevice(Channels[Channel_Music]);
     SDL_PauseAudioDevice(Channels[Channel_SFX]);
 }
 
-void audio_system::ResumeAll()
+void audio_system::ResumeAllChannels()
 {
     Log(Info, "AudioSystem::ResumeAll - Resuming All Sound Devices");
 
@@ -119,61 +195,74 @@ void audio_system::SetGlobalVolume(f32 Volume)
     SDL_SetAudioDeviceGain(Channels[Channel_SFX], Volume);
 }
 
-sound audio_system::CreateSound(const std::string &Path, audio_channel Channel)
+sound audio_system::CreateSound(const std::string &Filepath, audio_channel Channel)
 {
-    Log(Info, "audio_system::CreateSound()  - Creating sound %s, bound to Channel: %s", Path.c_str(), Channel == Channel_Music ? "Channel_Music" : "Channel_SFX");
+    Log(Info, "audio_system::CreateSound()  - Creating sound %s, bound to Channel: %s", Filepath.c_str(), Channel == Channel_Music ? "Channel_Music" : "Channel_SFX");
 
-    // Look for a free slot
-    for(u32 Index = 0; Index < MaxSoundCount; ++Index)
+    // Find a free asset slot
+    sound_asset *Asset = nullptr;
+    i16 AssetIndex = -1;
+    for(u32 Index = 0; Index < MaxSoundAssetCount; ++Index)
     {
-        sound_slot *Slot = &Sounds[Index];
-
-        if(Slot->InUse == false)
+        if(Assets[Index].DataBuffer == nullptr)
         {
-            bool Success = SDL_LoadWAV(Path.c_str(), &Slot->Spec, &Slot->AudioDataBuffer, &Slot->AudioDataBufferLength);
-            if(!Success)
-            {
-                Log(Error, "Failed to load wave file: %s, Error: %s", Path.c_str(), SDL_GetError());
-
-                return InvalidHandle();
-            }
-
-            SDL_AudioSpec DeviceSpec;
-            SDL_GetAudioDeviceFormat(Channels[Channel], &DeviceSpec, NULL);
-
-            Slot->InUse = true;
-            Slot->Filename = Path;
-            Slot->Stream = SDL_CreateAudioStream(&Slot->Spec, &DeviceSpec);
-            Slot->Channel = Channel;
-
-            SDL_PutAudioStreamData(Slot->Stream, Slot->AudioDataBuffer, Slot->AudioDataBufferLength);
-
-            return CreateHandle(Index, Slot->Generation);
+            Asset = &Assets[Index];
+            AssetIndex = Index;
+            break;
         }
     }
 
-    return InvalidHandle();
+    // Found no free asset slot, return (-1, -1)
+    if(Asset == nullptr)
+        return InvalidHandle();
+
+    // Found Asset Slot, load file
+    bool Success = SDL_LoadWAV(Filepath.c_str(), &Asset->AudioSpec, &Asset->DataBuffer, &Asset->DataBufferLength);
+    if(!Success)
+    {
+        Log(Error, "Failed to load wave file: %s, Error: %s", Filepath.c_str(), SDL_GetError());
+
+        return InvalidHandle();
+    }
+
+    Asset->Filename = Filepath;
+    Asset->Channel = Channel;
+    Asset->Repeats = false;
+    Asset->Volume = 0.5f;
+
+    AssetsCount++;
+
+    return CreateHandle(AssetIndex, Asset->Generation);
 }
 
 void audio_system::DestroySound(sound Handle)
 {
-    sound_slot *Slot = ResolveHandle(Handle);
-    if(Slot == nullptr)
+    sound_asset *Asset = ResolveHandle(Handle);
+    if(Asset == nullptr)
+    {
+        Log(Info,"audio_system::DestroySound - Tried to destroy an already destroyed asset");
         return;
+    }
 
-    Log(Info, "audio_system::DestroySound() - Destroying sound: %s", Slot->Filename.c_str());
+    Log(Info, "audio_system::DestroySound() - Destroying sound: %s", Asset->Filename.c_str());
 
-    Slot->InUse = false;
-    Slot->Generation++;
-    Slot->Filename.clear();
-    Slot->Repeats = false;
-    Slot->Channel = Channel_Invalid;
-    Slot->Spec = {};
-    SDL_DestroyAudioStream(Slot->Stream);
-    Slot->Stream = nullptr;
-    SDL_free(Slot->AudioDataBuffer);
-    Slot->AudioDataBuffer = 0;
-    Slot->AudioDataBufferLength = 0;
+    Asset->Generation++;
+    Asset->Filename.clear();
+    Asset->Channel = Channel_Invalid;
+    Asset->Repeats = false;
+    Asset->AudioSpec = {};
+    Asset->DataBufferLength = 0;
+    SDL_free(Asset->DataBuffer);
+    Asset->DataBuffer = nullptr;
+
+    // Clear all sound streams
+    for(int i = 0; i < MaxConcurrentStreams; ++i)
+    {
+        SDL_DestroyAudioStream(Asset->Streams[i]);
+        Asset->Streams[i] = nullptr;
+    }
+
+    AssetsCount--;
 }
 
 //
@@ -190,24 +279,24 @@ sound audio_system::InvalidHandle()
     return CreateHandle(-1, -1);
 }
 
-sound_slot *audio_system::ResolveHandle(sound Handle)
+sound_asset *audio_system::ResolveHandle(sound Handle)
 {
     i16 Index = Handle >> 16;
     i16 Generation = Handle & 0xFFFF;
 
-    if(Index < 0 || Index > MaxSoundCount - 1)
+    if(Index < 0 || Index > MaxSoundAssetCount - 1)
     {
         Log(Warning, "audio_system::ResolveHandle() - Tried to use invalid sound handle!");
         return nullptr;
     }
 
-    if(Sounds[Index].Generation != Generation)
+    if(Assets[Index].Generation != Generation)
     {
         Log(Warning, "audio_system::ResolveHandle() - Tried to use invalid sound handle!");
         return nullptr;
     }
 
-    return &Sounds[Index];
+    return &Assets[Index];
 }
 
 i16 audio_system::GetIndexFromHandle(sound Handle)
@@ -220,15 +309,19 @@ i16 audio_system::GetGenerationFromHandle(sound Handle)
     return Handle & 0xFFFF;
 }
 
-
 void SDLCALL AudioStreamGetCallback(void *UserData, SDL_AudioStream *Stream, int AdditionalAmount, int TotalAmount)
 {
-    sound_slot *Slot = (sound_slot*)UserData;
+    sound_asset *Asset = (sound_asset*)UserData;
 
-    // Copy more data for sounds that are supposed to repeat
-    int SoundBytesRemaining = SDL_GetAudioStreamAvailable(Stream);
-    if(SoundBytesRemaining == 0)
+    for(i32 i = 0; i < MaxConcurrentStreams; ++i)
     {
-        SDL_PutAudioStreamData(Stream, Slot->AudioDataBuffer, Slot->AudioDataBufferLength);
+        if(Asset->Streams[i] != nullptr)
+        {
+            int SoundBytesRemaining = SDL_GetAudioStreamAvailable(Asset->Streams[i]);
+            if(SoundBytesRemaining == 0)
+            {
+                SDL_PutAudioStreamData(Asset->Streams[i], Asset->DataBuffer, Asset->DataBufferLength);
+            }
+        }
     }
 }
