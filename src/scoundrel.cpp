@@ -63,14 +63,14 @@ i32 main(i32 Argc, char **Argv)
 
     Audio.Init();
     Audio.SetGlobalVolume(1.0f);
-    Audio.ResumeAll();
+    Audio.ResumeAllChannels();
 
     shader HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
 
     camera Camera = CreateCamera();
     sound TestSong = Audio.CreateSound("assets/Sounds/music.wav", Channel_Music);
-    Audio.SetRepeat(TestSong, true);
     sound TestSound = Audio.CreateSound("assets/Sounds/TestingSound.wav", Channel_SFX);
+    Audio.SetRepeat(TestSound, true);
 
     texture TexClubs2             = Renderer.CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
     texture AwesomeFaceTexture    = Renderer.CreateTexture("assets/Textures/awesomeface.png");
@@ -122,20 +122,34 @@ i32 main(i32 Argc, char **Argv)
             Camera.Position.y -= 0.05f;
         }
 
-        if(Keyboard.IsPressed(SDL_SCANCODE_O))
-        {
-            Audio.Play(TestSong);
-        }
-
-        if(Keyboard.IsPressed(SDL_SCANCODE_P))
+        if(Keyboard.IsReleased(SDL_SCANCODE_O))
         {
             Audio.Play(TestSound);
         }
 
+        if(Keyboard.IsReleased(SDL_SCANCODE_P))
+        {
+            Audio.Pause(TestSound);
+        }
+
         if(Keyboard.IsReleased(SDL_SCANCODE_X))
         {
-            Audio.DestroySound(TestSong);
-            // Audio.DestroySound(TestSound);
+            Audio.Resume(TestSound);
+        }
+
+        if(Keyboard.IsReleased(SDL_SCANCODE_R))
+        {
+            Audio.SetRepeat(TestSound, false);
+        }
+
+        if(Keyboard.IsReleased(SDL_SCANCODE_KP_MINUS))
+        {
+            Audio.SetSoundVolume(TestSound, 0.0f);
+        }
+
+        if(Keyboard.IsReleased(SDL_SCANCODE_KP_PLUS))
+        {
+            Audio.SetSoundVolume(TestSound, 1.0f);
         }
 
         Renderer.ClearScreen(ORANGE);
