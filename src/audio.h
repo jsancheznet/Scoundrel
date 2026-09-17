@@ -76,14 +76,10 @@ struct audio_system
 private:
 
     SDL_AudioDeviceID Channels[Channel_Count];
-
     u32 AssetsCount = 0;
     sound_asset Assets[MaxSoundAssetCount];
 
-    //
     // Handle Helpers
-    //
-
     inline sound CreateHandle(i16 Index, i16 Generation);
     inline sound InvalidHandle();
     inline sound_asset *ResolveHandle(sound Handle);

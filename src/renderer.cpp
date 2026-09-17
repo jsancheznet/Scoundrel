@@ -166,6 +166,16 @@ shader renderer::CompileShader(const char *Filename)
 {
     Assert(Filename);
 
+    // Check if the file exists
+    b32 FileExists = SDL_GetPathInfo(Filename, NULL);
+    if(!FileExists)
+    {
+        Log(Error, "renderer::CompileShader() - Could not find shader file: %s", Filename);
+        return 0;
+    }
+
+    Log(Info, "renderer::CompileShader() - Compiling shader: %s", Filename);
+
     size_t Size;
     char *FileString = static_cast<char*>(SDL_LoadFile(Filename, &Size));
 
