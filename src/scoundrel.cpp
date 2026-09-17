@@ -65,7 +65,7 @@ i32 main(i32 Argc, char **Argv)
     Audio.SetGlobalVolume(1.0f);
     Audio.ResumeAllChannels();
 
-    shader HelloWorldShader = Renderer.CompileShader("shaders/hello_world.glsl");
+    shader HelloWorldShader = Renderer.CompileShader("shaders/batched_texture.glsl");
 
     camera Camera = CreateCamera();
     sound TestSong = Audio.CreateSound("assets/Sounds/music.wav", Channel_Music);
