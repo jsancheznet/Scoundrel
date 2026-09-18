@@ -6,13 +6,16 @@ void audio_system::Init()
 {
     Log(Info, "AudioSystem::Init()");
 
-    i32 AudioDeviceCount = 0;
-    SDL_AudioDeviceID *Devices = SDL_GetAudioPlaybackDevices(&AudioDeviceCount);
-    Log(Info, "AudioSystem::Init - Printing available audio devices");
-    for(int i = 0; i < AudioDeviceCount; ++i)
-    {
-        Log(Info, "\tDevice %d: %s", i, SDL_GetAudioDeviceName(Devices[i]));
+    { // Print Audio Devices to Log
+        i32 AudioDeviceCount = 0;
+        SDL_AudioDeviceID *Devices = SDL_GetAudioPlaybackDevices(&AudioDeviceCount);
+        Log(Info, "AudioSystem::Init - Printing available audio devices");
+        for(int i = 0; i < AudioDeviceCount; ++i)
+        {
+            Log(Info, "\tDevice %d: %s", i, SDL_GetAudioDeviceName(Devices[i]));
+        }
     }
+
 
     // Create all the channels on the default device
     Channels[Channel_Music] = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
@@ -228,7 +231,7 @@ sound audio_system::CreateSound(const std::string &Filepath, audio_channel Chann
     Asset->Filename = Filepath;
     Asset->Channel = Channel;
     Asset->Repeats = false;
-    Asset->Volume = 0.5f;
+    Asset->Volume = DefaultVolume;
 
     AssetsCount++;
 
@@ -252,6 +255,7 @@ void audio_system::DestroySound(sound Handle)
     Asset->Repeats = false;
     Asset->AudioSpec = {};
     Asset->DataBufferLength = 0;
+    Asset->Volume = DefaultVolume;
     SDL_free(Asset->DataBuffer);
     Asset->DataBuffer = nullptr;
 
@@ -284,13 +288,7 @@ sound_asset *audio_system::ResolveHandle(sound Handle)
     i16 Index = Handle >> 16;
     i16 Generation = Handle & 0xFFFF;
 
-    if(Index < 0 || Index > MaxSoundAssetCount - 1)
-    {
-        Log(Warning, "audio_system::ResolveHandle() - Tried to use invalid sound handle!");
-        return nullptr;
-    }
-
-    if(Assets[Index].Generation != Generation)
+    if(Index < 0 || Index > MaxSoundAssetCount - 1 || Assets[Index].Generation != Generation)
     {
         Log(Warning, "audio_system::ResolveHandle() - Tried to use invalid sound handle!");
         return nullptr;
@@ -311,6 +309,9 @@ i16 audio_system::GetGenerationFromHandle(sound Handle)
 
 void SDLCALL AudioStreamGetCallback(void *UserData, SDL_AudioStream *Stream, int AdditionalAmount, int TotalAmount)
 {
+    // This function only gets called for repeating sounds. It checks if the sound has ended and copies the audio data
+    // to be played again
+
     sound_asset *Asset = (sound_asset*)UserData;
 
     for(i32 i = 0; i < MaxConcurrentStreams; ++i)

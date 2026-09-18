@@ -27,6 +27,7 @@
 
 constexpr i16 MaxSoundAssetCount = 32;
 constexpr i16 MaxConcurrentStreams = 8;
+constexpr f32 DefaultVolume = 0.5f;
 
 enum audio_channel
 {
