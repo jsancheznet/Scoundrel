@@ -42,17 +42,6 @@ card CreateCard(texture Texture, glm::vec3 Position, f32 Rotation, f32 Scale, gl
 
 i32 main(i32 Argc, char **Argv)
 {
-    // Object Picking
-    // DONE: 0- Hacer que todas las cartas tengan un id, el index de array Cards es el ID
-    // 1- Crear un framebuffer object para que contenga toda la info de la render pass
-    // 2- Crear el renderbuffer y attachearlo al FBO
-    // 3- Crear depthbuffer y attachearlo al FBO
-    // 4- Crear un vertex shader con input int32 ObjectID, y mat4 MVP
-    // 5- Fragment shader convierte el id en color y lo dibuja
-    // 6- Bindear el FB, enable depth test, clear los buffers
-    // 7- En draw texture agregar el id a otro array
-    // 8- Hacer el draw para esto
-
     Application.Init();
 
     Application.CreateWindow("Scoundrel", 1366, 768);
@@ -69,7 +58,7 @@ i32 main(i32 Argc, char **Argv)
 
     camera Camera = CreateCamera();
     sound TestSong = Audio.CreateSound("assets/Sounds/music.wav", Channel_Music);
-    sound TestSound = Audio.CreateSound("assets/Sounds/TestingSound.wav", Channel_SFX);
+    sound TestSound = Audio.CreateSound("assets/Sounds/SuccesfulClick.wav", Channel_SFX);
     Audio.SetRepeat(TestSound, true);
 
     texture TexClubs2             = Renderer.CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");

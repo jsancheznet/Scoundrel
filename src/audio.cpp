@@ -92,7 +92,7 @@ void audio_system::Play(sound Handle)
     if(Asset->Repeats)
     {
         // Set the callback
-        SDL_SetAudioStreamGetCallback(Asset->Streams[Index], AudioStreamGetCallback, Asset);
+        SDL_SetAudioStreamGetCallback(Asset->Streams[Index], audio_system::AudioStreamGetCallback, Asset);
     }
 }
 
@@ -307,7 +307,7 @@ i16 audio_system::GetGenerationFromHandle(sound Handle)
     return Handle & 0xFFFF;
 }
 
-void SDLCALL AudioStreamGetCallback(void *UserData, SDL_AudioStream *Stream, int AdditionalAmount, int TotalAmount)
+void SDLCALL audio_system::AudioStreamGetCallback(void *UserData, SDL_AudioStream *Stream, int AdditionalAmount, int TotalAmount)
 {
     // This function only gets called for repeating sounds. It checks if the sound has ended and copies the audio data
     // to be played again

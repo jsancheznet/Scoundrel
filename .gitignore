@@ -2,4 +2,6 @@
 *.ilk
 *.rdi
 
+.*
+
 build/*
