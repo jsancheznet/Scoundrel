@@ -5,6 +5,12 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_audio.h>
 
+//
+// NOTE: This system is a bit over-engineered, i wanted to try out a handle based system. In the future i might create
+// an asset_manager that takes care of all the loading and asset handling. Right now there are more important things to
+// work on and time is valuable.
+//
+
 // Audio here has three layers: devices, assets, and streams.
 //
 // At the bottom are two SDL audio devices, one for music and one for sound effects. They work like mixing buses
@@ -86,8 +92,8 @@ private:
     inline sound_asset *ResolveHandle(sound Handle);
     inline i16 GetIndexFromHandle(sound Handle);
     inline i16 GetGenerationFromHandle(sound Handle);
-};
 
-// This was made exclusively for repeating a sound, this function checks if all bytes have been played, and copies the
-// sound again to the Stream
-void SDLCALL AudioStreamGetCallback(void *UserData, SDL_AudioStream *Stream, int AdditionalAmount, int TotalAmount);
+    // This was made exclusively for repeating a sound, this function checks if all bytes have been played, and copies the
+    // sound again to the Stream
+    static void SDLCALL AudioStreamGetCallback(void *UserData, SDL_AudioStream *Stream, int AdditionalAmount, int TotalAmount);
+};
