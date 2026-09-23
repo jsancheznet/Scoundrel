@@ -1,11 +1,10 @@
 #include <stdio.h>
 
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
 #include "renderer.h"
 #include "log.h"
+#include "asset_manager.h"
+
+extern asset_manager AssetMgr;
 
 void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 {
@@ -27,7 +26,6 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
         }
         printf("\n");
     }
-
 
     // Log OpenGL info
     i32 MaxUniformBufferBindings = -1;
@@ -155,8 +153,11 @@ void renderer::ClearScreen(color Color)
 void renderer::EndFrame()
 {
     // In here we can split things up according to teir material requirements, bind things and call draw
-    glNamedBufferSubData(SpritesVBO, 0, SpriteList.size() * sizeof(sprite_instance), &SpriteList[0]);
-    glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, SpriteList.size());
+    if(SpriteList.size() != 0)
+    {
+        glNamedBufferSubData(SpritesVBO, 0, SpriteList.size() * sizeof(sprite_instance), &SpriteList[0]);
+        glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, SpriteList.size());
+    }
 
     SpriteList.clear();
     SDL_GL_SwapWindow(Window);
@@ -232,57 +233,46 @@ u64 renderer::CompileShader(const char *Filename)
     return CompiledShader;
 }
 
-texture renderer::CreateTexture(const char* File)
+void renderer::UploadTexture(u8 *Data, i32 Width, i32 Height, u32 *ID, u64 *Handle)
 {
-    Assert(File);
+    Assert(Data && ID && Handle);
+    Assert(Width > 0 && Height > 0);
 
-    texture Result = {};
+    glCreateTextures(GL_TEXTURE_2D, 1, ID);
 
-    b32 FileExists = SDL_GetPathInfo(File, NULL);
-    if(!FileExists)
-    {
-        Log(Error, "CreateTexture(%s), File does not exist!", File);
-        return Result;
-    }
+    glTextureParameteri(*ID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(*ID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(*ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(*ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    i32 ChannelCount;
+    glTextureStorage2D(*ID, 1, GL_RGBA8, Width, Height);
 
-    stbi_set_flip_vertically_on_load(true);
+    glTextureSubImage2D(*ID, 0, 0, 0, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, Data);
 
-    u8 *ImageData = stbi_load(File, &Result.Width, &Result.Height, &ChannelCount, 4);
+    glGenerateTextureMipmap(*ID);
 
-    glCreateTextures(GL_TEXTURE_2D, 1, &Result.ID);
+    *Handle = glGetTextureHandleARB(*ID);
 
-    glTextureParameteri(Result.ID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(Result.ID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(Result.ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTextureParameteri(Result.ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glMakeTextureHandleResidentARB(*Handle);
 
-    glTextureStorage2D(Result.ID, 1, GL_RGBA8, Result.Width, Result.Height);
-
-    glTextureSubImage2D(Result.ID, 0, 0, 0, Result.Width, Result.Height, GL_RGBA, GL_UNSIGNED_BYTE, ImageData);
-
-    glGenerateTextureMipmap(Result.ID);
-
-    Result.Handle = glGetTextureHandleARB(Result.ID);
-
-    glMakeTextureHandleResidentARB(Result.Handle);
-
-    stbi_image_free(ImageData);
-
-    Log(Info, "CreateTexture() - Successfully created texture %s, Id %d, Handle %ld", File, Result.ID, Result.Handle);
-
-    return Result;
+    Log(Info, "renderer::UploadTexture()");
 }
 
-void renderer::DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect, glm::vec4 Tint)
+void renderer::DrawTexture(u64 AssetHandle, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect, glm::vec4 Tint)
 {
+    texture *Texture = (texture*)AssetMgr.ResolveHandle(AssetHandle);
+    if(Texture == nullptr)
+    {
+        Log(Warning, "renderer::DrawTexture() - Tried to draw an invalid texture handle");
+        return;
+    }
+
     sprite_instance Sprite = {};
 
     Sprite.Position = Position;
     Sprite.Scale = glm::vec3(Scale);
     Sprite.Rotation = Rotation;
-    Sprite.TextureHandle = Texture.Handle;
+    Sprite.TextureHandle = Texture->BindlessTextureHandle;
     Sprite.SrcRect = SrcRect;
     Sprite.Tint = Tint;
 
