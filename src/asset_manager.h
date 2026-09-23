@@ -4,6 +4,7 @@
 
 #include "typedefs.h"
 #include "audio.h"
+#include "renderer.h"
 
 constexpr u32 InvalidIndex = UINT32_MAX;
 constexpr u32 InvalidGeneration = UINT32_MAX;
@@ -13,6 +14,7 @@ enum asset_type
 {
     Asset_None = 0,
     Asset_Sound = 1,
+    Asset_Texture = 2,
 
     Asset_Count
 };
@@ -27,6 +29,7 @@ struct asset
     union
     {
         sound Sound;
+        texture Texture;
     };
 };
 
@@ -38,7 +41,7 @@ struct asset_manager
 
     // Asset Loading
     u64 LoadSound(const char *Filepath, audio_channel Channel);
-    // asset_handle LoadTexture(const char *Filepath);
+    u64 LoadTexture(const char *Filepath);
 
     // Asset Unloading
     b32 Unload(u64 Handle);

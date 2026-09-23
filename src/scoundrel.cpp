@@ -24,12 +24,12 @@ struct card
 {
     f32 Rotation;
     f32 Scale;
-    texture Texture;
+    u64 Texture;
     glm::vec3 Position;
     glm::vec4 Tint;
 };
 
-card CreateCard(texture Texture, glm::vec3 Position, f32 Rotation, f32 Scale, glm::vec4 Tint)
+card CreateCard(u64 Texture, glm::vec3 Position, f32 Rotation, f32 Scale, glm::vec4 Tint)
 {
     card Result = {};
 
@@ -69,9 +69,11 @@ i32 main(i32 Argc, char **Argv)
     Log(Info, "Sound Repeats: %x", &MySound->Repeats);
     MySound = (sound*)AssetMgr.ResolveHandle(TestingHandle);
 
-    texture TexClubs2             = Renderer.CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
-    texture AwesomeFaceTexture    = Renderer.CreateTexture("assets/Textures/awesomeface.png");
-    texture Spades5Texture        = Renderer.CreateTexture("assets/Textures/Scoundrel-Spades-5.jpg");
+    u64 TexClubs2             = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
+    u64 AwesomeFaceTexture    = AssetMgr.LoadTexture("assets/Textures/awesomeface.png");
+    u64 Spades5Texture        = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Spades-5.jpg");
+
+    u64 TestingTexture = AssetMgr.LoadTexture("assets/Textures/awesomeface.png");
 
     card Clubs2 = CreateCard(TexClubs2, glm::vec3(-0.5f, 0.0f, 0.f), 0.0f, 1.0f, glm::vec4(0.0f));
     card AwesomeFace = CreateCard(AwesomeFaceTexture, glm::vec3(0.5f, 0.0f, 0.f), 0.0f, 1.0f, glm::vec4(0.1f));
@@ -139,6 +141,11 @@ i32 main(i32 Argc, char **Argv)
         if(Keyboard.IsReleased(SDL_SCANCODE_R))
         {
             Audio.SetRepeat(TestSound, false);
+        }
+
+        if(Keyboard.IsReleased(SDL_SCANCODE_J))
+        {
+            AssetMgr.Unload(AwesomeFaceTexture);
         }
 
         Renderer.ClearScreen(ORANGE);

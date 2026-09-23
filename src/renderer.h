@@ -10,7 +10,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "typedefs.h"
-
 #include "camera.h"
 
 #define HOT_PINK color{1.0f, 0.0f, 1.0f, 0.0f}
@@ -33,9 +32,11 @@ struct rect
 struct texture
 {
     u32 ID;
-    u64 Handle;
+    u64 BindlessTextureHandle;
     i32 Width;
     i32 Height;
+    i32 ChannelCount;
+    u8 *Data;
 };
 
 struct sprite_instance
@@ -72,13 +73,13 @@ struct renderer
 
     void UpdateCamera(camera Camera);
 
-    texture CreateTexture(const char *File);
-    void DrawTexture(texture Texture, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f}, glm::vec4 Tint = {1.0f, 1.0f, 1.0f, 0.0f});
+    void UploadTexture(u8 *Data, i32 Width, i32 Height, u32 *ID, u64 *Handle);
+
+    void DrawTexture(u64 AssetHandle, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f}, glm::vec4 Tint = {1.0f, 1.0f, 1.0f, 0.0f});
 
     void UseShader(u32 Shader);
     void ClearScreen(color Color);
     void EndFrame();
-
 
   private:
 

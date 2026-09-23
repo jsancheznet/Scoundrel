@@ -2,8 +2,16 @@
 #include "typedefs.h"
 #include "log.h"
 #include "helpers.h"
+#include "renderer.h"
 
 #include <cstring>
+
+#ifndef STB_IMAGE_IMPLEMENTATION
+    #define STB_IMAGE_IMPLEMENTATION
+    #include <stb_image.h>
+#endif
+
+extern renderer Renderer;
 
 void asset_manager::Init()
 {
@@ -61,6 +69,45 @@ u64 asset_manager::LoadSound(const char *Filepath, audio_channel Channel)
 
 }
 
+u64 asset_manager::LoadTexture(const char *Filepath)
+{
+    Log(Info, "asset_manager::LoadTexture(%s)", Filepath);
+
+    if(!FileExists(Filepath))
+    {
+        Log(Error, "asset_manager::LoadTexture(%s) - File does not exist", Filepath);
+        return InvalidHandle();
+    }
+
+    // Find a free slot, return if nothing was found
+    u32 Index = FindFreeIndex();
+    if(Index == InvalidIndex)
+    {
+        Log(Warning, "asset_manager::LoadSound(%s) - Found no free slot inside the asset_manager", Filepath);
+        return InvalidHandle();
+    }
+
+    asset *Asset = &Assets[Index];
+
+    // Set Asset Vars
+    Asset->Type = Asset_Texture;
+    Asset->Used = true;
+    const char *Filename = FilenameFromPath(Filepath); Assert(Filename);
+    std::strncpy(Asset->Filename, Filename, std::strlen(Filename));
+
+    // Set Texture Vars
+    stbi_set_flip_vertically_on_load(true);
+    Asset->Texture.Data = stbi_load(Filepath, &Asset->Texture.Width, &Asset->Texture.Height, &Asset->Texture.ChannelCount, 4);
+
+    Renderer.UploadTexture(Asset->Texture.Data,
+                           Asset->Texture.Width,
+                           Asset->Texture.Height,
+                           &Asset->Texture.ID,
+                           &Asset->Texture.BindlessTextureHandle);
+
+    return CreateHandle(Index, Asset->Generation);
+}
+
 b32 asset_manager::Unload(u64 Handle)
 {
     u32 Index = GetIndexFromHandle(Handle);
@@ -74,9 +121,6 @@ b32 asset_manager::Unload(u64 Handle)
     asset *Asset = &Assets[Index];
 
     Log(Info, "asset_manager::Unload(%s)", Asset->Filename);
-
-    Asset->Used = false;
-    std::memset(Asset->Filename, 0, sizeof(Asset->Filename));
 
     switch(Asset->Type)
     {
@@ -95,6 +139,17 @@ b32 asset_manager::Unload(u64 Handle)
 
             break;
         }
+        case Asset_Texture:
+        {
+            Asset->Texture.ID = 0;
+            Asset->Texture.BindlessTextureHandle = 0;
+            Asset->Texture.Width = 0;
+            Asset->Texture.Height = 0;
+            Asset->Texture.ChannelCount = 0;
+            stbi_image_free(Asset->Texture.Data);
+            Asset->Texture.Data = nullptr;
+            break;
+        }
         default:
         {
             Log(Warning, "asset_manager::Unload() - Invalid Asset Type");
@@ -102,6 +157,8 @@ b32 asset_manager::Unload(u64 Handle)
         }
     }
 
+    Asset->Used = false;
+    std::memset(Asset->Filename, 0, sizeof(Asset->Filename));
     Asset->Type = Asset_None;
     Asset->Generation++;
     AssetCount--;
@@ -111,8 +168,6 @@ b32 asset_manager::Unload(u64 Handle)
 
 void *asset_manager::ResolveHandle(u64 Handle)
 {
-    Log(Info, "asset_manager::ResolveHandle()");
-
     u32 Index = GetIndexFromHandle(Handle);
     u32 Generation = GetGenerationFromHandle(Handle);
 
