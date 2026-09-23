@@ -2,6 +2,7 @@
 #include "log.h"
 #include "application.h"
 #include "renderer.h"
+#include "asset_manager.h"
 #include "audio.h"
 #include "keyboard.h"
 #include "mouse.h"
@@ -12,11 +13,12 @@
 
 #include <SDL3/SDL.h>
 
-application  Application;
-renderer     Renderer;
-mouse        Mouse;
-keyboard     Keyboard;
-audio_system Audio;
+application   Application;
+renderer      Renderer;
+asset_manager AssetMgr;
+mouse         Mouse;
+keyboard      Keyboard;
+audio_system  Audio;
 
 struct card
 {
@@ -46,20 +48,26 @@ i32 main(i32 Argc, char **Argv)
 
     Application.CreateWindow("Scoundrel", 1366, 768);
 
+    AssetMgr.Init();
     Keyboard.Init();
-
     Renderer.Init(Application.Window, 1366, 768);
-
     Audio.Init();
-    Audio.SetGlobalVolume(1.0f);
-    Audio.ResumeAllChannels();
 
-    shader HelloWorldShader = Renderer.CompileShader("shaders/batched_texture.glsl");
+    u64 HelloWorldShader = Renderer.CompileShader("shaders/batched_texture.glsl");
 
     camera Camera = CreateCamera();
-    sound TestSong = Audio.CreateSound("assets/Sounds/music.wav", Channel_Music);
-    sound TestSound = Audio.CreateSound("assets/Sounds/SuccesfulClick.wav", Channel_SFX);
+    u64 TestSong = AssetMgr.LoadSound("assets/Sounds/music.wav", Channel_Music);
+    Audio.Play(TestSong);
+
+    u64 TestSound = AssetMgr.LoadSound("assets/Sounds/SuccesfulClick.wav", Channel_SFX);
+
     Audio.SetRepeat(TestSound, true);
+
+    u64 TestingHandle = AssetMgr.LoadSound("assets/Sounds/music.wav", Channel_Music);
+    sound *MySound = (sound*)AssetMgr.ResolveHandle(TestingHandle);
+    AssetMgr.Unload(TestingHandle);
+    Log(Info, "Sound Repeats: %x", &MySound->Repeats);
+    MySound = (sound*)AssetMgr.ResolveHandle(TestingHandle);
 
     texture TexClubs2             = Renderer.CreateTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
     texture AwesomeFaceTexture    = Renderer.CreateTexture("assets/Textures/awesomeface.png");
@@ -119,26 +127,18 @@ i32 main(i32 Argc, char **Argv)
         if(Keyboard.IsReleased(SDL_SCANCODE_P))
         {
             Audio.Pause(TestSound);
+            Audio.Pause(TestSong);
         }
 
         if(Keyboard.IsReleased(SDL_SCANCODE_X))
         {
             Audio.Resume(TestSound);
+            Audio.Resume(TestSong);
         }
 
         if(Keyboard.IsReleased(SDL_SCANCODE_R))
         {
             Audio.SetRepeat(TestSound, false);
-        }
-
-        if(Keyboard.IsReleased(SDL_SCANCODE_KP_MINUS))
-        {
-            Audio.SetSoundVolume(TestSound, 0.0f);
-        }
-
-        if(Keyboard.IsReleased(SDL_SCANCODE_KP_PLUS))
-        {
-            Audio.SetSoundVolume(TestSound, 1.0f);
         }
 
         Renderer.ClearScreen(ORANGE);

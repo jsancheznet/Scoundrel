@@ -162,7 +162,7 @@ void renderer::EndFrame()
     SDL_GL_SwapWindow(Window);
 }
 
-shader renderer::CompileShader(const char *Filename)
+u64 renderer::CompileShader(const char *Filename)
 {
     Assert(Filename);
 
