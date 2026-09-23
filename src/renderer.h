@@ -68,7 +68,7 @@ struct renderer
     void Init(SDL_Window *SDLWindow, u32 Width, u32 Height);
     void UpdateViewport(i32 Width, i32 Height);
 
-    shader CompileShader(const char *Filename);
+    u64 CompileShader(const char *Filename);
 
     void UpdateCamera(camera Camera);
 
