@@ -5,6 +5,7 @@
 #include "typedefs.h"
 #include "audio.h"
 #include "renderer.h"
+#include "bitmap_font.h"
 
 constexpr u32 InvalidIndex = UINT32_MAX;
 constexpr u32 InvalidGeneration = UINT32_MAX;
