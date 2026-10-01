@@ -9,7 +9,7 @@ SDLInclude="-I../libraries/SDL-release-3.4.8/include"
 GLADInclude="-I../libraries/glad/include"
 GLMInclude="-I../libraries/glm-1.0.1-light"
 STBInclude="-I../libraries/stb"
-# JSONInclude="-I../libraries/json"
+JSONInclude="-I../libraries/json"
 
 IncludeDirectories="$SDLInclude $GLADInclude $GLMInclude $STBInclude $JSONInclude"
 
@@ -34,6 +34,7 @@ clang++ -g -O0 -Wall -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter 
     ../src/audio.cpp \
     ../src/asset_manager.cpp \
     ../src/helpers.cpp \
+    ../src/bitmap_font.cpp \
     -x c ../libraries/glad/src/glad.c \
     $IncludeDirectories \
     -L../libraries/SDL-release-3.4.8 \
