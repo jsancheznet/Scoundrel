@@ -72,8 +72,10 @@ i32 main(i32 Argc, char **Argv)
     u64 TexClubs2             = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
     u64 AwesomeFaceTexture    = AssetMgr.LoadTexture("assets/Textures/awesomeface.png");
     u64 Spades5Texture        = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Spades-5.jpg");
+    u64 TestingTexture        = AssetMgr.LoadTexture("assets/Textures/awesomeface.png");
 
-    u64 TestingTexture = AssetMgr.LoadTexture("assets/Textures/awesomeface.png");
+    u64 MarcellusFont = AssetMgr.LoadBitmapFont("assets/Fonts/Marcellus_sc.png", "assets/Fonts/Marcellus_sc.json");
+    u64 ArialFont     = AssetMgr.LoadBitmapFont("assets/Fonts/Arial.png", "assets/Fonts/Arial.json");
 
     card Clubs2 = CreateCard(TexClubs2, glm::vec3(-0.5f, 0.0f, 0.f), 0.0f, 1.0f, glm::vec4(0.0f));
     card AwesomeFace = CreateCard(AwesomeFaceTexture, glm::vec3(0.5f, 0.0f, 0.f), 0.0f, 1.0f, glm::vec4(0.1f));

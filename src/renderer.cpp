@@ -258,6 +258,20 @@ void renderer::UploadTexture(u8 *Data, i32 Width, i32 Height, u32 *ID, u64 *Hand
     Log(Info, "renderer::UploadTexture()");
 }
 
+void renderer::DeleteTexture(u32 *ID, u64 *Handle)
+{
+    Assert(ID && Handle);
+
+    // A resident bindless handle has to be made non resident before deleting its texture
+    if(*Handle) glMakeTextureHandleNonResidentARB(*Handle);
+    if(*ID) glDeleteTextures(1, ID);
+
+    *ID = 0;
+    *Handle = 0;
+
+    Log(Info, "renderer::DeleteTexture()");
+}
+
 void renderer::DrawTexture(u64 AssetHandle, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect, glm::vec4 Tint)
 {
     texture *Texture = (texture*)AssetMgr.ResolveHandle(AssetHandle);

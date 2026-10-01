@@ -16,6 +16,7 @@ enum asset_type
     Asset_None = 0,
     Asset_Sound = 1,
     Asset_Texture = 2,
+    Asset_BitmapFont = 3,
 
     Asset_Count
 };
@@ -25,12 +26,13 @@ struct asset
     asset_type Type;
     b32 Used;
     u32 Generation;
-    char Filename[256];
+    char Name[256];
 
     union
     {
         sound Sound;
         texture Texture;
+        bitmap_font Font;
     };
 };
 
@@ -43,6 +45,7 @@ struct asset_manager
     // Asset Loading
     u64 LoadSound(const char *Filepath, audio_channel Channel);
     u64 LoadTexture(const char *Filepath);
+    u64 LoadBitmapFont(const char *Image, const char *Json);
 
     // Asset Unloading
     b32 Unload(u64 Handle);
