@@ -258,7 +258,7 @@ void renderer::UploadTexture(u8 *Data, i32 Width, i32 Height, u32 *ID, u64 *Hand
     Log(Info, "renderer::UploadTexture()");
 }
 
-void renderer::DeleteTexture(u32 *ID, u64 *Handle)
+void renderer::DestroyTexture(u32 *ID, u64 *Handle)
 {
     Assert(ID && Handle);
 
@@ -293,6 +293,22 @@ void renderer::DrawTexture(u64 AssetHandle, vec3 Position, f32 Scale, f32 Rotati
     SpriteList.push_back(Sprite);
 }
 
+void renderer::DrawText(u64 Font, const char *Text)
+{
+    bitmap_font *BitmapFont = (bitmap_font*)AssetMgr.ResolveHandle(Font);
+    if(BitmapFont == nullptr)
+    {
+        Log(Warning, "renderer:DrawText() - Tried to draw text using an invalid font handle.");
+        return;
+    }
+
+    // TODO: Loop over the text, get each glyph, generate a quad with  vertex positions and texture coordinates
+    // TODO: Create an array that will hold all the quad text
+    // TODO: Draw everything on FrameEnd
+
+    font_glyph *Glyph = GetGlyph(BitmapFont, 'J');
+}
+
 void renderer::UseShader(u32 Shader)
 {
     CurrentShader = Shader;
@@ -303,9 +319,11 @@ void renderer::UseShader(u32 Shader)
 void renderer::UpdateCamera(camera Camera)
 {
     Camera.View = glm::lookAt(Camera.Position, Camera.Target, Camera.Up);
-    Camera.Projection = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
+    Camera.Perspective = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
+    Camera.Orthographic = glm::ortho(0.0f, (f32)ViewportWidth, (f32)ViewportHeight, 0.0f);
 
-    glNamedBufferSubData(CameraUBO, 0                    , sizeof(glm::mat4), glm::value_ptr(Camera.Projection));
+    glNamedBufferSubData(CameraUBO, 0                    , sizeof(glm::mat4), glm::value_ptr(Camera.Perspective));
+    glNamedBufferSubData(CameraUBO, sizeof(glm::mat4) * 1, sizeof(glm::mat4), glm::value_ptr(Camera.Orthographic));
     glNamedBufferSubData(CameraUBO, sizeof(glm::mat4) * 2, sizeof(glm::mat4), glm::value_ptr(Camera.View));
 }
 

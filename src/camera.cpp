@@ -19,7 +19,8 @@ camera CreateCamera()
     Camera.Far = 1000.0f;
 
     Camera.AspectRatio = (f32)Application.WindowWidth / (f32)Application.WindowHeight;
-    Camera.Projection = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
+    Camera.Perspective = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
+    Camera.Orthographic = glm::ortho(0.0f, (f32)Application.WindowWidth, (f32)Application.WindowHeight, 0.0f);
 
     Log(Info, "CreateCamera() - Created Camera, Position: %.2f %.2f, %.2f, Target: %.2f %.2f, %.2f",
 	Camera.Position.x, Camera.Position.y, Camera.Position.z, Camera.Target.x, Camera.Target.y, Camera.Target.z);

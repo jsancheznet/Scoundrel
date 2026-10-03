@@ -88,6 +88,12 @@ i32 main(i32 Argc, char **Argv)
     Cards.push_back(AwesomeFace);
     Cards.push_back(Spades5);
 
+
+    glm::mat4 Ortho = glm::ortho(0.0f, (f32)Application.WindowWidth, (f32)Application.WindowHeight, 0.0f);
+    glm::vec4 T = glm::vec4(0.0f);
+    glm::vec4 R = Ortho * T;
+    glm::vec4 R2 = Ortho * glm::vec4((f32)Application.WindowWidth / 2.0f, (f32) Application.WindowHeight / 2.0f, 0.0f, 1.0f);
+
     while(Application.IsRunning)
     {
         Application.BeginFrame();
@@ -157,6 +163,8 @@ i32 main(i32 Argc, char **Argv)
         Renderer.DrawTexture(AwesomeFace.Texture, AwesomeFace.Position, AwesomeFace.Scale, AwesomeFace.Rotation);
         rect SrcRect = {0.0f, 0.0, 1.0f, 1.0f};
         Renderer.DrawTexture(Spades5.Texture, Spades5.Position, Spades5.Scale, Spades5.Rotation, SrcRect, Spades5.Tint);
+
+        Renderer.DrawText(MarcellusFont, "Jorge");
 
         { // DEBUG
             char Buff[200];
