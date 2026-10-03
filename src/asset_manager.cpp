@@ -26,7 +26,7 @@ static void JsonGetBounds(json_object_s *Object, font_glyph_bounds *Bounds)
 // Frees the GPU texture and the CPU image data
 static void ReleaseTexture(texture *Texture)
 {
-    Renderer.DeleteTexture(&Texture->ID, &Texture->BindlessTextureHandle);
+    Renderer.DestroyTexture(&Texture->ID, &Texture->BindlessTextureHandle);
     Texture->Width = 0;
     Texture->Height = 0;
     Texture->ChannelCount = 0;

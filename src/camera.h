@@ -20,7 +20,8 @@ struct camera
     f32 AspectRatio;
 
     mat4 View;
-    mat4 Projection;
+    mat4 Perspective;
+    mat4 Orthographic;
 };
 
 
