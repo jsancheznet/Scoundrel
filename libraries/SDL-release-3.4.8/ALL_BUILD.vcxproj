@@ -1,0 +1,555 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ResolveNugetPackages>false</ResolveNugetPackages>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{59061E33-B89F-3777-B7AE-187D4B6233A9}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8 -BC:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8 --check-stamp-file C:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-4.4\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakePushCheckState.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CPack.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CPackComponent.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCSourceRuns.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckLanguage.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckStructHasMember.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindGit.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindPkgConfig.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckCommon.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckSourceRuns.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\WriteBasicConfigVersionFile.cmake;C:\Program Files\CMake\share\cmake-4.4\Templates\CPackConfig.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeCCompiler.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeCXXCompiler.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeRCCompiler.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeSystem.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\SDL_build_config.h.intermediate;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\cmake.verify_globs;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\3rdparty.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\CPackProjectConfig.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\FindLibUSB.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\GetGitRevisionDescription.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\PreseedEmscriptenCache.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\PreseedMSVCCache.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\PreseedNokiaNGageCache.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\SDL3Config.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\cmake_uninstall.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\macros.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdl3.pc.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlchecks.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlcommands.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlcompilers.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlcpu.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlmanpages.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlplatform.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\include\build_config\SDL_build_config.h.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\include\build_config\SDL_revision.h.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8 -BC:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8 --check-stamp-file C:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-4.4\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakePushCheckState.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CPack.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CPackComponent.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCSourceRuns.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckLanguage.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckStructHasMember.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindGit.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindPkgConfig.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckCommon.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckSourceRuns.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\WriteBasicConfigVersionFile.cmake;C:\Program Files\CMake\share\cmake-4.4\Templates\CPackConfig.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeCCompiler.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeCXXCompiler.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeRCCompiler.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeSystem.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\SDL_build_config.h.intermediate;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\cmake.verify_globs;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\3rdparty.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\CPackProjectConfig.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\FindLibUSB.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\GetGitRevisionDescription.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\PreseedEmscriptenCache.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\PreseedMSVCCache.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\PreseedNokiaNGageCache.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\SDL3Config.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\cmake_uninstall.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\macros.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdl3.pc.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlchecks.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlcommands.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlcompilers.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlcpu.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlmanpages.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlplatform.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\include\build_config\SDL_build_config.h.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\include\build_config\SDL_revision.h.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8 -BC:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8 --check-stamp-file C:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-4.4\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakePushCheckState.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CPack.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CPackComponent.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCSourceRuns.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckLanguage.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckStructHasMember.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindGit.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindPkgConfig.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckCommon.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckSourceRuns.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\WriteBasicConfigVersionFile.cmake;C:\Program Files\CMake\share\cmake-4.4\Templates\CPackConfig.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeCCompiler.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeCXXCompiler.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeRCCompiler.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeSystem.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\SDL_build_config.h.intermediate;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\cmake.verify_globs;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\3rdparty.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\CPackProjectConfig.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\FindLibUSB.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\GetGitRevisionDescription.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\PreseedEmscriptenCache.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\PreseedMSVCCache.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\PreseedNokiaNGageCache.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\SDL3Config.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\cmake_uninstall.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\macros.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdl3.pc.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlchecks.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlcommands.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlcompilers.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlcpu.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlmanpages.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlplatform.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\include\build_config\SDL_build_config.h.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\include\build_config\SDL_revision.h.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8 -BC:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8 --check-stamp-file C:/Users/jsanc/Desktop/Scoundrel/libraries/SDL-release-3.4.8/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-4.4\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakePackageConfigHelpers.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakePushCheckState.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CPack.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CPackComponent.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCSourceRuns.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckCXXSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckIncludeFiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckLanguage.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckStructHasMember.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\CheckSymbolExists.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindGit.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\FindPkgConfig.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\GNUInstallDirs.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckCommon.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckFlagCommonConfig.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckLinkerFlag.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Internal\CheckSourceRuns.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\Platform\WindowsPaths.cmake;C:\Program Files\CMake\share\cmake-4.4\Modules\WriteBasicConfigVersionFile.cmake;C:\Program Files\CMake\share\cmake-4.4\Templates\CPackConfig.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeCCompiler.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeCXXCompiler.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeRCCompiler.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\4.4.4\CMakeSystem.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\SDL_build_config.h.intermediate;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\cmake.verify_globs;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\3rdparty.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\CPackProjectConfig.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\FindLibUSB.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\GetGitRevisionDescription.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\PreseedEmscriptenCache.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\PreseedMSVCCache.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\PreseedNokiaNGageCache.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\SDL3Config.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\cmake_uninstall.cmake.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\macros.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdl3.pc.in;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlchecks.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlcommands.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlcompilers.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlcpu.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlmanpages.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\cmake\sdlplatform.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\include\build_config\SDL_build_config.h.cmake;C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\include\build_config\SDL_revision.h.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\ZERO_CHECK.vcxproj">
+      <Project>{75EB1056-5DAD-3BC4-A68E-519D05AC6154}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\SDL3-shared.vcxproj">
+      <Project>{07CBD41C-3DAB-3CB3-BF89-93660BF15407}</Project>
+      <Name>SDL3-shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\SDL3_test.vcxproj">
+      <Project>{75D95BD2-A917-3063-B95D-41E60B976C76}</Project>
+      <Name>SDL3_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\SDL_uclibc.vcxproj">
+      <Project>{B11B7219-4C58-326A-B00E-C8AC7BAEEBE3}</Project>
+      <Name>SDL_uclibc</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\checkkeys.vcxproj">
+      <Project>{9D288052-C9EC-3007-9CE8-C78AA9EFF1F6}</Project>
+      <Name>checkkeys</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\childprocess.vcxproj">
+      <Project>{2EEDF18F-AE2D-3E96-8611-6B7ED1D2F982}</Project>
+      <Name>childprocess</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\loopwave.vcxproj">
+      <Project>{9CD868EA-F42C-347C-83E2-EA12C275C12B}</Project>
+      <Name>loopwave</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\sdltests_utils.vcxproj">
+      <Project>{5151957A-B209-32BB-8E89-C844E2448358}</Project>
+      <Name>sdltests_utils</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testasyncio.vcxproj">
+      <Project>{6CD4FD50-ACB8-3BF3-B693-D612DEB6FF8E}</Project>
+      <Name>testasyncio</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testatomic.vcxproj">
+      <Project>{B15F3350-9CDF-331F-BEAD-E57508E0D205}</Project>
+      <Name>testatomic</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testaudio.vcxproj">
+      <Project>{17E81078-A453-319C-94A5-3D6BBE69E0EF}</Project>
+      <Name>testaudio</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testaudiohotplug.vcxproj">
+      <Project>{6C188315-D954-35D9-ADA4-1F99165E13D2}</Project>
+      <Name>testaudiohotplug</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testaudioinfo.vcxproj">
+      <Project>{42146F0B-4110-394A-ADC7-3B24C47CBF9E}</Project>
+      <Name>testaudioinfo</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testaudiorecording.vcxproj">
+      <Project>{53267750-4692-36C4-9E57-83A990BF6585}</Project>
+      <Name>testaudiorecording</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testaudiostreamdynamicresample.vcxproj">
+      <Project>{F10305A0-6868-3535-81AB-B7C4337DFA05}</Project>
+      <Name>testaudiostreamdynamicresample</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testautomation.vcxproj">
+      <Project>{B9FB2381-F01F-3E98-9A6D-CEB7FDC554E4}</Project>
+      <Name>testautomation</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testbounds.vcxproj">
+      <Project>{796A86E5-6075-3597-B141-6F0BE80C9FB8}</Project>
+      <Name>testbounds</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testcamera.vcxproj">
+      <Project>{D2CF27FA-42E5-3829-9B3F-F906970A141C}</Project>
+      <Name>testcamera</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testclipboard.vcxproj">
+      <Project>{415B230C-05EB-3D7C-BBDD-2ED9E563829F}</Project>
+      <Name>testclipboard</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testcolorspace.vcxproj">
+      <Project>{2A75B027-767D-3101-9827-F4500209EC05}</Project>
+      <Name>testcolorspace</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testcontroller.vcxproj">
+      <Project>{D2E58399-5DA6-38B8-81A4-6B303401D4F2}</Project>
+      <Name>testcontroller</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testcustomcursor.vcxproj">
+      <Project>{F5FFBE19-056B-313A-B355-DD9E3D83B3BC}</Project>
+      <Name>testcustomcursor</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testdialog.vcxproj">
+      <Project>{3FFB9F6D-8984-3CEB-8B37-E5821C085074}</Project>
+      <Name>testdialog</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testdisplayinfo.vcxproj">
+      <Project>{4718EED0-9615-336C-9BC6-3343705D300D}</Project>
+      <Name>testdisplayinfo</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testdlopennote.vcxproj">
+      <Project>{3467CE37-6E8D-335D-98FB-B7429A0A9C7F}</Project>
+      <Name>testdlopennote</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testdraw.vcxproj">
+      <Project>{7E9B783C-4B69-3C1D-A32A-757506E6A743}</Project>
+      <Name>testdraw</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testdrawchessboard.vcxproj">
+      <Project>{728B7163-3796-3941-8E60-19CEC45223A6}</Project>
+      <Name>testdrawchessboard</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testdropfile.vcxproj">
+      <Project>{87F0A6E3-30D6-38F4-9F19-2D541CD6766F}</Project>
+      <Name>testdropfile</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testerror.vcxproj">
+      <Project>{CC505930-005C-398D-8318-F2A6D5959AC6}</Project>
+      <Name>testerror</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testevdev.vcxproj">
+      <Project>{9A49D21F-E163-3F0A-BCBD-4629094C5C49}</Project>
+      <Name>testevdev</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testfile.vcxproj">
+      <Project>{D9180EC0-6D5B-3586-B776-011D06E51CCB}</Project>
+      <Name>testfile</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testfilesystem.vcxproj">
+      <Project>{ECC83311-CBC3-32CF-AB76-FE2879B443BA}</Project>
+      <Name>testfilesystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testgeometry.vcxproj">
+      <Project>{23D659A1-A09D-3B52-BF78-2FD101D76687}</Project>
+      <Name>testgeometry</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testgl.vcxproj">
+      <Project>{ADCBA6A5-B745-34FB-BE3A-6661134E6204}</Project>
+      <Name>testgl</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testgles.vcxproj">
+      <Project>{65A2E0D4-156B-3483-8C0C-E74F0789DFD4}</Project>
+      <Name>testgles</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testgles2.vcxproj">
+      <Project>{83993AC3-603A-314E-A5F0-30A82997A0D6}</Project>
+      <Name>testgles2</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testgpu_simple_clear.vcxproj">
+      <Project>{5405EB14-95E2-3C11-A69B-ED2A3241155A}</Project>
+      <Name>testgpu_simple_clear</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testgpu_spinning_cube.vcxproj">
+      <Project>{93728034-5840-31AA-AD05-C16C9D6BC4FB}</Project>
+      <Name>testgpu_spinning_cube</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testgpurender_effects.vcxproj">
+      <Project>{6D40E044-64E2-3258-99C3-93E32D55798C}</Project>
+      <Name>testgpurender_effects</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testgpurender_msdf.vcxproj">
+      <Project>{3BEB45A0-E0E7-3837-8457-3A0135FE7686}</Project>
+      <Name>testgpurender_msdf</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testhaptic.vcxproj">
+      <Project>{0692B067-8E8F-3469-AB25-10C53B1A0BE2}</Project>
+      <Name>testhaptic</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testhittesting.vcxproj">
+      <Project>{7CBA84CA-DBBD-3704-8676-77C89FA4DF9F}</Project>
+      <Name>testhittesting</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testhotplug.vcxproj">
+      <Project>{1079A97B-B115-3BBA-BD9F-3899C29F7FE4}</Project>
+      <Name>testhotplug</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testiconv.vcxproj">
+      <Project>{CD7BD421-D637-3E84-84A2-0A7E5989B875}</Project>
+      <Name>testiconv</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testime.vcxproj">
+      <Project>{692E4CCE-9C90-3B1A-9BD0-7ED3F1A96305}</Project>
+      <Name>testime</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testintersections.vcxproj">
+      <Project>{E6A9E430-D639-362A-AAEC-FBBAAD98EFE4}</Project>
+      <Name>testintersections</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testkeys.vcxproj">
+      <Project>{7180D7C3-48AC-3861-B359-5307E70DF8FD}</Project>
+      <Name>testkeys</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testloadso.vcxproj">
+      <Project>{F8E40752-790F-377C-A3A2-4A4AB6E9F7B4}</Project>
+      <Name>testloadso</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testlocale.vcxproj">
+      <Project>{92545D63-38A6-32FC-9CD6-7B217AAA1ABC}</Project>
+      <Name>testlocale</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testlock.vcxproj">
+      <Project>{A58987FB-B290-32CD-8359-D3AA87844968}</Project>
+      <Name>testlock</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testmanymouse.vcxproj">
+      <Project>{DD13D540-5155-32BB-8FAD-449F86671A32}</Project>
+      <Name>testmanymouse</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testmessage.vcxproj">
+      <Project>{BA3B477B-728F-30E7-96C9-1B144AA9FD97}</Project>
+      <Name>testmessage</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testmodal.vcxproj">
+      <Project>{3884CD40-02D0-3D5B-B273-CC7C417C15E5}</Project>
+      <Name>testmodal</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testmouse.vcxproj">
+      <Project>{06B8987E-7001-3485-B701-F796395A95B7}</Project>
+      <Name>testmouse</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testmultiaudio.vcxproj">
+      <Project>{716C8F55-0507-3B47-96F0-7CE2412E3A56}</Project>
+      <Name>testmultiaudio</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testnative.vcxproj">
+      <Project>{77158533-84A9-3134-BD14-1F83CC123849}</Project>
+      <Name>testnative</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testoffscreen.vcxproj">
+      <Project>{BEB35F68-8B95-3865-910D-63D5B4E3BC74}</Project>
+      <Name>testoffscreen</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testoverlay.vcxproj">
+      <Project>{D63197A3-9A88-335D-8F6A-04EF1C748D63}</Project>
+      <Name>testoverlay</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testpalette.vcxproj">
+      <Project>{0E60546E-CF66-38E0-B51F-B352D6F8DECC}</Project>
+      <Name>testpalette</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testpen.vcxproj">
+      <Project>{DE42F277-F95F-3655-A245-37AD7C4BEC48}</Project>
+      <Name>testpen</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testplatform.vcxproj">
+      <Project>{039DACB4-47A1-34F3-B26B-8767ACCA5B39}</Project>
+      <Name>testplatform</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testpopup.vcxproj">
+      <Project>{B4B8539E-7FFC-3713-B81C-A86E9CE0C743}</Project>
+      <Name>testpopup</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testpower.vcxproj">
+      <Project>{4382EEEA-3136-31A3-A7C5-383CF320D491}</Project>
+      <Name>testpower</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testprocess.vcxproj">
+      <Project>{D80F9B51-4BE1-372F-B670-FE0501ED49BE}</Project>
+      <Name>testprocess</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testqsort.vcxproj">
+      <Project>{63D66428-7706-3D3D-A63B-D96C52E008A2}</Project>
+      <Name>testqsort</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testrelative.vcxproj">
+      <Project>{010D6575-0945-368C-BDFD-6E85360B7A49}</Project>
+      <Name>testrelative</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testrendercopyex.vcxproj">
+      <Project>{5933E053-9686-3AFC-B095-42EA67617480}</Project>
+      <Name>testrendercopyex</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testrendertarget.vcxproj">
+      <Project>{9664A2B0-56D6-3DA7-852A-83B9AAF23090}</Project>
+      <Name>testrendertarget</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testresample.vcxproj">
+      <Project>{3EED7AC5-2697-3853-9F2B-AE4ED809AEB2}</Project>
+      <Name>testresample</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testrotate.vcxproj">
+      <Project>{25BDB25E-7BF8-3BD6-A7D7-EC9E23ED4766}</Project>
+      <Name>testrotate</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testrumble.vcxproj">
+      <Project>{25E38736-E364-3A1C-B86A-89DBB4FEA048}</Project>
+      <Name>testrumble</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testrwlock.vcxproj">
+      <Project>{59DFFAEE-9FFA-3319-A60C-8CBC700DF8FC}</Project>
+      <Name>testrwlock</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testscale.vcxproj">
+      <Project>{29A3C42F-8489-3AB4-8D01-C9560F88EAE6}</Project>
+      <Name>testscale</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testsem.vcxproj">
+      <Project>{C6566288-F697-31E0-8D50-3F9124016F82}</Project>
+      <Name>testsem</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testsensor.vcxproj">
+      <Project>{2D47F598-7802-36A2-A5ED-77E5E405D2A2}</Project>
+      <Name>testsensor</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testshader.vcxproj">
+      <Project>{82558BBC-54EE-394B-A5A5-3B6AE20A8F6D}</Project>
+      <Name>testshader</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testshape.vcxproj">
+      <Project>{C3B4E008-50AB-3F52-9242-05BAEA40FF55}</Project>
+      <Name>testshape</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testsoftwaretransparent.vcxproj">
+      <Project>{AE62E561-4155-30CC-A0B0-7FD6B92993EC}</Project>
+      <Name>testsoftwaretransparent</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testsprite.vcxproj">
+      <Project>{AFE78C2A-3250-3170-8C7D-085D58873193}</Project>
+      <Name>testsprite</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testspriteminimal.vcxproj">
+      <Project>{272DA445-E3FB-32AB-913C-A55B855D19EF}</Project>
+      <Name>testspriteminimal</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testspritesurface.vcxproj">
+      <Project>{D299D174-93BE-3B21-9F2C-40E10325A822}</Project>
+      <Name>testspritesurface</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testsurround.vcxproj">
+      <Project>{339F3F77-8C6E-3559-8C81-00B1E6ECA73E}</Project>
+      <Name>testsurround</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testsymbols.vcxproj">
+      <Project>{A8C73FBF-5EBA-3200-8176-12665FA20CFF}</Project>
+      <Name>testsymbols</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testthread.vcxproj">
+      <Project>{3B9AE1A1-BF5A-3CFD-98F7-082F009A80C1}</Project>
+      <Name>testthread</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testtime.vcxproj">
+      <Project>{51FC1186-EB62-3D4A-AFE1-C3A692D21351}</Project>
+      <Name>testtime</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testtimer.vcxproj">
+      <Project>{869F05C1-65D5-351B-82F9-180634A02A49}</Project>
+      <Name>testtimer</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testtray.vcxproj">
+      <Project>{B7D59B76-0B67-3A13-BF6D-660FD57DC1D4}</Project>
+      <Name>testtray</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testurl.vcxproj">
+      <Project>{6EF94A07-E4FD-3379-A510-3913C5B5C430}</Project>
+      <Name>testurl</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testver.vcxproj">
+      <Project>{BD585C8D-C5BC-32CC-99D3-9247D68913FC}</Project>
+      <Name>testver</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testviewport.vcxproj">
+      <Project>{9C6859F4-18B3-3252-B2C9-E6461FAFB49A}</Project>
+      <Name>testviewport</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testvulkan.vcxproj">
+      <Project>{316A2214-80FA-396E-B223-B3628EE72222}</Project>
+      <Name>testvulkan</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testwm.vcxproj">
+      <Project>{3ADC5B9A-276B-3E5A-B630-860AFB9CF28B}</Project>
+      <Name>testwm</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testyuv.vcxproj">
+      <Project>{0C347675-15DF-39C3-8573-2068E43E4F72}</Project>
+      <Name>testyuv</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\torturethread.vcxproj">
+      <Project>{9DD1A9E0-EC5D-3153-B4A6-8D60CDB7866E}</Project>
+      <Name>torturethread</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testspritesurface.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\icon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{68E988D4-D942-3153-BF4E-EA96C9D9E6FE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4F1402FA-0909-3894-9248-7780070FB091}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

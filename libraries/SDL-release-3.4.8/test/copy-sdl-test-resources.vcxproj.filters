@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\a826877bb675dba7.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\addfcae861a73c50.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\6db771ca1ce581ce.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\66956a6690a8e1ce.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\43f7b89df85d38f3.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\8a990ff972256ad0.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\0a6025aba1c5542b.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\bbeaede2eec5749b.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\9cf30fc337e3fc53.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\088c621c7010eb24.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\1bb1481ff2bcc9d9.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\a81408c8f20ae687.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\74b3a136bc4c13a7.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\146f26636f8a224f.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\0c2788fc3712ba04.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\ded4b85839d27537.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\7ceb1caf7e4f8610.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\1531b035494bc2cb.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\f53b56da4dd5dd17.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\33ac8fa2eb9920a0.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\4642420540bf33c8.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\c0160ea169c32fd2.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\59f3b0c24e45cb4a.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\206afae6a886bd38.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\a2529f51004177f6.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\d0350b73356fe7e1.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\d68208f25ad994e5.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\10697bd2638a0c27.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\4f2e97c7ba221f2c.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\6ad6e26c029812af.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\3b41013a703bd6be.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\9193246d51c21794.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\4440cb7e5ae75109.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\911f5574513d9f98.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\9bf450f6d49f2303.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\b8f94b6c24dbed0b.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\b022bcc2c5f250b4.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\c5fcb42b7ba8e043d183302cf5ce4453\copy-sdl-test-resources.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\CMakeFiles\copy-sdl-test-resources" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{01F26C1C-9C2D-3977-B700-0A8A3701DE6D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

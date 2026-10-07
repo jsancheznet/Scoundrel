@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\34c8a148f807a679ca5b77629bfcaecf\uninstall.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\CMakeFiles\uninstall" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{01F26C1C-9C2D-3977-B700-0A8A3701DE6D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
