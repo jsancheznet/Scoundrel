@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\testcontroller.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepadutils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_axis_arrow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_axis.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_back.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_battery.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_battery_wired.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_button_background.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_button_small.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_face_abxy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_face_axby.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_face_bayx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_face_sony.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_front.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_touchpad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_wired.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\gamepad_wireless.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="C:\Users\jsanc\Desktop\Scoundrel\libraries\SDL-release-3.4.8\test\sdltests_utils.dir\$(Configuration)\testutils.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{68E988D4-D942-3153-BF4E-EA96C9D9E6FE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object Libraries">
+      <UniqueIdentifier>{B3FB2C90-5AC9-3338-A99D-F690DEAD77E6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4F1402FA-0909-3894-9248-7780070FB091}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

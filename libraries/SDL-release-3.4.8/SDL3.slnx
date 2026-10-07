@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="RelWithDebInfo"/>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Release"/>
+		<BuildType Name="MinSizeRel"/>
+		<Platform Name="x64"/>
+	</Configurations>
+	<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="59061e33-b89f-3777-b7ae-187d4b6233a9" DefaultStartup="true">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="SDL_uclibc.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/checkkeys.vcxproj"/>
+		<BuildDependency Project="test/childprocess.vcxproj"/>
+		<BuildDependency Project="test/loopwave.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+		<BuildDependency Project="test/testasyncio.vcxproj"/>
+		<BuildDependency Project="test/testatomic.vcxproj"/>
+		<BuildDependency Project="test/testaudio.vcxproj"/>
+		<BuildDependency Project="test/testaudiohotplug.vcxproj"/>
+		<BuildDependency Project="test/testaudioinfo.vcxproj"/>
+		<BuildDependency Project="test/testaudiorecording.vcxproj"/>
+		<BuildDependency Project="test/testaudiostreamdynamicresample.vcxproj"/>
+		<BuildDependency Project="test/testautomation.vcxproj"/>
+		<BuildDependency Project="test/testbounds.vcxproj"/>
+		<BuildDependency Project="test/testcamera.vcxproj"/>
+		<BuildDependency Project="test/testclipboard.vcxproj"/>
+		<BuildDependency Project="test/testcolorspace.vcxproj"/>
+		<BuildDependency Project="test/testcontroller.vcxproj"/>
+		<BuildDependency Project="test/testcustomcursor.vcxproj"/>
+		<BuildDependency Project="test/testdialog.vcxproj"/>
+		<BuildDependency Project="test/testdisplayinfo.vcxproj"/>
+		<BuildDependency Project="test/testdlopennote.vcxproj"/>
+		<BuildDependency Project="test/testdraw.vcxproj"/>
+		<BuildDependency Project="test/testdrawchessboard.vcxproj"/>
+		<BuildDependency Project="test/testdropfile.vcxproj"/>
+		<BuildDependency Project="test/testerror.vcxproj"/>
+		<BuildDependency Project="test/testevdev.vcxproj"/>
+		<BuildDependency Project="test/testfile.vcxproj"/>
+		<BuildDependency Project="test/testfilesystem.vcxproj"/>
+		<BuildDependency Project="test/testgeometry.vcxproj"/>
+		<BuildDependency Project="test/testgl.vcxproj"/>
+		<BuildDependency Project="test/testgles.vcxproj"/>
+		<BuildDependency Project="test/testgles2.vcxproj"/>
+		<BuildDependency Project="test/testgpu_simple_clear.vcxproj"/>
+		<BuildDependency Project="test/testgpu_spinning_cube.vcxproj"/>
+		<BuildDependency Project="test/testgpurender_effects.vcxproj"/>
+		<BuildDependency Project="test/testgpurender_msdf.vcxproj"/>
+		<BuildDependency Project="test/testhaptic.vcxproj"/>
+		<BuildDependency Project="test/testhittesting.vcxproj"/>
+		<BuildDependency Project="test/testhotplug.vcxproj"/>
+		<BuildDependency Project="test/testiconv.vcxproj"/>
+		<BuildDependency Project="test/testime.vcxproj"/>
+		<BuildDependency Project="test/testintersections.vcxproj"/>
+		<BuildDependency Project="test/testkeys.vcxproj"/>
+		<BuildDependency Project="test/testloadso.vcxproj"/>
+		<BuildDependency Project="test/testlocale.vcxproj"/>
+		<BuildDependency Project="test/testlock.vcxproj"/>
+		<BuildDependency Project="test/testmanymouse.vcxproj"/>
+		<BuildDependency Project="test/testmessage.vcxproj"/>
+		<BuildDependency Project="test/testmodal.vcxproj"/>
+		<BuildDependency Project="test/testmouse.vcxproj"/>
+		<BuildDependency Project="test/testmultiaudio.vcxproj"/>
+		<BuildDependency Project="test/testnative.vcxproj"/>
+		<BuildDependency Project="test/testoffscreen.vcxproj"/>
+		<BuildDependency Project="test/testoverlay.vcxproj"/>
+		<BuildDependency Project="test/testpalette.vcxproj"/>
+		<BuildDependency Project="test/testpen.vcxproj"/>
+		<BuildDependency Project="test/testplatform.vcxproj"/>
+		<BuildDependency Project="test/testpopup.vcxproj"/>
+		<BuildDependency Project="test/testpower.vcxproj"/>
+		<BuildDependency Project="test/testprocess.vcxproj"/>
+		<BuildDependency Project="test/testqsort.vcxproj"/>
+		<BuildDependency Project="test/testrelative.vcxproj"/>
+		<BuildDependency Project="test/testrendercopyex.vcxproj"/>
+		<BuildDependency Project="test/testrendertarget.vcxproj"/>
+		<BuildDependency Project="test/testresample.vcxproj"/>
+		<BuildDependency Project="test/testrotate.vcxproj"/>
+		<BuildDependency Project="test/testrumble.vcxproj"/>
+		<BuildDependency Project="test/testrwlock.vcxproj"/>
+		<BuildDependency Project="test/testscale.vcxproj"/>
+		<BuildDependency Project="test/testsem.vcxproj"/>
+		<BuildDependency Project="test/testsensor.vcxproj"/>
+		<BuildDependency Project="test/testshader.vcxproj"/>
+		<BuildDependency Project="test/testshape.vcxproj"/>
+		<BuildDependency Project="test/testsoftwaretransparent.vcxproj"/>
+		<BuildDependency Project="test/testsprite.vcxproj"/>
+		<BuildDependency Project="test/testspriteminimal.vcxproj"/>
+		<BuildDependency Project="test/testspritesurface.vcxproj"/>
+		<BuildDependency Project="test/testsurround.vcxproj"/>
+		<BuildDependency Project="test/testsymbols.vcxproj"/>
+		<BuildDependency Project="test/testthread.vcxproj"/>
+		<BuildDependency Project="test/testtime.vcxproj"/>
+		<BuildDependency Project="test/testtimer.vcxproj"/>
+		<BuildDependency Project="test/testtray.vcxproj"/>
+		<BuildDependency Project="test/testurl.vcxproj"/>
+		<BuildDependency Project="test/testver.vcxproj"/>
+		<BuildDependency Project="test/testviewport.vcxproj"/>
+		<BuildDependency Project="test/testvulkan.vcxproj"/>
+		<BuildDependency Project="test/testwm.vcxproj"/>
+		<BuildDependency Project="test/testyuv.vcxproj"/>
+		<BuildDependency Project="test/torturethread.vcxproj"/>
+	</Project>
+	<Project Path="INSTALL.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="ae09c5e5-505e-37b5-95f1-fb6a23dc656f">
+		<BuildDependency Project="ALL_BUILD.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+	</Project>
+	<Project Path="PACKAGE.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="c0451a2b-1fa9-36d5-8548-1b044f1b6baf">
+		<BuildDependency Project="ALL_BUILD.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+	</Project>
+	<Project Path="RUN_TESTS.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="459084c2-15c9-3363-b94d-2f64b0bea903">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+	</Project>
+	<Project Path="SDL3-shared.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="07cbd41c-3dab-3cb3-bf89-93660bf15407">
+		<BuildDependency Project="SDL_uclibc.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="SDL3_test.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="75d95bd2-a917-3063-b95d-41e60b976c76">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="SDL_uclibc.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b11b7219-4c58-326a-b00e-c8ac7baeebe3">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="75eb1056-5dad-3bc4-a68e-519d05ac6154"/>
+	<Project Path="test/checkkeys.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="9d288052-c9ec-3007-9ce8-c78aa9eff1f6">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/childprocess.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="2eedf18f-ae2d-3e96-8611-6b7ed1d2f982">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/copy-sdl-test-resources.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="20fba7d5-0fcb-357d-8d11-9e3b4b901b11">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/generate-gamepad_image_headers.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="c5684941-77cf-3b89-b436-130c8f529d92">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/generate-glass_png_header.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="2efccc39-0400-39fd-85d5-698aa133ac74">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/generate-icon_png_header.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="4cbf4a9d-7881-3527-954b-7ac32633d6ad">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/loopwave.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="9cd868ea-f42c-347c-83e2-ea12c275c12b">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/sdlprocdump.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="0e0a1d54-edd5-3958-8f73-dd3b8e5e0b05">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/sdltests_utils.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="5151957a-b209-32bb-8e89-c844e2448358">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testasyncio.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="6cd4fd50-acb8-3bf3-b693-d612deb6ff8e">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testatomic.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b15f3350-9cdf-331f-bead-e57508e0d205">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testaudio.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="17e81078-a453-319c-94a5-3d6bbe69e0ef">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testaudiohotplug.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="6c188315-d954-35d9-ada4-1f99165e13d2">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testaudioinfo.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="42146f0b-4110-394a-adc7-3b24c47cbf9e">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testaudiorecording.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="53267750-4692-36c4-9e57-83a990bf6585">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testaudiostreamdynamicresample.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f10305a0-6868-3535-81ab-b7c4337dfa05">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testautomation.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b9fb2381-f01f-3e98-9a6d-ceb7fdc554e4">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+	</Project>
+	<Project Path="test/testbounds.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="796a86e5-6075-3597-b141-6f0be80c9fb8">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testcamera.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="d2cf27fa-42e5-3829-9b3f-f906970a141c">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testclipboard.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="415b230c-05eb-3d7c-bbdd-2ed9e563829f">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/generate-icon_png_header.vcxproj"/>
+	</Project>
+	<Project Path="test/testcolorspace.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="2a75b027-767d-3101-9827-f4500209ec05">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testcontroller.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="d2e58399-5da6-38b8-81a4-6b303401d4f2">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/generate-gamepad_image_headers.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testcustomcursor.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f5ffbe19-056b-313a-b355-dd9e3d83b3bc">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testdialog.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="3ffb9f6d-8984-3ceb-8b37-e5821c085074">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testdisplayinfo.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="4718eed0-9615-336c-9bc6-3343705d300d">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testdlopennote.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="3467ce37-6e8d-335d-98fb-b7429a0a9c7f">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testdraw.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="7e9b783c-4b69-3c1d-a32a-757506e6a743">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testdrawchessboard.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="728b7163-3796-3941-8e60-19cec45223a6">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testdropfile.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="87f0a6e3-30d6-38f4-9f19-2d541cd6766f">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testerror.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="cc505930-005c-398d-8318-f2a6d5959ac6">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testevdev.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="9a49d21f-e163-3f0a-bcbd-4629094c5c49">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testfile.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="d9180ec0-6d5b-3586-b776-011d06e51ccb">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testfilesystem.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="ecc83311-cbc3-32cf-ab76-fe2879b443ba">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testgeometry.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="23d659a1-a09d-3b52-bf78-2fd101d76687">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testgl.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="adcba6a5-b745-34fb-be3a-6661134e6204">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testgles.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="65a2e0d4-156b-3483-8c0c-e74f0789dfd4">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testgles2.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="83993ac3-603a-314e-a5f0-30a82997a0d6">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testgpu_simple_clear.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="5405eb14-95e2-3c11-a69b-ed2a3241155a">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testgpu_spinning_cube.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="93728034-5840-31aa-ad05-c16c9d6bc4fb">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/generate-icon_png_header.vcxproj"/>
+	</Project>
+	<Project Path="test/testgpurender_effects.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="6d40e044-64e2-3258-99c3-93e32d55798c">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testgpurender_msdf.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="3beb45a0-e0e7-3837-8457-3a0135fe7686">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testhaptic.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="0692b067-8e8f-3469-ab25-10c53b1a0be2">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testhittesting.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="7cba84ca-dbbd-3704-8676-77c89fa4df9f">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testhotplug.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="1079a97b-b115-3bba-bd9f-3899c29f7fe4">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testiconv.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="cd7bd421-d637-3e84-84a2-0a7e5989b875">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testime.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="692e4cce-9c90-3b1a-9bd0-7ed3f1a96305">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testintersections.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="e6a9e430-d639-362a-aaec-fbbaad98efe4">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testkeys.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="7180d7c3-48ac-3861-b359-5307e70df8fd">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testloadso.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f8e40752-790f-377c-a3a2-4a4ab6e9f7b4">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testlocale.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="92545d63-38a6-32fc-9cd6-7b217aaa1abc">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testlock.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="a58987fb-b290-32cd-8359-d3aa87844968">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testmanymouse.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="dd13d540-5155-32bb-8fad-449f86671a32">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testmessage.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="ba3b477b-728f-30e7-96c9-1b144aa9fd97">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testmodal.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="3884cd40-02d0-3d5b-b273-cc7c417c15e5">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testmouse.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="06b8987e-7001-3485-b701-f796395a95b7">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testmultiaudio.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="716c8f55-0507-3b47-96f0-7ce2412e3a56">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testnative.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="77158533-84a9-3134-bd14-1f83cc123849">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testoffscreen.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="beb35f68-8b95-3865-910d-63d5b4e3bc74">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testoverlay.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="d63197a3-9a88-335d-8f6a-04ef1c748d63">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testpalette.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="0e60546e-cf66-38e0-b51f-b352d6f8decc">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testpen.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="de42f277-f95f-3655-a245-37ad7c4bec48">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testplatform.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="039dacb4-47a1-34f3-b26b-8767acca5b39">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testpopup.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b4b8539e-7ffc-3713-b81c-a86e9ce0c743">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testpower.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="4382eeea-3136-31a3-a7c5-383cf320d491">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testprocess.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="d80f9b51-4be1-372f-b670-fe0501ed49be">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/childprocess.vcxproj"/>
+	</Project>
+	<Project Path="test/testqsort.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="63d66428-7706-3d3d-a63b-d96c52e008a2">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testrelative.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="010d6575-0945-368c-bdfd-6e85360b7a49">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testrendercopyex.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="5933e053-9686-3afc-b095-42ea67617480">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testrendertarget.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="9664a2b0-56d6-3da7-852a-83b9aaf23090">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testresample.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="3eed7ac5-2697-3853-9f2b-ae4ed809aeb2">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+	</Project>
+	<Project Path="test/testrotate.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="25bdb25e-7bf8-3bd6-a7d7-ec9e23ed4766">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testrumble.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="25e38736-e364-3a1c-b86a-89dbb4fea048">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testrwlock.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="59dffaee-9ffa-3319-a60c-8cbc700df8fc">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testscale.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="29a3c42f-8489-3ab4-8d01-c9560f88eae6">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testsem.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="c6566288-f697-31e0-8d50-3f9124016f82">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testsensor.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="2d47f598-7802-36a2-a5ed-77e5e405d2a2">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testshader.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="82558bbc-54ee-394b-a5a5-3b6ae20a8f6d">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testshape.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="c3b4e008-50ab-3f52-9242-05baea40ff55">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/generate-glass_png_header.vcxproj"/>
+	</Project>
+	<Project Path="test/testsoftwaretransparent.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="ae62e561-4155-30cc-a0b0-7fd6b92993ec">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testsprite.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="afe78c2a-3250-3170-8c7d-085d58873193">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testspriteminimal.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="272da445-e3fb-32ab-913c-a55b855d19ef">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/generate-icon_png_header.vcxproj"/>
+	</Project>
+	<Project Path="test/testspritesurface.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="d299d174-93be-3b21-9f2c-40e10325a822">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/generate-icon_png_header.vcxproj"/>
+	</Project>
+	<Project Path="test/testsurround.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="339f3f77-8c6e-3559-8c81-00b1e6eca73e">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testsymbols.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="a8c73fbf-5eba-3200-8176-12665fa20cff">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testthread.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="3b9ae1a1-bf5a-3cfd-98f7-082f009a80c1">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testtime.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="51fc1186-eb62-3d4a-afe1-c3a692d21351">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testtimer.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="869f05c1-65d5-351b-82f9-180634a02a49">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testtray.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b7d59b76-0b67-3a13-bf6d-660fd57dc1d4">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testurl.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="6ef94a07-e4fd-3379-a510-3913c5b5c430">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testver.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="bd585c8d-c5bc-32cc-99d3-9247d68913fc">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testviewport.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="9c6859f4-18b3-3252-b2c9-e6461fafb49a">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/testvulkan.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="316a2214-80fa-396e-b223-b3628ee72222">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testwm.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="3adc5b9a-276b-3e5a-b630-860afb9cf28b">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="test/testyuv.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="0c347675-15df-39c3-8573-2068e43e4f72">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="test/copy-sdl-test-resources.vcxproj"/>
+		<BuildDependency Project="test/sdltests_utils.vcxproj"/>
+	</Project>
+	<Project Path="test/torturethread.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="9dd1a9e0-ec5d-3153-b4a6-8d60cdb7866e">
+		<BuildDependency Project="SDL3-shared.vcxproj"/>
+		<BuildDependency Project="SDL3_test.vcxproj"/>
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="uninstall.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="2b862951-d52c-3a7d-87c1-7029663c6592">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<Build Solution="RelWithDebInfo|*" Project="false"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+		<Build Solution="MinSizeRel|*" Project="false"/>
+	</Project>
+</Solution>

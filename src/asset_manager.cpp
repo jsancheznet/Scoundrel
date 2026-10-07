@@ -6,6 +6,7 @@
 #include "json.h"
 
 #include <cstring>
+#include <string.h>
 
 #ifndef STB_IMAGE_IMPLEMENTATION
     #define STB_IMAGE_IMPLEMENTATION
@@ -68,7 +69,7 @@ u64 asset_manager::LoadSound(const char *Filepath, audio_channel Channel)
     Asset->Type = Asset_Sound;
     Asset->Used = true;
     const char *Filename = FilenameFromPath(Filepath); Assert(Filename);
-    std::strncpy(Asset->Name, Filename, std::strlen(Filename));
+    strncpy_s(&Asset->Name[0], sizeof(Asset->Name), Filename, std::strlen(Filename));
 
     // Fill Sound Related Data
     {
@@ -114,7 +115,7 @@ u64 asset_manager::LoadTexture(const char *Filepath)
     Asset->Type = Asset_Texture;
     Asset->Used = true;
     const char *Filename = FilenameFromPath(Filepath); Assert(Filename);
-    std::strncpy(Asset->Name, Filename, std::strlen(Filename));
+    strncpy_s(&Asset->Name[0], sizeof(Asset->Name), Filename, std::strlen(Filename));
 
     // Set Texture Vars
     stbi_set_flip_vertically_on_load(true);
