@@ -49,15 +49,21 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    glCreateVertexArrays(1, &MainVAO);
-    glBindVertexArray(MainVAO);
+    glCreateVertexArrays(1, &SpritesVAO);
+    glBindVertexArray(SpritesVAO);
 
-    CurrentShader = 0;
+    glCreateVertexArrays(1, &TextVAO);
+    glBindVertexArray(TextVAO);
 
-    SpriteList.reserve(MAX_SPRITE_COUNT);
+    Sprites.reserve(MAX_SPRITE_COUNT);
+    Glyphs.reserve(MAX_GLYPH_COUNT);
 
-    { // Create mesh that holds the card
+    { // Load Shaders
+        SpriteShader = CompileShader("shaders/batched_texture.glsl");
+        TextShader = CompileShader("shaders/text_sdf.glsl");
+    }
 
+    { // Create a Quad mesh
         float Vertices[] =
         {
             // x     y     z      u     v
@@ -74,17 +80,17 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
         // Bind the recently created VBO to binding point 0
         u32 BindingPoint = 0;
-        glVertexArrayVertexBuffer(MainVAO, BindingPoint, QuadVBO, 0, sizeof(f32) * 5); // 5 floats
+        glVertexArrayVertexBuffer(SpritesVAO, BindingPoint, QuadVBO, 0, sizeof(f32) * 5); // 5 floats
 
         // Vertex Attribute - Configure Vertex Attribute 0 (Position) from the interleaved buffer data
-        glEnableVertexArrayAttrib(MainVAO, 0);
-        glVertexArrayAttribFormat(MainVAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
-        glVertexArrayAttribBinding(MainVAO, 0, 0);
+        glEnableVertexArrayAttrib(SpritesVAO, 0);
+        glVertexArrayAttribFormat(SpritesVAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
+        glVertexArrayAttribBinding(SpritesVAO, 0, 0);
 
         // UV Attribute - Configure Vertex Attribute 1 (UV) from the interleaved buffer data
-        glEnableVertexArrayAttrib(MainVAO, 1);
-        glVertexArrayAttribFormat(MainVAO, 1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 3);
-        glVertexArrayAttribBinding(MainVAO, 1, 0);
+        glEnableVertexArrayAttrib(SpritesVAO, 1);
+        glVertexArrayAttribFormat(SpritesVAO, 1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 3);
+        glVertexArrayAttribBinding(SpritesVAO, 1, 0);
     }
 
     { // SpritesVBO
@@ -92,42 +98,102 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
         glCreateBuffers(1, &SpritesVBO);
         u32 BufferSize = sizeof(sprite_instance) * MAX_SPRITE_COUNT;
         glNamedBufferStorage(SpritesVBO, BufferSize, NULL, GL_DYNAMIC_STORAGE_BIT);
-        Log(Info, "OPENGL, Allocating %d bytes to SpritesVBO", BufferSize);
+        Log(Info, "renderer::Init() - Allocating %d bytes to SpritesVBO", BufferSize);
 
         u32 BindingPoint = 3;
-        glVertexArrayVertexBuffer(MainVAO, BindingPoint, SpritesVBO, 0, sizeof(sprite_instance));
+        glVertexArrayVertexBuffer(SpritesVAO, BindingPoint, SpritesVBO, 0, sizeof(sprite_instance));
 
         // Position
-        glEnableVertexArrayAttrib(MainVAO, 2);
-        glVertexArrayAttribFormat(MainVAO, 2, 3, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Position));
-        glVertexArrayAttribBinding(MainVAO, 2, BindingPoint);
+        glEnableVertexArrayAttrib(SpritesVAO, 2);
+        glVertexArrayAttribFormat(SpritesVAO, 2, 3, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Position));
+        glVertexArrayAttribBinding(SpritesVAO, 2, BindingPoint);
 
         // Scale
-        glEnableVertexArrayAttrib(MainVAO, 3);
-        glVertexArrayAttribFormat(MainVAO, 3, 3, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Scale));
-        glVertexArrayAttribBinding(MainVAO, 3, BindingPoint);
+        glEnableVertexArrayAttrib(SpritesVAO, 3);
+        glVertexArrayAttribFormat(SpritesVAO, 3, 3, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Scale));
+        glVertexArrayAttribBinding(SpritesVAO, 3, BindingPoint);
 
         // Rotation
-        glEnableVertexArrayAttrib(MainVAO, 4);
-        glVertexArrayAttribFormat(MainVAO, 4, 1, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Rotation));
-        glVertexArrayAttribBinding(MainVAO, 4, BindingPoint);
+        glEnableVertexArrayAttrib(SpritesVAO, 4);
+        glVertexArrayAttribFormat(SpritesVAO, 4, 1, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Rotation));
+        glVertexArrayAttribBinding(SpritesVAO, 4, BindingPoint);
 
         // Texture Handle
-        glEnableVertexArrayAttrib(MainVAO, 5);
-        glVertexArrayAttribIFormat(MainVAO, 5, 2, GL_UNSIGNED_INT, offsetof(sprite_instance, TextureHandle));
-        glVertexArrayAttribBinding(MainVAO, 5, BindingPoint);
+        glEnableVertexArrayAttrib(SpritesVAO, 5);
+        glVertexArrayAttribIFormat(SpritesVAO, 5, 2, GL_UNSIGNED_INT, offsetof(sprite_instance, TextureHandle));
+        glVertexArrayAttribBinding(SpritesVAO, 5, BindingPoint);
 
         // Src Rect
-        glEnableVertexArrayAttrib(MainVAO, 6);
-        glVertexArrayAttribFormat(MainVAO, 6, 4, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, SrcRect));
-        glVertexArrayAttribBinding(MainVAO, 6, BindingPoint);
+        glEnableVertexArrayAttrib(SpritesVAO, 6);
+        glVertexArrayAttribFormat(SpritesVAO, 6, 4, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, SrcRect));
+        glVertexArrayAttribBinding(SpritesVAO, 6, BindingPoint);
 
         // Tint
-        glEnableVertexArrayAttrib(MainVAO, 7);
-        glVertexArrayAttribFormat(MainVAO, 7, 4, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Tint));
-        glVertexArrayAttribBinding(MainVAO, 7, BindingPoint);
+        glEnableVertexArrayAttrib(SpritesVAO, 7);
+        glVertexArrayAttribFormat(SpritesVAO, 7, 4, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Tint));
+        glVertexArrayAttribBinding(SpritesVAO, 7, BindingPoint);
 
-        glVertexArrayBindingDivisor(MainVAO, 3, 1);
+        glVertexArrayBindingDivisor(SpritesVAO, 3, 1);
+    }
+
+    { // Text Rendering
+
+        //         Binding point 0 (QuadVBO)  ──► location 0  VertexPosition
+        //                                    ──► location 1  UV
+        //
+        //         Binding point 1 (TextVBO)  ──► location 2  ScreenPosition
+        //                                    ──► location 3  Rect
+        //                                    ──► location 4  Size
+        //                                    ──► location 5  Color
+        //                                    ──► location 6  TextureHandle
+        //
+
+        // VBO Creation
+        glCreateBuffers(1, &TextVBO);
+        u32 BufferSize = sizeof(character_glyph) * MAX_GLYPH_COUNT;
+        glNamedBufferStorage(TextVBO, BufferSize, NULL, GL_DYNAMIC_STORAGE_BIT);
+        Log(Info, "renderer::Init() - Allocating %d bytes to TextVBO", BufferSize);
+
+        glVertexArrayVertexBuffer(TextVAO, 1, TextVBO, 0, sizeof(character_glyph));
+
+        { // Bind the QuadVBO as vertex data
+
+            // Bind the recently created VBO to binding point 0
+            u32 BindingPoint = 0;
+            glVertexArrayVertexBuffer(TextVAO, BindingPoint, QuadVBO, 0, sizeof(f32) * 5); // 5 floats
+
+            // Vertex Attribute - Configure Vertex Attribute 0 (Position) from the interleaved buffer data
+            glEnableVertexArrayAttrib(TextVAO, 0);
+            glVertexArrayAttribFormat(TextVAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
+            glVertexArrayAttribBinding(TextVAO, 0, 0);
+
+            // UV Attribute - Configure Vertex Attribute 1 (UV) from the interleaved buffer data
+            glEnableVertexArrayAttrib(TextVAO, 1);
+            glVertexArrayAttribFormat(TextVAO, 1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 3);
+            glVertexArrayAttribBinding(TextVAO, 1, 0);
+        }
+
+        // Screen Position
+        glEnableVertexArrayAttrib(TextVAO, 2);
+        glVertexArrayAttribFormat(TextVAO, 2, 2, GL_FLOAT, GL_FALSE, offsetof(character_glyph, ScreenPosition));
+        glVertexArrayAttribBinding(TextVAO, 2, 1);
+
+        // Rect
+        glEnableVertexArrayAttrib(TextVAO, 3);
+        glVertexArrayAttribFormat(TextVAO, 3, 2, GL_FLOAT, GL_FALSE, offsetof(character_glyph, Rect));
+        glVertexArrayAttribBinding(TextVAO, 3, 1);
+
+        // Size
+        glEnableVertexArrayAttrib(TextVAO, 4);
+        glVertexArrayAttribFormat(TextVAO, 4, 2, GL_FLOAT, GL_FALSE, offsetof(character_glyph, Size));
+        glVertexArrayAttribBinding(TextVAO, 4, 1);
+
+        // Color
+        glEnableVertexArrayAttrib(TextVAO, 5);
+        glVertexArrayAttribFormat(TextVAO, 5, 3, GL_FLOAT, GL_FALSE, offsetof(character_glyph, Color));
+        glVertexArrayAttribBinding(TextVAO, 5, 1);
+
+        glVertexArrayBindingDivisor(TextVAO, 1, 1);
     }
 
     { // Camera UBO setup
@@ -153,13 +219,29 @@ void renderer::ClearScreen(color Color)
 void renderer::EndFrame()
 {
     // In here we can split things up according to teir material requirements, bind things and call draw
-    if(SpriteList.size() != 0)
-    {
-        glNamedBufferSubData(SpritesVBO, 0, SpriteList.size() * sizeof(sprite_instance), &SpriteList[0]);
-        glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, SpriteList.size());
-    }
 
-    SpriteList.clear();
+    // Draw Sprites
+    UseShader(SpriteShader);
+    glEnable(GL_DEPTH_TEST);
+    glBindVertexArray(SpritesVAO);
+    if(Sprites.size() != 0)
+    {
+        glNamedBufferSubData(SpritesVBO, 0, Sprites.size() * sizeof(sprite_instance), &Sprites[0]);
+        glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, Sprites.size());
+    }
+    Sprites.clear();
+
+    // Draw Text
+    UseShader(TextShader); // TODO: Fix the glGetUniform bug, by setting a texture
+    glDisable(GL_DEPTH_TEST);
+    glBindVertexArray(TextVAO);
+    if(Glyphs.size() != 0)
+    {
+        glNamedBufferSubData(TextVBO, 0, Glyphs.size() * sizeof(character_glyph), &Glyphs[0]);
+        glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, Glyphs.size());
+    }
+    Glyphs.clear();
+
     SDL_GL_SwapWindow(Window);
 }
 
@@ -290,10 +372,10 @@ void renderer::DrawTexture(u64 AssetHandle, vec3 Position, f32 Scale, f32 Rotati
     Sprite.SrcRect = SrcRect;
     Sprite.Tint = Tint;
 
-    SpriteList.push_back(Sprite);
+    Sprites.push_back(Sprite);
 }
 
-void renderer::DrawText(u64 Font, const char *Text)
+void renderer::DrawText(u64 Font, i32 X, i32 Y, f32 Size, const char *Text)
 {
     bitmap_font *BitmapFont = (bitmap_font*)AssetMgr.ResolveHandle(Font);
     if(BitmapFont == nullptr)
@@ -302,18 +384,22 @@ void renderer::DrawText(u64 Font, const char *Text)
         return;
     }
 
-    // TODO: Loop over the text, get each glyph, generate a quad with  vertex positions and texture coordinates
-    // TODO: Create an array that will hold all the quad text
-    // TODO: Draw everything on FrameEnd
+    // font_glyph *Glyph = GetGlyph(BitmapFont, 'J');
 
-    font_glyph *Glyph = GetGlyph(BitmapFont, 'J');
+    character_glyph Character = {};
+    Character.TextureHandle = 0; // TODO: Get the correct texture handle,
+    Character.ScreenPosition = {(f32) X, (f32) Y};
+    Character.Rect = glm::vec2(0.0f, 0.0f); // TODO: The Uv's are per vertex, we should use the QuadVBO, talk to claude about this
+    Character.Size = glm::vec2((f32) Size, (f32) Size);
+    Character.Color = glm::vec3(1.0f, 0.0f, 0.0f);
+
+    Glyphs.push_back(Character);
 }
 
 void renderer::UseShader(u32 Shader)
 {
-    CurrentShader = Shader;
     glUseProgram(Shader);
-    glUniform1i(glGetUniformLocation(CurrentShader, "Texture"), 0);
+    glUniform1i(glGetUniformLocation(Shader, "Texture"), 0);
 }
 
 void renderer::UpdateCamera(camera Camera)

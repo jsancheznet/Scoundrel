@@ -8,8 +8,10 @@
 #include "mouse.h"
 #include "camera.h"
 #include "random.h"
+#include "helpers.h"
 
 #include <stdio.h>
+#include <iostream>
 
 #include <SDL3/SDL.h>
 
@@ -53,8 +55,6 @@ i32 main(i32 Argc, char **Argv)
     Renderer.Init(Application.Window, 1366, 768);
     Audio.Init();
 
-    u64 HelloWorldShader = Renderer.CompileShader("shaders/batched_texture.glsl");
-
     camera Camera = CreateCamera();
     u64 TestSong = AssetMgr.LoadSound("assets/Sounds/music.wav", Channel_Music);
     Audio.Play(TestSong);
@@ -81,8 +81,6 @@ i32 main(i32 Argc, char **Argv)
     card AwesomeFace = CreateCard(AwesomeFaceTexture, glm::vec3(0.5f, 0.0f, 0.f), 0.0f, 1.0f, glm::vec4(0.1f));
     card Spades5 = CreateCard(Spades5Texture, glm::vec3(0.0f, -1.0, 0.0f), 0.0f, 1.0f, glm::vec4(1.0f, 0.0f, 0.0f, 0.45f));
 
-    Renderer.UseShader(HelloWorldShader);
-
     std::vector<card> Cards;
     Cards.push_back(Clubs2);
     Cards.push_back(AwesomeFace);
@@ -93,6 +91,11 @@ i32 main(i32 Argc, char **Argv)
     glm::vec4 T = glm::vec4(0.0f);
     glm::vec4 R = Ortho * T;
     glm::vec4 R2 = Ortho * glm::vec4((f32)Application.WindowWidth / 2.0f, (f32) Application.WindowHeight / 2.0f, 0.0f, 1.0f);
+
+    printf("-- Ortho\n");
+    PrintMat4(Camera.Orthographic);
+    printf("-- Perspective\n");
+    PrintMat4(Camera.Perspective);
 
     while(Application.IsRunning)
     {
@@ -164,7 +167,7 @@ i32 main(i32 Argc, char **Argv)
         rect SrcRect = {0.0f, 0.0, 1.0f, 1.0f};
         Renderer.DrawTexture(Spades5.Texture, Spades5.Position, Spades5.Scale, Spades5.Rotation, SrcRect, Spades5.Tint);
 
-        Renderer.DrawText(MarcellusFont, "Jorge");
+        Renderer.DrawText(MarcellusFont, 100.0f, 100.0f, 100.0f, "Jorge");
 
         { // DEBUG
             char Buff[200];
