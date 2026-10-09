@@ -16,6 +16,7 @@
 #define ORANGE   color{1.0f, 0.647f, 0.0f, 0.0f}
 
 #define MAX_SPRITE_COUNT 10000
+#define MAX_GLYPH_COUNT 10000
 
 using namespace glm;
 
@@ -49,27 +50,40 @@ struct sprite_instance
     glm::vec4 Tint;
 };
 
+struct character_glyph
+{
+    u64 TextureHandle;
+    glm::vec2 ScreenPosition;
+    glm::vec2 Rect;
+    glm::vec2 Size;
+    glm::vec3 Color;
+};
+
 struct renderer
 {
     SDL_Window* Window;
     u32 ViewportWidth;
     u32 ViewportHeight;
 
-    // GL Buffers
-    u32 MainVAO;
     u32 QuadVBO;
+
+    u32 SpritesVAO;
     u32 SpritesVBO;
+
+    u32 TextVAO;
+    u32 TextVBO;
+
     u32 CameraUBO;
 
     // Shaders
-    u32 CurrentShader;
+    u32 SpriteShader;
+    u32 TextShader;
 
-    std::vector<sprite_instance> SpriteList;
+    std::vector<sprite_instance> Sprites;
+    std::vector<character_glyph> Glyphs;
 
     void Init(SDL_Window *SDLWindow, u32 Width, u32 Height);
     void UpdateViewport(i32 Width, i32 Height);
-
-    u64 CompileShader(const char *Filename);
 
     void UpdateCamera(camera Camera);
 
@@ -77,13 +91,14 @@ struct renderer
     void DestroyTexture(u32 *ID, u64 *Handle);
 
     void DrawTexture(u64 AssetHandle, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f}, glm::vec4 Tint = {1.0f, 1.0f, 1.0f, 0.0f});
-    void DrawText(u64 Font, const char *Text);
+    void DrawText(u64 Font, i32 X, i32 Y, f32 Size, const char *Text);
 
-    void UseShader(u32 Shader);
     void ClearScreen(color Color);
     void EndFrame();
 
   private:
+    u64 CompileShader(const char *Filename);
+    void UseShader(u32 Shader);
 
     static void DebugCallback(GLenum Source, GLenum Type, GLuint Id,  GLenum Severity, GLsizei Length, GLchar const *Message, void const *UserParam);
 };

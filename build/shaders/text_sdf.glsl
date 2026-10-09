@@ -1,24 +1,32 @@
 ﻿#ifdef VERTEX_SHADER
 
-layout (location = 0) in vec3 Position;
-layout (location = 1) in vec2 TexCoords;
+#extension GL_ARB_bindless_texture : require
 
-uniform mat4 Model;
-// uniform mat4 View;
-// uniform mat4 Projection;
+// Local vertex data in NDC coords
+layout(location = 0) in vec3 VertexPosition;
+layout(location = 1) in vec2 UV;
 
-layout(std140, binding = 0) uniform Camera
+// Instance Data per sprite
+layout(location = 2) in vec2 ScreenPosition;
+layout(location = 3) in vec2 Rect; // UV coords for the texture atlas
+layout(location = 4) in vec2 Size;
+layout(location = 5) in vec3 Color;
+layout(location = 6) in uvec2 TextureHandle;
+
+layout (std140, binding = 50) uniform CameraMatrices
 {
+    mat4 Perspective;
+    mat4 Orthographic;
     mat4 View;
-    mat4 Projection;
 };
 
 out vec2 TexCoord;
 
 void main()
 {
-    gl_Position = Projection * View * Model * vec4(Position.x, Position.y, Position.z, 1.0);
-    TexCoord = vec2(TexCoords.x, TexCoords.y);
+    vec2 Corner = ScreenPosition + UV * Size;
+    gl_Position = Orthographic * vec4(Corner, 0.0, 1.0);
+    TexCoord = vec2(UV.x, UV.y);
 }
 
 #endif
@@ -32,10 +40,13 @@ uniform sampler2D Texture;
 
 void main()
 {
-    float Smoothing = 0.02;
-    float Distance = texture(Texture, TexCoord).x;
-    float Alpha = smoothstep(0.5 - Smoothing, 0.5 + Smoothing, Distance);
-    FragmentColor = vec4(vec3(1.0), Alpha);
+    // float Smoothing = 0.02;
+    // float Distance = texture(Texture, TexCoord).x;
+    // float Alpha = smoothstep(0.5 - Smoothing, 0.5 + Smoothing, Distance);
+    // FragmentColor = vec4(vec3(1.0), Alpha);
+
+    FragmentColor = vec4(1.0, 0.0, 1.0, 1.0);
+
 }
 
 #endif

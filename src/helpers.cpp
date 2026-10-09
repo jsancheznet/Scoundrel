@@ -7,13 +7,7 @@
 
 const char *FilenameFromPath(const char *Filepath)
 {
-    // Get the last occurence of "/" || "\\", add 1 to it to get the filename
-
-#ifdef _WIN32
     const char *Filename = strrchr(Filepath, '/');
-#else
-    const char *Filename = strrchr(Filepath, '/');
-#endif
 
     return Filename ? Filename + 1 : nullptr;
 }
@@ -21,6 +15,20 @@ const char *FilenameFromPath(const char *Filepath)
 b32 FileExists(const char *Filepath)
 {
     return SDL_GetPathInfo(Filepath, NULL);
+}
+
+void PrintMat4(const glm::mat4& m)
+{
+    for (int row = 0; row < 4; ++row)
+    {
+        std::printf(
+            "[ %.3f %.3f %.3f %.3f ]\n",
+            m[0][row],
+            m[1][row],
+            m[2][row],
+            m[3][row]
+        );
+    }
 }
 
 json_value_s *JsonFind(json_object_s *Object, const char *Key)
