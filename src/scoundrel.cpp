@@ -167,7 +167,9 @@ i32 main(i32 Argc, char **Argv)
         rect SrcRect = {0.0f, 0.0, 1.0f, 1.0f};
         Renderer.DrawTexture(Spades5.Texture, Spades5.Position, Spades5.Scale, Spades5.Rotation, SrcRect, Spades5.Tint);
 
-        Renderer.DrawText(MarcellusFont, 100.0f, 100.0f, 100.0f, "Jorge");
+        Renderer.DrawText(MarcellusFont, 100.0f, 100.0f, 100.0f, "Jorge", color{1.0f, 0.8f, 0.2f, 1.0f});
+        Renderer.DrawText(MarcellusFont, 0.0f, 0.0f, 100.0f, "Jsanchez!");
+        Renderer.DrawText(MarcellusFont, 500, 500, 50.0f, "Testing One Two\nThree", {1.0f, 0.0f, 1.0f, 0.5f});
 
         { // DEBUG
             char Buff[200];
