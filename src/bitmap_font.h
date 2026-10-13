@@ -1,7 +1,8 @@
 #pragma once
 
 // The following is the command used to generate the bitmap font used in this project.
-//     msdf-gen command -> ~/Projects/Scoundrel/tools/msdf-atlas-gen -font MarcellusSC-Regular.ttf -charset charset.txt -fontname marcellus_sc -type sdf -format png -pots -imageout marcellus_sc.png -csv marcellus_sc.csv -json marcellus_sc.json -minsize 42
+// Run it from tools/fonts/Marcellus_SC/, it writes the atlas straight into assets/Fonts/:
+//     ..\..\msdf-atlas-gen.exe -font MarcellusSC-Regular.ttf -charset charset.txt -fontname marcellus_sc -type sdf -format png -pots -imageout ..\..\..\assets\Fonts\Marcellus_sc.png -json ..\..\..\assets\Fonts\Marcellus_sc.json -minsize 42
 
 #include "typedefs.h"
 #include "renderer.h"

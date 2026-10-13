@@ -12,8 +12,8 @@
 #include "typedefs.h"
 #include "camera.h"
 
-#define HOT_PINK color{1.0f, 0.0f, 1.0f, 0.0f}
-#define ORANGE   color{1.0f, 0.647f, 0.0f, 0.0f}
+#define HOT_PINK color{1.0f, 0.0f, 1.0f, 1.0f}
+#define ORANGE   color{1.0f, 0.647f, 0.0f, 1.0f}
 
 #define MAX_SPRITE_COUNT 10000
 #define MAX_GLYPH_COUNT 10000
@@ -54,9 +54,9 @@ struct character_glyph
 {
     u64 TextureHandle;
     glm::vec2 ScreenPosition;
-    glm::vec2 Rect;
+    glm::vec4 Rect; // Atlas UVs (left, bottom, right, top)
     glm::vec2 Size;
-    glm::vec3 Color;
+    glm::vec4 Color;
 };
 
 struct renderer
@@ -91,7 +91,7 @@ struct renderer
     void DestroyTexture(u32 *ID, u64 *Handle);
 
     void DrawTexture(u64 AssetHandle, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f}, glm::vec4 Tint = {1.0f, 1.0f, 1.0f, 0.0f});
-    void DrawText(u64 Font, i32 X, i32 Y, f32 Size, const char *Text);
+    void DrawText(u64 Font, f32 X, f32 Y, f32 Size, const char *Text, color Color = {1.0f, 1.0f, 1.0f, 1.0f});
 
     void ClearScreen(color Color);
     void EndFrame();

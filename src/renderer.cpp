@@ -180,7 +180,7 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
         // Rect
         glEnableVertexArrayAttrib(TextVAO, 3);
-        glVertexArrayAttribFormat(TextVAO, 3, 2, GL_FLOAT, GL_FALSE, offsetof(character_glyph, Rect));
+        glVertexArrayAttribFormat(TextVAO, 3, 4, GL_FLOAT, GL_FALSE, offsetof(character_glyph, Rect));
         glVertexArrayAttribBinding(TextVAO, 3, 1);
 
         // Size
@@ -190,8 +190,13 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
 
         // Color
         glEnableVertexArrayAttrib(TextVAO, 5);
-        glVertexArrayAttribFormat(TextVAO, 5, 3, GL_FLOAT, GL_FALSE, offsetof(character_glyph, Color));
+        glVertexArrayAttribFormat(TextVAO, 5, 4, GL_FLOAT, GL_FALSE, offsetof(character_glyph, Color));
         glVertexArrayAttribBinding(TextVAO, 5, 1);
+
+        // Texture Handle
+        glEnableVertexArrayAttrib(TextVAO, 6);
+        glVertexArrayAttribIFormat(TextVAO, 6, 2, GL_UNSIGNED_INT, offsetof(character_glyph, TextureHandle));
+        glVertexArrayAttribBinding(TextVAO, 6, 1);
 
         glVertexArrayBindingDivisor(TextVAO, 1, 1);
     }
@@ -232,14 +237,16 @@ void renderer::EndFrame()
     Sprites.clear();
 
     // Draw Text
-    UseShader(TextShader); // TODO: Fix the glGetUniform bug, by setting a texture
+    UseShader(TextShader);
     glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
     glBindVertexArray(TextVAO);
     if(Glyphs.size() != 0)
     {
         glNamedBufferSubData(TextVBO, 0, Glyphs.size() * sizeof(character_glyph), &Glyphs[0]);
         glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, Glyphs.size());
     }
+    glDisable(GL_BLEND);
     Glyphs.clear();
 
     SDL_GL_SwapWindow(Window);
@@ -375,7 +382,8 @@ void renderer::DrawTexture(u64 AssetHandle, vec3 Position, f32 Scale, f32 Rotati
     Sprites.push_back(Sprite);
 }
 
-void renderer::DrawText(u64 Font, i32 X, i32 Y, f32 Size, const char *Text)
+// X, Y is the top-left of the text block, Size is the font size (em size) in pixels
+void renderer::DrawText(u64 Font, f32 X, f32 Y, f32 Size, const char *Text, color Color)
 {
     bitmap_font *BitmapFont = (bitmap_font*)AssetMgr.ResolveHandle(Font);
     if(BitmapFont == nullptr)
@@ -384,22 +392,63 @@ void renderer::DrawText(u64 Font, i32 X, i32 Y, f32 Size, const char *Text)
         return;
     }
 
-    // font_glyph *Glyph = GetGlyph(BitmapFont, 'J');
+    if(!Text) return;
 
-    character_glyph Character = {};
-    Character.TextureHandle = 0; // TODO: Get the correct texture handle,
-    Character.ScreenPosition = {(f32) X, (f32) Y};
-    Character.Rect = glm::vec2(0.0f, 0.0f); // TODO: The Uv's are per vertex, we should use the QuadVBO, talk to claude about this
-    Character.Size = glm::vec2((f32) Size, (f32) Size);
-    Character.Color = glm::vec3(1.0f, 0.0f, 0.0f);
+    f32 PenX     = X;
+    f32 Baseline = Y + BitmapFont->Metrics.Ascender * Size; // Y is the top of the line
+    f32 AtlasWidth  = (f32)BitmapFont->Atlas.Width;
+    f32 AtlasHeight = (f32)BitmapFont->Atlas.Height;
 
-    Glyphs.push_back(Character);
+    for(const char *C = Text; *C; ++C)
+    {
+        if(*C == '\n')
+        {
+            PenX = X;
+            Baseline += BitmapFont->Metrics.LineHeight * Size;
+            continue;
+        }
+
+        font_glyph *Glyph = GetGlyph(BitmapFont, *C);
+        if(Glyph == nullptr)
+        {
+            // Fonts generated without a space glyph still need the gap between words
+            if(*C == ' ') { PenX += 0.25f * Size; continue; }
+
+            Log(Warning, "renderer::DrawText() - Character '%c' is not in the font", *C);
+            continue;
+        }
+
+        font_glyph_bounds *Plane = &Glyph->PlaneBounds;
+        font_glyph_bounds *Atlas = &Glyph->AtlasBounds;
+
+        // Whitespace glyphs have no bounds, only advance the pen
+        if(Plane->Right > Plane->Left && Plane->Top > Plane->Bottom)
+        {
+            if(Glyphs.size() >= MAX_GLYPH_COUNT)
+            {
+                Log(Warning, "renderer::DrawText() - Reached MAX_GLYPH_COUNT (%d), text will be truncated", MAX_GLYPH_COUNT);
+                return;
+            }
+
+            character_glyph Character = {};
+            Character.TextureHandle = BitmapFont->Texture.BindlessTextureHandle;
+            // Plane bounds are y-up from the baseline, the screen is y-down
+            Character.ScreenPosition = {PenX + Plane->Left * Size, Baseline - Plane->Top * Size};
+            Character.Size = glm::vec2((Plane->Right - Plane->Left) * Size, (Plane->Top - Plane->Bottom) * Size);
+            Character.Rect = glm::vec4(Atlas->Left  / AtlasWidth, Atlas->Bottom / AtlasHeight,
+                                       Atlas->Right / AtlasWidth, Atlas->Top    / AtlasHeight);
+            Character.Color = glm::vec4(Color.r, Color.g, Color.b, Color.a);
+
+            Glyphs.push_back(Character);
+        }
+
+        PenX += Glyph->Advance * Size;
+    }
 }
 
 void renderer::UseShader(u32 Shader)
 {
     glUseProgram(Shader);
-    glUniform1i(glGetUniformLocation(Shader, "Texture"), 0);
 }
 
 void renderer::UpdateCamera(camera Camera)
