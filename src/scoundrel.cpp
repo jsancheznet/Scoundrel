@@ -63,12 +63,6 @@ i32 main(i32 Argc, char **Argv)
 
     Audio.SetRepeat(TestSound, true);
 
-    u64 TestingHandle = AssetMgr.LoadSound("assets/Sounds/music.wav", Channel_Music);
-    sound *MySound = (sound*)AssetMgr.ResolveHandle(TestingHandle);
-    AssetMgr.Unload(TestingHandle);
-    Log(Info, "Sound Repeats: %x", &MySound->Repeats);
-    MySound = (sound*)AssetMgr.ResolveHandle(TestingHandle);
-
     u64 TexClubs2             = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
     u64 AwesomeFaceTexture    = AssetMgr.LoadTexture("assets/Textures/awesomeface.png");
     u64 Spades5Texture        = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Spades-5.jpg");
@@ -85,17 +79,6 @@ i32 main(i32 Argc, char **Argv)
     Cards.push_back(Clubs2);
     Cards.push_back(AwesomeFace);
     Cards.push_back(Spades5);
-
-
-    glm::mat4 Ortho = glm::ortho(0.0f, (f32)Application.WindowWidth, (f32)Application.WindowHeight, 0.0f);
-    glm::vec4 T = glm::vec4(0.0f);
-    glm::vec4 R = Ortho * T;
-    glm::vec4 R2 = Ortho * glm::vec4((f32)Application.WindowWidth / 2.0f, (f32) Application.WindowHeight / 2.0f, 0.0f, 1.0f);
-
-    printf("-- Ortho\n");
-    PrintMat4(Camera.Orthographic);
-    printf("-- Perspective\n");
-    PrintMat4(Camera.Perspective);
 
     while(Application.IsRunning)
     {
@@ -177,7 +160,6 @@ i32 main(i32 Argc, char **Argv)
             const char *Ptr = &Buff[0];
             SDL_SetWindowTitle(Application.Window, Ptr);
         }
-
 
         Renderer.EndFrame();
         Application.EndFrame();
