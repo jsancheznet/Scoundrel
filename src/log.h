@@ -11,4 +11,8 @@ enum log_category
     Success,
 };
 
-void Log(log_category Category, const char *Fmt, ...);
+#if defined(NDEBUG)
+    #define Log(...) ((void)0)
+#else
+    void Log(log_category Category, const char *Fmt, ...);
+#endif

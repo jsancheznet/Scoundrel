@@ -1,8 +1,8 @@
 #include "log.h"
 
-// TODO(Jsanchez): Implement something that does not print logs when built for release!
-// TODO(Bugfix): Executing the following line crashes the game: Log(Info, "%s");
+// TODO(Jsanchez): Executing the following line crashes the game: Log(Info, "%s");
 
+#ifndef NDEBUG
 void Log(log_category Category, const char *Fmt, ...)
 {
     va_list Args;
@@ -44,7 +44,7 @@ void Log(log_category Category, const char *Fmt, ...)
     //     3- Write the reset terminal color code
     //
 
-    char Buffer[2048];
+    char Buffer[4096];
     int CharCount = snprintf(Buffer, sizeof(Buffer), "%s[%s]: ", Color, CategoryString);
     CharCount += vsnprintf(Buffer + CharCount, sizeof(Buffer) - CharCount, Fmt, Args);
     snprintf(Buffer + CharCount, sizeof(Buffer) - CharCount, "%s", ResetColorCode);
@@ -53,3 +53,4 @@ void Log(log_category Category, const char *Fmt, ...)
 
     puts(Buffer);
 }
+#endif
