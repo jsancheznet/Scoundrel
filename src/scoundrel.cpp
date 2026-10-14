@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <iostream>
 
+#include <glm/gtc/matrix_inverse.hpp>
+
 #include <SDL3/SDL.h>
 
 application   Application;
@@ -42,6 +44,30 @@ card CreateCard(u64 Texture, glm::vec3 Position, f32 Rotation, f32 Scale, glm::v
     Result.Tint = Tint;
 
     return Result;
+}
+
+glm::vec3 ScreenToWorldRay(f32 ScreenMouseX, f32 ScreenMouseY, u32 ViewportWidth, u32 ViewportHeight, glm::mat4 Perspective, glm::mat4 View)
+{
+    // TODO(Jsanchez): Tomar nota de los pasos y subirlo a un gist
+
+    // Step 1 - Mouse NDC Coords
+    f32 X_NDC = (ScreenMouseX * 2.0f) / ViewportWidth - 1.0f;
+    f32 Y_NDC = 1.0f - (2.0f * ScreenMouseY) / ViewportHeight;
+    f32 Z_NDC = 1.0f;
+    glm::vec3 RayNDC = glm::vec3(X_NDC, Y_NDC, Z_NDC);
+
+    // Step 2 - Homogeneous Clip Coords - Make Ray Z point forwards, Forward is Negative Z on OpenGL
+    glm::vec4 RayClip = vec4(RayNDC.x, RayNDC.y, -1.0f, 1.0f);
+
+    // Step 3 - Ray to Eye Space - Multiply by inverse of the projection matrix and Set Z & WW to mean Forwards, and not a point
+    glm::vec4 RayEyeSpace = glm::inverse(Perspective) * RayClip;
+    RayEyeSpace = glm::vec4(RayEyeSpace.x, RayEyeSpace.y, -1.0f, 0.0f);
+
+    // Step 4 - World Coordinates - Go to world coordinates and normalize the vector to mean a direction
+    glm::vec4 RayWorld4 = glm::inverse(View) * glm::vec4(RayEyeSpace.x, RayEyeSpace.y, -1.0f, 0.0f);
+    glm::vec3 RayWorld  = glm::normalize(glm::vec3(RayWorld4));
+
+    return RayWorld;
 }
 
 i32 main(i32 Argc, char **Argv)
@@ -150,9 +176,45 @@ i32 main(i32 Argc, char **Argv)
         rect SrcRect = {0.0f, 0.0, 1.0f, 1.0f};
         Renderer.DrawTexture(Spades5.Texture, Spades5.Position, Spades5.Scale, Spades5.Rotation, SrcRect, Spades5.Tint);
 
-        Renderer.DrawText(MarcellusFont, 100.0f, 100.0f, 100.0f, "Jorge", color{1.0f, 0.8f, 0.2f, 1.0f});
-        Renderer.DrawText(MarcellusFont, 0.0f, 0.0f, 100.0f, "Jsanchez!");
-        Renderer.DrawText(MarcellusFont, 500, 500, 50.0f, "Testing One Two\nThree", {1.0f, 0.0f, 1.0f, 0.5f});
+        //
+        //
+        //
+
+#if 0
+        // Step 0 - Viewport Mouse Coords
+        char TextBuffer[200];
+        snprintf(TextBuffer, sizeof(TextBuffer), "Mouse Screen Pos - %.2f, %.2f", Mouse.X, Mouse.Y);
+        Renderer.DrawText(MarcellusFont, 0.0f, 0.0f, 40.0f, TextBuffer, HOT_PINK);
+
+        // Step 1 - Mouse NDC Coords
+        f32 X_NDC = (Mouse.X * 2.0f) / Renderer.ViewportWidth - 1.0f;
+        f32 Y_NDC = 1.0f - (2.0f * Mouse.Y) / Renderer.ViewportHeight;
+        f32 Z_NDC = 1.0f;
+        glm::vec3 RayNDC = glm::vec3(X_NDC, Y_NDC, Z_NDC);
+        snprintf(TextBuffer, sizeof(TextBuffer), "Mouse NDC - %.2f, %.2f, %.2f", RayNDC.x, RayNDC.y, RayNDC.z);
+        Renderer.DrawText(MarcellusFont, 0.0f, 40.0f, 40.0f, TextBuffer, HOT_PINK);
+
+        // Step 2 - Homogeneous Clip Coords - Make Ray Z point forwards, Forward is Negative Z on OpenGL
+        glm::vec4 RayClip = vec4(RayNDC.x, RayNDC.y, -1.0f, 1.0f);
+
+        // Step 3 - Ray to Eye Space - Multiply by inverse of the projection matrix and Set Z & WW to mean Forwards, and not a point
+        glm::vec4 RayEyeSpace = glm::inverse(Camera.Perspective) * RayClip;
+        RayEyeSpace = glm::vec4(RayEyeSpace.x, RayEyeSpace.y, -1.0f, 0.0f);
+        snprintf(TextBuffer, sizeof(TextBuffer), "Eye Space - %.2f, %.2f", RayEyeSpace.x, RayEyeSpace.y);
+        Renderer.DrawText(MarcellusFont, 0.0f, 80.0f, 40.0f, TextBuffer, HOT_PINK);
+
+        // Step 4 - World Coordinates - Go to world coordinates and normalize the vector to mean a direction
+        glm::vec4 RayWorld4 = glm::inverse(Camera.View) * glm::vec4(RayEyeSpace.x, RayEyeSpace.y, -1.0f, 0.0f);
+        glm::vec3 RayWorld  = glm::normalize(glm::vec3(RayWorld4));
+        snprintf(TextBuffer, sizeof(TextBuffer), "World Coords - %.2f, %.2f, %.2f", RayWorld.x, RayWorld.y, RayWorld.z);
+        Renderer.DrawText(MarcellusFont, 0.0f, 120.0f, 40.0f, TextBuffer, HOT_PINK);
+
+        // Puede ser que hagamos una funcion que devuelva RayWorld, es el rayo direccion en world coords
+#endif
+        glm::vec3 Ray = ScreenToWorldRay(Mouse.X, Mouse.Y, Renderer.ViewportWidth, Renderer.ViewportHeight, Camera.Perspective, Camera.View);
+        char TextBuffer[200];
+        snprintf(TextBuffer, sizeof(TextBuffer), "ScreenToWorldRay - %.2f, %.2f, %.2f", Ray.x, Ray.y, Ray.z);
+        Renderer.DrawText(MarcellusFont, 0.0f, 0.0f, 40.0f, TextBuffer);
 
         { // DEBUG
             char Buff[200];

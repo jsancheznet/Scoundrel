@@ -453,6 +453,8 @@ void renderer::UseShader(u32 Shader)
 
 void renderer::UpdateCamera(camera Camera)
 {
+    // TODO(Jsanchez): This function should be inside camera.h/cpp and should call a new function Renderer.UpdateCameraBuffer(Persp, Ortho, View);
+
     Camera.View = glm::lookAt(Camera.Position, Camera.Target, Camera.Up);
     Camera.Perspective = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
     Camera.Orthographic = glm::ortho(0.0f, (f32)ViewportWidth, (f32)ViewportHeight, 0.0f);
