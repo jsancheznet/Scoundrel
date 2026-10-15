@@ -1,0 +1,11 @@
+--driver-mode=cl
+-W4
+-Wextra
+-Wno-unused-variable
+-Wno-unused-parameter
+-Wno-unused-value
+-Ilibraries/SDL-release-3.4.8/include
+-Ilibraries/glad/include
+-Ilibraries/glm-1.0.1-light
+-Ilibraries/stb
+-Ilibraries/json
