@@ -18,6 +18,9 @@ struct application
     u32 WindowWidth;
     u32 WindowHeight;
 
+    b32 IsFullscreen;
+    SDL_Rect WindowedRect; // Position and size to restore when leaving fullscreen
+
     u64 FrameBeginTime;
     u64 FrameEndTime;
     f64 DeltaTime;
@@ -27,6 +30,8 @@ struct application
     void Quit();
 
     void ProcessEvents();
+
+    void ToggleFullscreen();
 
     void BeginFrame();
     void EndFrame();

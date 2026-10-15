@@ -1,3 +1,4 @@
+#include "SDL3/SDL_scancode.h"
 #include "typedefs.h"
 #include "log.h"
 #include "application.h"
@@ -115,6 +116,12 @@ i32 main(i32 Argc, char **Argv)
         Mouse.Update();
         Keyboard.Update();
 
+        if(Keyboard.IsPressed(SDL_SCANCODE_LALT) && Keyboard.IsReleased(SDL_SCANCODE_RETURN))
+        {
+            Log(Info, "Yep!");
+            Application.ToggleFullscreen();
+        }
+
         if(Keyboard.IsPressed(SDL_SCANCODE_D))
         {
             Camera.Position.x += 0.05f;
@@ -176,45 +183,15 @@ i32 main(i32 Argc, char **Argv)
         rect SrcRect = {0.0f, 0.0, 1.0f, 1.0f};
         Renderer.DrawTexture(Spades5.Texture, Spades5.Position, Spades5.Scale, Spades5.Rotation, SrcRect, Spades5.Tint);
 
-        //
-        //
-        //
-
-#if 0
-        // Step 0 - Viewport Mouse Coords
-        char TextBuffer[200];
-        snprintf(TextBuffer, sizeof(TextBuffer), "Mouse Screen Pos - %.2f, %.2f", Mouse.X, Mouse.Y);
-        Renderer.DrawText(MarcellusFont, 0.0f, 0.0f, 40.0f, TextBuffer, HOT_PINK);
-
-        // Step 1 - Mouse NDC Coords
-        f32 X_NDC = (Mouse.X * 2.0f) / Renderer.ViewportWidth - 1.0f;
-        f32 Y_NDC = 1.0f - (2.0f * Mouse.Y) / Renderer.ViewportHeight;
-        f32 Z_NDC = 1.0f;
-        glm::vec3 RayNDC = glm::vec3(X_NDC, Y_NDC, Z_NDC);
-        snprintf(TextBuffer, sizeof(TextBuffer), "Mouse NDC - %.2f, %.2f, %.2f", RayNDC.x, RayNDC.y, RayNDC.z);
-        Renderer.DrawText(MarcellusFont, 0.0f, 40.0f, 40.0f, TextBuffer, HOT_PINK);
-
-        // Step 2 - Homogeneous Clip Coords - Make Ray Z point forwards, Forward is Negative Z on OpenGL
-        glm::vec4 RayClip = vec4(RayNDC.x, RayNDC.y, -1.0f, 1.0f);
-
-        // Step 3 - Ray to Eye Space - Multiply by inverse of the projection matrix and Set Z & WW to mean Forwards, and not a point
-        glm::vec4 RayEyeSpace = glm::inverse(Camera.Perspective) * RayClip;
-        RayEyeSpace = glm::vec4(RayEyeSpace.x, RayEyeSpace.y, -1.0f, 0.0f);
-        snprintf(TextBuffer, sizeof(TextBuffer), "Eye Space - %.2f, %.2f", RayEyeSpace.x, RayEyeSpace.y);
-        Renderer.DrawText(MarcellusFont, 0.0f, 80.0f, 40.0f, TextBuffer, HOT_PINK);
-
-        // Step 4 - World Coordinates - Go to world coordinates and normalize the vector to mean a direction
-        glm::vec4 RayWorld4 = glm::inverse(Camera.View) * glm::vec4(RayEyeSpace.x, RayEyeSpace.y, -1.0f, 0.0f);
-        glm::vec3 RayWorld  = glm::normalize(glm::vec3(RayWorld4));
-        snprintf(TextBuffer, sizeof(TextBuffer), "World Coords - %.2f, %.2f, %.2f", RayWorld.x, RayWorld.y, RayWorld.z);
-        Renderer.DrawText(MarcellusFont, 0.0f, 120.0f, 40.0f, TextBuffer, HOT_PINK);
-
-        // Puede ser que hagamos una funcion que devuelva RayWorld, es el rayo direccion en world coords
-#endif
         glm::vec3 Ray = ScreenToWorldRay(Mouse.X, Mouse.Y, Renderer.ViewportWidth, Renderer.ViewportHeight, Camera.Perspective, Camera.View);
-        char TextBuffer[200];
-        snprintf(TextBuffer, sizeof(TextBuffer), "ScreenToWorldRay - %.2f, %.2f, %.2f", Ray.x, Ray.y, Ray.z);
-        Renderer.DrawText(MarcellusFont, 0.0f, 0.0f, 40.0f, TextBuffer);
+        //char TextBuffer[200];
+        //snprintf(TextBuffer, sizeof(TextBuffer), "ScreenToWorldRay - %.2f, %.2f, %.2f", Ray.x, Ray.y, Ray.z);
+        //Renderer.DrawText(MarcellusFont, 0.0f, 0.0f, 40.0f, TextBuffer);
+
+        f32 X = 0.0f;
+        f32 Y = 0.0f;
+        Renderer.DrawText(MarcellusFont, X + 6, Y + 6, 50.0f, "The quick brown fox jumps over the lazy dog.", color{0.0f, 0.0f, 0.0f, 0.6f});
+        Renderer.DrawText(MarcellusFont, X,     Y,     50.0f, "The quick brown fox jumps over the lazy dog", HOT_PINK);
 
         { // DEBUG
             char Buff[200];

@@ -1,4 +1,5 @@
 #include "application.h"
+#include "SDL3/SDL_video.h"
 #include "log.h"
 
 #include <glad/glad.h>
@@ -76,10 +77,10 @@ void application::ProcessEvents()
             } break;
             case SDL_EVENT_WINDOW_RESIZED:
             {
-                i32 Width = Event.window.data1;
-                i32 Height = Event.window.data2;
-                Renderer.UpdateViewport(Width, Height);
-                Log(Info, "Window Resized, Width: %d, Height %d", Width, Height);
+                WindowWidth = Event.window.data1;
+                WindowHeight = Event.window.data2;
+                Renderer.UpdateViewport(WindowWidth, WindowHeight);
+                Log(Info, "Window Resized, Width: %d, Height %d", WindowWidth, WindowHeight);
             } break;
             default:
             {
@@ -88,6 +89,45 @@ void application::ProcessEvents()
     }
 }
 
+void application::ToggleFullscreen()
+{
+    if(!IsFullscreen)
+    {
+        // A maximized window ignores resizes and would be saved as the maximized rect
+        if(SDL_GetWindowFlags(Window) & SDL_WINDOW_MAXIMIZED)
+        {
+            SDL_RestoreWindow(Window);
+        }
+
+        // Remember where the window was so we can go back to it
+        SDL_GetWindowPosition(Window, &WindowedRect.x, &WindowedRect.y);
+        SDL_GetWindowSize(Window, &WindowedRect.w, &WindowedRect.h);
+
+        SDL_Rect Display;
+        if(!SDL_GetDisplayBounds(SDL_GetDisplayForWindow(Window), &Display))
+        {
+            Log(Error, "application::ToggleFullscreen() - SDL_GetDisplayBounds failed: %s", SDL_GetError());
+            return;
+        }
+
+        // Windowed fullscreen: a borderless window covering the monitor, the display mode never changes.
+        // NOTE: The extra pixel of height keeps the window from exactly matching the monitor, otherwise
+        // the OpenGL driver promotes it to exclusive fullscreen and we get the slow mode switch again.
+        SDL_SetWindowBordered(Window, false);
+        SDL_SetWindowPosition(Window, Display.x, Display.y);
+        SDL_SetWindowSize(Window, Display.w, Display.h + 1);
+    }
+    else
+    {
+        SDL_SetWindowBordered(Window, true);
+        SDL_SetWindowSize(Window, WindowedRect.w, WindowedRect.h);
+        SDL_SetWindowPosition(Window, WindowedRect.x, WindowedRect.y);
+    }
+
+    IsFullscreen = !IsFullscreen;
+
+    // The viewport gets updated when SDL_EVENT_WINDOW_RESIZED arrives
+}
 
 void application::BeginFrame()
 {
