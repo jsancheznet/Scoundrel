@@ -451,17 +451,13 @@ void renderer::UseShader(u32 Shader)
     glUseProgram(Shader);
 }
 
-void renderer::UpdateCamera(camera Camera)
+void renderer::UpdateCameraBuffer(camera *Camera)
 {
-    // TODO(Jsanchez): This function should be inside camera.h/cpp and should call a new function Renderer.UpdateCameraBuffer(Persp, Ortho, View);
+    // Uploads the camera matrices to the CameraMatrices UBO, the matrices are computed by UpdateCamera() in camera.cpp
 
-    Camera.View = glm::lookAt(Camera.Position, Camera.Target, Camera.Up);
-    Camera.Perspective = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
-    Camera.Orthographic = glm::ortho(0.0f, (f32)ViewportWidth, (f32)ViewportHeight, 0.0f);
-
-    glNamedBufferSubData(CameraUBO, 0                    , sizeof(glm::mat4), glm::value_ptr(Camera.Perspective));
-    glNamedBufferSubData(CameraUBO, sizeof(glm::mat4) * 1, sizeof(glm::mat4), glm::value_ptr(Camera.Orthographic));
-    glNamedBufferSubData(CameraUBO, sizeof(glm::mat4) * 2, sizeof(glm::mat4), glm::value_ptr(Camera.View));
+    glNamedBufferSubData(CameraUBO, 0                    , sizeof(glm::mat4), glm::value_ptr(Camera->Perspective));
+    glNamedBufferSubData(CameraUBO, sizeof(glm::mat4) * 1, sizeof(glm::mat4), glm::value_ptr(Camera->Orthographic));
+    glNamedBufferSubData(CameraUBO, sizeof(glm::mat4) * 2, sizeof(glm::mat4), glm::value_ptr(Camera->View));
 }
 
 void renderer::DebugCallback(GLenum Source, GLenum Type, GLuint Id,  GLenum Severity, GLsizei Length, GLchar const *Message, void const *UserParam)

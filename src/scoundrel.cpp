@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <algorithm>
 
 #include <glm/gtc/matrix_inverse.hpp>
 
@@ -47,28 +48,20 @@ card CreateCard(u64 Texture, glm::vec3 Position, f32 Rotation, f32 Scale, glm::v
     return Result;
 }
 
-glm::vec3 ScreenToWorldRay(f32 ScreenMouseX, f32 ScreenMouseY, u32 ViewportWidth, u32 ViewportHeight, glm::mat4 Perspective, glm::mat4 View)
+b32 CardContainsPoint(card *Card, glm::vec3 Point)
 {
-    // TODO(Jsanchez): Tomar nota de los pasos y subirlo a un gist
+    // Point must be on the card plane, returns true if it lands inside the card quad
+    glm::vec3 Local = Point - Card->Position;
 
-    // Step 1 - Mouse NDC Coords
-    f32 X_NDC = (ScreenMouseX * 2.0f) / ViewportWidth - 1.0f;
-    f32 Y_NDC = 1.0f - (2.0f * ScreenMouseY) / ViewportHeight;
-    f32 Z_NDC = 1.0f;
-    glm::vec3 RayNDC = glm::vec3(X_NDC, Y_NDC, Z_NDC);
+    // Undo the card rotation (around Z) so we can test against an axis aligned quad
+    f32 C = cos(-Card->Rotation);
+    f32 S = sin(-Card->Rotation);
+    f32 X = C * Local.x - S * Local.y;
+    f32 Y = S * Local.x + C * Local.y;
 
-    // Step 2 - Homogeneous Clip Coords - Make Ray Z point forwards, Forward is Negative Z on OpenGL
-    glm::vec4 RayClip = vec4(RayNDC.x, RayNDC.y, -1.0f, 1.0f);
-
-    // Step 3 - Ray to Eye Space - Multiply by inverse of the projection matrix and Set Z & WW to mean Forwards, and not a point
-    glm::vec4 RayEyeSpace = glm::inverse(Perspective) * RayClip;
-    RayEyeSpace = glm::vec4(RayEyeSpace.x, RayEyeSpace.y, -1.0f, 0.0f);
-
-    // Step 4 - World Coordinates - Go to world coordinates and normalize the vector to mean a direction
-    glm::vec4 RayWorld4 = glm::inverse(View) * glm::vec4(RayEyeSpace.x, RayEyeSpace.y, -1.0f, 0.0f);
-    glm::vec3 RayWorld  = glm::normalize(glm::vec3(RayWorld4));
-
-    return RayWorld;
+    // Cards use the unit quad (-0.5 to 0.5) scaled by Card->Scale
+    f32 HalfSize = 0.5f * Card->Scale;
+    return glm::abs(X) <= HalfSize && glm::abs(Y) <= HalfSize;
 }
 
 i32 main(i32 Argc, char **Argv)
@@ -107,6 +100,9 @@ i32 main(i32 Argc, char **Argv)
     Cards.push_back(AwesomeFace);
     Cards.push_back(Spades5);
 
+    i32 DraggedCard = -1;
+    glm::vec3 DragOffset = {}; // Hit point relative to the card center, so the card doesn't snap to the cursor
+
     while(Application.IsRunning)
     {
         Application.BeginFrame();
@@ -118,7 +114,6 @@ i32 main(i32 Argc, char **Argv)
 
         if(Keyboard.IsPressed(SDL_SCANCODE_LALT) && Keyboard.IsReleased(SDL_SCANCODE_RETURN))
         {
-            Log(Info, "Yep!");
             Application.ToggleFullscreen();
         }
 
@@ -176,17 +171,50 @@ i32 main(i32 Argc, char **Argv)
         }
 
         Renderer.ClearScreen(ORANGE);
-        Renderer.UpdateCamera(Camera);
+        Camera.Update();
 
-        Renderer.DrawTexture(Clubs2.Texture, Clubs2.Position, Clubs2.Scale, Clubs2.Rotation);
-        Renderer.DrawTexture(AwesomeFace.Texture, AwesomeFace.Position, AwesomeFace.Scale, AwesomeFace.Rotation);
-        rect SrcRect = {0.0f, 0.0, 1.0f, 1.0f};
-        Renderer.DrawTexture(Spades5.Texture, Spades5.Position, Spades5.Scale, Spades5.Rotation, SrcRect, Spades5.Tint);
+        { // Card picking and dragging
+            glm::vec3 RayDirection = ScreenToWorldRay(&Mouse, &Renderer, &Camera);
+            glm::vec3 CardNormal = glm::vec3(0.0f, 0.0f, 1.0f); // Cards lie flat on the table and only rotate around Z
 
-        glm::vec3 Ray = ScreenToWorldRay(Mouse.X, Mouse.Y, Renderer.ViewportWidth, Renderer.ViewportHeight, Camera.Perspective, Camera.View);
-        //char TextBuffer[200];
-        //snprintf(TextBuffer, sizeof(TextBuffer), "ScreenToWorldRay - %.2f, %.2f, %.2f", Ray.x, Ray.y, Ray.z);
-        //Renderer.DrawText(MarcellusFont, 0.0f, 0.0f, 40.0f, TextBuffer);
+            b32 MouseDown    = Mouse.IsButtonPressed(SDL_BUTTON_LEFT);
+            b32 MouseWasDown = Mouse.WasButtonPressed(SDL_BUTTON_LEFT);
+
+            if(MouseDown && !MouseWasDown) // Just pressed, pick the top card under the cursor
+            {
+                // NOTE: All cards share the same Z and depth test is GL_LESS, so the first card drawn ends up on top
+                for(i32 i = 0; i < (i32)Cards.size(); i++)
+                {
+                    glm::vec3 Hit;
+                    if(RayPlaneIntersection(Camera.Position, RayDirection, Cards[i].Position, CardNormal, &Hit) && CardContainsPoint(&Cards[i], Hit))
+                    {
+                        DragOffset = Hit - Cards[i].Position;
+                        std::rotate(Cards.begin(), Cards.begin() + i, Cards.begin() + i + 1); // Bring it to the top
+                        DraggedCard = 0;
+                        break;
+                    }
+                }
+            }
+            else if(MouseDown && DraggedCard != -1) // Dragging, follow the cursor on the card plane
+            {
+                card *Card = &Cards[DraggedCard];
+                glm::vec3 Hit;
+                if(RayPlaneIntersection(Camera.Position, RayDirection, Card->Position, CardNormal, &Hit))
+                {
+                    Card->Position.x = Hit.x - DragOffset.x;
+                    Card->Position.y = Hit.y - DragOffset.y;
+                }
+            }
+            else if(!MouseDown) // Released
+            {
+                DraggedCard = -1;
+            }
+        }
+
+        for(card &Card : Cards)
+        {
+            Renderer.DrawTexture(Card.Texture, Card.Position, Card.Scale, Card.Rotation, rect{0.0f, 0.0f, 1.0f, 1.0f}, Card.Tint);
+        }
 
         f32 X = 0.0f;
         f32 Y = 0.0f;
