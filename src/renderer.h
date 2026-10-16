@@ -85,7 +85,7 @@ struct renderer
     void Init(SDL_Window *SDLWindow, u32 Width, u32 Height);
     void UpdateViewport(i32 Width, i32 Height);
 
-    void UpdateCamera(camera Camera);
+    void UpdateCameraBuffer(camera *Camera);
 
     void UploadTexture(u8 *Data, i32 Width, i32 Height, u32 *ID, u64 *Handle);
     void DestroyTexture(u32 *ID, u64 *Handle);
