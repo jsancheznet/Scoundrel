@@ -5,7 +5,7 @@
 layout(location = 0) in vec3 LocalVertexPosition;
 layout(location = 1) in vec2 UV;
 layout(location = 2) in vec3 InstanceWorldPosition;
-layout(location = 3) in vec3 InstanceWorldScale;
+layout(location = 3) in vec2 InstanceWorldScale;
 layout(location = 4) in float InstanceWorldRotation;
 layout(location = 5) in uvec2 TextureHandle;
 layout(location = 6) in vec4 SrcRect;
@@ -24,7 +24,7 @@ out vec2 Uv;
 flat out uvec2 fsTextureHandle;
 out vec4 TintColor;
 
-mat4 CreateModelMatrix(vec3 Pos, vec3 Scale, float Rotation)
+mat4 CreateModelMatrix(vec3 Pos, vec2 Scale, float Rotation)
 {
     float C = cos(Rotation);
     float S = sin(Rotation);
@@ -33,7 +33,7 @@ mat4 CreateModelMatrix(vec3 Pos, vec3 Scale, float Rotation)
     (
         C * Scale.x, S * Scale.x, 0.0, 0.0,
         -S * Scale.y, C * Scale.y, 0.0, 0.0,
-        0.0, 0.0, Scale.z, 0.0,
+        0.0, 0.0, 1.0, 0.0,
         Pos.x, Pos.y, Pos.z, 1.0
     );
 }

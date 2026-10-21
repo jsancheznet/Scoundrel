@@ -11,6 +11,10 @@ struct mouse
     f32 X;
     f32 Y;
 
+    b32 IsDragging;
+
+    void Init();
+
     void Update(); // This needs to be called after all events have been pumped
 
     b32 IsButtonPressed(u32 Button);

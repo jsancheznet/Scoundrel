@@ -4,6 +4,12 @@
 
 #include <SDL3/SDL.h>
 
+void mouse::Init()
+{
+    Update();
+    b32 IsDragging = false;
+}
+
 void mouse::Update()
 {
     PrevButtonState = ButtonState;

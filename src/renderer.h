@@ -44,7 +44,7 @@ struct sprite_instance
 {
     u64 TextureHandle;
     glm::vec3 Position;
-    glm::vec3 Scale;
+    glm::vec2 Scale;
     f32 Rotation;
     rect SrcRect;
     glm::vec4 Tint;
@@ -73,11 +73,16 @@ struct renderer
     u32 TextVAO;
     u32 TextVBO;
 
+    u32 CardVAO;
+    u32 CardVBO;
+    u32 CardEBO;
+
     u32 CameraUBO;
 
     // Shaders
     u32 SpriteShader;
     u32 TextShader;
+    u32 CardShader;
 
     std::vector<sprite_instance> Sprites;
     std::vector<character_glyph> Glyphs;
@@ -90,13 +95,25 @@ struct renderer
     void UploadTexture(u8 *Data, i32 Width, i32 Height, u32 *ID, u64 *Handle);
     void DestroyTexture(u32 *ID, u64 *Handle);
 
-    void DrawTexture(u64 AssetHandle, vec3 Position, f32 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f}, glm::vec4 Tint = {1.0f, 1.0f, 1.0f, 0.0f});
+    void DrawTexture(u64 AssetHandle, vec3 Position, vec2 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f}, glm::vec4 Tint = {1.0f, 1.0f, 1.0f, 0.0f});
     void DrawText(u64 Font, f32 X, f32 Y, f32 Size, const char *Text, color Color = {1.0f, 1.0f, 1.0f, 1.0f});
 
     void ClearScreen(color Color);
     void EndFrame();
 
   private:
+
+    void ConfigureRenderer();
+
+    void LoadShaders();
+
+    void CreateCameraUBO();
+
+    void CreateQuadMesh();
+    void CreateSpriteMesh();
+    void CreateTextMesh();
+    void CreateCardMesh();
+
     u64 CompileShader(const char *Filename);
     void UseShader(u32 Shader);
 

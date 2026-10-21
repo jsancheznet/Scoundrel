@@ -1,52 +1,60 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "typedefs.h"
 
-static u32 _State = 1;
+// NOTE: The state lives inside an inline function, so every .cpp that includes this header shares the same one.
+// A static global would give each .cpp its own copy, and seeding in one file wouldn't affect the others.
+inline
+u32 *RandomState()
+{
+    static u32 State = 1;
+    return &State;
+}
 
 inline
 void RandomSeed(u32 Input)
 {
     Assert(Input != 0);
 
-    _State = Input;
+    *RandomState() = Input;
 }
 
 inline
 u32 RandomU32()
 {
-	u32 X = _State;
-	X ^= X << 13;
-	X ^= X >> 17;
-	X ^= X << 5;
-	return _State= X;
+    u32 X = *RandomState();
+    X ^= X << 13;
+    X ^= X >> 17;
+    X ^= X << 5;
+    return *RandomState() = X;
 }
 
 inline
 i32 RandomI32()
 {
-	i32 X = _State;
-	X ^= X << 13;
-	X ^= X >> 17;
-	X ^= X << 5;
-	return _State= X;
+    return (i32)RandomU32();
 }
 
+// Returns a value in [Min, Max), Max is never returned
 inline
 i32 RandomBetween(i32 Min, i32 Max)
 {
     Assert(Min < Max);
-    return Min + (i32)( RandomU32() / (i32) ( 0xffffffff/ (Max-Min)));
+
+    // Scale the 32 bit random number into the range instead of dividing, so it can never reach Max
+    u32 Range = (u32)((i64)Max - (i64)Min);
+    return Min + (i32)(((u64)RandomU32() * Range) >> 32);
 }
 
+// Returns a value in [Min, Max), Max is never returned
 inline
 f32 RandomBetween(f32 Min, f32 Max)
 {
     Assert(Min < Max);
 
-    return Min + (f32)( RandomU32() / (f32) ( (f32)0xffffffff/ (Max-Min)));
+    // Use the top 24 bits, a f32 represents all of them exactly, so Normalized stays below 1.0
+    f32 Normalized = (f32)(RandomU32() >> 8) * (1.0f / 16777216.0f);
+    return Min + (Max - Min) * Normalized;
 }
 
 inline

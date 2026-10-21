@@ -1,6 +1,5 @@
 #include "log.h"
-
-// TODO(Jsanchez): Executing the following line crashes the game: Log(Info, "%s");
+#include "typedefs.h"
 
 #ifndef NDEBUG
 void Log(log_category Category, const char *Fmt, ...)
@@ -44,9 +43,19 @@ void Log(log_category Category, const char *Fmt, ...)
     //     3- Write the reset terminal color code
     //
 
+    // NOTE: snprintf/vsnprintf return the length the string would have had, not what was written,
+    // so CharCount has to be clamped, otherwise a long message moves the write pointer past the buffer
     char Buffer[4096];
-    int CharCount = snprintf(Buffer, sizeof(Buffer), "%s[%s]: ", Color, CategoryString);
-    CharCount += vsnprintf(Buffer + CharCount, sizeof(Buffer) - CharCount, Fmt, Args);
+    i32 MaxCount = (i32)sizeof(Buffer) - 1;
+
+    i32 CharCount = snprintf(Buffer, sizeof(Buffer), "%s[%s]: ", Color, CategoryString);
+    if(CharCount < 0) CharCount = 0;
+    if(CharCount > MaxCount) CharCount = MaxCount;
+
+    i32 MessageCount = vsnprintf(Buffer + CharCount, sizeof(Buffer) - CharCount, Fmt, Args);
+    if(MessageCount > 0) CharCount += MessageCount;
+    if(CharCount > MaxCount) CharCount = MaxCount;
+
     snprintf(Buffer + CharCount, sizeof(Buffer) - CharCount, "%s", ResetColorCode);
 
     va_end(Args);
