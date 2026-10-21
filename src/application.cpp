@@ -1,6 +1,7 @@
 #include "application.h"
 #include "SDL3/SDL_video.h"
 #include "log.h"
+#include "random.h"
 
 #include <glad/glad.h>
 
@@ -15,6 +16,8 @@ void application::Init()
 #endif
 
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+
+    RandomSeed((u32)SDL_GetPerformanceCounter() | 1); // | 1 so the seed is never 0
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
