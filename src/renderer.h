@@ -17,6 +17,7 @@
 
 #define MAX_SPRITE_COUNT 10000
 #define MAX_GLYPH_COUNT 10000
+#define MAX_CARD_COUNT 1024
 
 using namespace glm;
 
@@ -59,6 +60,13 @@ struct character_glyph
     glm::vec4 Color;
 };
 
+struct card_instance
+{
+    u64 FrontTexture;   // Bindless handles first, same layout idea as sprite_instance
+    u64 BackTexture;
+    glm::mat4 Model;    // Built on the CPU, the shader just multiplies by it
+};
+
 struct renderer
 {
     SDL_Window* Window;
@@ -76,6 +84,7 @@ struct renderer
     u32 CardVAO;
     u32 CardVBO;
     u32 CardEBO;
+    u32 CardInstanceVBO;
 
     u32 CameraUBO;
 
@@ -86,6 +95,7 @@ struct renderer
 
     std::vector<sprite_instance> Sprites;
     std::vector<character_glyph> Glyphs;
+    std::vector<card_instance> CardInstances;
 
     void Init(SDL_Window *SDLWindow, u32 Width, u32 Height);
     void UpdateViewport(i32 Width, i32 Height);
@@ -97,6 +107,7 @@ struct renderer
 
     void DrawTexture(u64 AssetHandle, vec3 Position, vec2 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f}, glm::vec4 Tint = {1.0f, 1.0f, 1.0f, 0.0f});
     void DrawText(u64 Font, f32 X, f32 Y, f32 Size, const char *Text, color Color = {1.0f, 1.0f, 1.0f, 1.0f});
+    void DrawCard(u64 FrontTexture, u64 BackTexture, vec3 Position, vec3 Scale, f32 Angle, vec3 Axis); // Angle in radians
 
     void ClearScreen(color Color);
     void EndFrame();
@@ -116,6 +127,10 @@ struct renderer
 
     u64 CompileShader(const char *Filename);
     void UseShader(u32 Shader);
+
+    void DrawSprites();
+    void DrawTexts();
+    void DrawCards();
 
     static void DebugCallback(GLenum Source, GLenum Type, GLuint Id,  GLenum Severity, GLsizei Length, GLchar const *Message, void const *UserParam);
 };

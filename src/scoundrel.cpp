@@ -32,6 +32,7 @@ struct card
     glm::vec3 TargetPosition; // Where the card wants to be, Position eases towards it every frame
     glm::vec4 Tint;
 };
+
 constexpr glm::vec2 CardSize =  glm::vec2(0.822f, 1.122f);
 card CreateCard(u64 Texture, glm::vec3 Position, f32 Rotation, glm::vec3 Scale, glm::vec4 Tint)
 {
@@ -78,6 +79,7 @@ i32 main(i32 Argc, char **Argv)
 
     u64 TexClubs2             = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
     u64 Spades5Texture        = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Spades-5.jpg");
+    u64 CardBackTexture       = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Back.jpg");
     u64 MarcellusFont         = AssetMgr.LoadBitmapFont("assets/Fonts/Marcellus_sc.png", "assets/Fonts/Marcellus_sc.json");
 
     card Clubs2 = CreateCard(TexClubs2, glm::vec3(-0.5f, 0.0f, 0.f), 0.0f, glm::vec3(0.822f, 1.122f, 0.0f), glm::vec4(0.0f));
@@ -184,11 +186,15 @@ i32 main(i32 Argc, char **Argv)
                 Card.Position += (Card.TargetPosition - Card.Position) * Blend;
             }
         }
+//
+//         for(card &Card : Cards)
+//         {
+//             Renderer.DrawTexture(Card.Texture, Card.Position, Card.Scale, Card.Rotation, rect{0.0f, 0.0f, 1.0f, 1.0f}, Card.Tint);
+//         }
 
-        for(card &Card : Cards)
-        {
-            Renderer.DrawTexture(Card.Texture, Card.Position, Card.Scale, Card.Rotation, rect{0.0f, 0.0f, 1.0f, 1.0f}, Card.Tint);
-        }
+        // TODO: Remove, card mesh test. Spins around Y so both sides show. The mesh is 6.3 x 8.8, 0.13 matches CardSize
+        Renderer.DrawCard(TexClubs2, CardBackTexture, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.13f),
+                          (f32)SDL_GetTicks() / 1000.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 
         f32 X = 0.0f;
         f32 Y = 0.0f;
