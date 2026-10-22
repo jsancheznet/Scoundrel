@@ -12,6 +12,7 @@
 #include <cfloat>
 
 #include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/constants.hpp>
 
 #include <SDL3/SDL.h>
 
@@ -22,6 +23,23 @@ mouse         Mouse;
 keyboard      Keyboard;
 audio_system  Audio;
 
+enum card_suit
+{
+    Suit_Clubs,
+    Suit_Spades,
+    Suit_Diamonds,
+    Suit_Hearts,
+
+    Suit_Count
+};
+
+enum card_type
+{
+    Card_Monster,   // Clubs and Spades
+    Card_Weapon,    // Diamonds
+    Card_Potion,    // Hearts
+};
+
 struct card
 {
     u64 Texture;        // Front
@@ -31,10 +49,15 @@ struct card
     glm::vec3 Axis;
     glm::vec2 Scale;    // Size of the card in world units, used for hit detection
     glm::vec4 Tint;
+
+    card_suit Suit;
+    card_type Type;
+    i32 Value;          // 2-10, J = 11, Q = 12, K = 13, A = 14. Damage for monsters, strength for weapons, health for potions
 };
 
 constexpr f32 CardMeshScale = 0.13f; // The card mesh is 6.3 x 8.8 units, this scales it down to the table size
 constexpr glm::vec2 CardSize = glm::vec2(6.3f * CardMeshScale, 8.8f * CardMeshScale);
+constexpr f32 CardThickness = 0.03f * CardMeshScale; // The card mesh is 0.03 units thick
 
 card CreateCard(u64 Texture, u64 BackTexture, glm::vec3 Position, f32 Angle, glm::vec3 Axis, glm::vec4 Tint)
 {
@@ -49,6 +72,47 @@ card CreateCard(u64 Texture, u64 BackTexture, glm::vec3 Position, f32 Angle, glm
     Result.Tint = Tint;
 
     return Result;
+}
+
+// Loads every card used by Scoundrel and returns them as the Dungeon, face down, stacked on DungeonPosition.
+// NOTE: Red face cards (J, Q, K) and red Aces are not part of the game, so Hearts and Diamonds only go up to 10
+std::vector<card> LoadDungeon(u64 BackTexture, glm::vec3 DungeonPosition)
+{
+    const char *SuitNames[Suit_Count] = {"Clubs", "Spades", "Diamonds", "Hearts"};
+    const char *RankNames[] = {"", "", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"}; // Indexed by Value
+
+    std::vector<card> Dungeon;
+    Dungeon.reserve(44);
+
+    for(i32 Suit = 0; Suit < Suit_Count; ++Suit)
+    {
+        b32 IsRed = (Suit == Suit_Diamonds || Suit == Suit_Hearts);
+        i32 MaxValue = IsRed ? 10 : 14;
+
+        for(i32 Value = 2; Value <= MaxValue; ++Value)
+        {
+            char Path[128];
+            snprintf(Path, sizeof(Path), "assets/Textures/Scoundrel-%s-%s.jpg", SuitNames[Suit], RankNames[Value]);
+
+            u64 FrontTexture = AssetMgr.LoadTexture(Path);
+
+            // Stack the cards, each one slightly above the previous one so the top of the pile is the closest to the camera
+            glm::vec3 Position = DungeonPosition + glm::vec3(0.0f, 0.0f, CardThickness * (f32)Dungeon.size());
+
+            // Face down, the back faces the camera
+            card Card = CreateCard(FrontTexture, BackTexture, Position, glm::pi<f32>(), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(0.0f));
+            Card.Suit = (card_suit)Suit;
+            Card.Type = (Suit == Suit_Diamonds) ? Card_Weapon : (Suit == Suit_Hearts) ? Card_Potion : Card_Monster;
+            Card.Value = Value;
+
+            Dungeon.push_back(Card);
+        }
+    }
+
+    Log(Info, "LoadDungeon() - Loaded %zu cards", Dungeon.size());
+    Assert(Dungeon.size() == 44);
+
+    return Dungeon;
 }
 
 // The card rotation as a matrix, the same rotation DrawCard uses
@@ -115,18 +179,12 @@ i32 main(i32 Argc, char **Argv)
     Renderer.Init(Application.Window, 1366, 768);
 
     camera Camera = CreateCamera();
+    Camera.Position = glm::vec3(0.0f, 0.0f, 2.0f);
 
-    u64 TexClubs2             = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Clubs-2.jpg");
-    u64 Spades5Texture        = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Spades-5.jpg");
     u64 CardBackTexture       = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Back.jpg");
     u64 MarcellusFont         = AssetMgr.LoadBitmapFont("assets/Fonts/Marcellus_sc.png", "assets/Fonts/Marcellus_sc.json");
 
-    card Clubs2 = CreateCard(TexClubs2, CardBackTexture, glm::vec3(-0.5f, 0.0f, 0.f), 0.0f, glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(0.0f));
-    card Spades5 = CreateCard(Spades5Texture, CardBackTexture, glm::vec3(0.0f, -1.0, 0.0f), 0.0f, glm::vec3(0.0f, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 0.45f));
-
-    std::vector<card> Cards;
-    Cards.push_back(Clubs2);
-    Cards.push_back(Spades5);
+    std::vector<card> Cards = LoadDungeon(CardBackTexture, glm::vec3(-1.5f, 0.0f, 0.0f)); // Dungeon pile on the left, like the table layout in the rules
 
     while(Application.IsRunning)
     {
@@ -170,9 +228,6 @@ i32 main(i32 Argc, char **Argv)
 
         Renderer.ClearScreen(ORANGE);
         Camera.Update();
-
-        // TODO: Remove, rotation test. Clubs2 spins around Y so both sides show and the hit test has to follow the tilt
-        Cards[0].Angle = (f32)SDL_GetTicks() / 1000.0f;
 
         b32 MouseDown    = Mouse.IsButtonPressed(SDL_BUTTON_LEFT);
         b32 MouseWasDown = Mouse.WasButtonPressed(SDL_BUTTON_LEFT);
