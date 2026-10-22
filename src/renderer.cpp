@@ -35,11 +35,8 @@ void renderer::ClearScreen(color Color)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void renderer::EndFrame()
+void renderer::DrawSprites()
 {
-    // In here we can split things up according to teir material requirements, bind things and call draw
-
-    // Draw Sprites
     UseShader(SpriteShader);
     glEnable(GL_DEPTH_TEST);
     glBindVertexArray(SpritesVAO);
@@ -49,8 +46,10 @@ void renderer::EndFrame()
         glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, Sprites.size());
     }
     Sprites.clear();
+}
 
-    // Draw Text
+void renderer::DrawTexts()
+{
     UseShader(TextShader);
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -62,12 +61,33 @@ void renderer::EndFrame()
     }
     glDisable(GL_BLEND);
     Glyphs.clear();
+}
 
-    // TODO: Remove this, it's only for testing
+void renderer::DrawCards()
+{
     UseShader(CardShader);
-    glBindVertexArray(CardVAO);
-    glDrawElements(GL_TRIANGLES, std::size(kCardIndices), GL_UNSIGNED_INT, nullptr);
+    glEnable(GL_DEPTH_TEST);
 
+    // Each side of the card is its own set of triangles, culling skips the side facing away from the camera.
+    // NOTE: A negative scale flips the winding and would cull the wrong side
+    glEnable(GL_CULL_FACE);
+
+    glBindVertexArray(CardVAO);
+    if(CardInstances.size() != 0)
+    {
+        glNamedBufferSubData(CardInstanceVBO, 0, CardInstances.size() * sizeof(card_instance), &CardInstances[0]);
+        glDrawElementsInstanced(GL_TRIANGLES, std::size(kCardIndices), GL_UNSIGNED_INT, nullptr, CardInstances.size());
+    }
+
+    glDisable(GL_CULL_FACE);
+    CardInstances.clear();
+}
+
+void renderer::EndFrame()
+{
+    DrawSprites();
+    DrawCards();
+    DrawTexts(); // Last, text is UI and goes on top of everything
     SDL_GL_SwapWindow(Window);
 }
 
@@ -200,6 +220,36 @@ void renderer::DrawTexture(u64 AssetHandle, vec3 Position, vec2 Scale, f32 Rotat
     Sprite.Tint = Tint;
 
     Sprites.push_back(Sprite);
+}
+
+// Angle is in radians, Axis doesn't need to be normalized (glm::rotate normalizes it)
+void renderer::DrawCard(u64 FrontTexture, u64 BackTexture, vec3 Position, vec3 Scale, f32 Angle, vec3 Axis)
+{
+    texture *Front = (texture*)AssetMgr.ResolveHandle(FrontTexture);
+    texture *Back = (texture*)AssetMgr.ResolveHandle(BackTexture);
+    if(Front == nullptr || Back == nullptr)
+    {
+        Log(Warning, "renderer::DrawCard() - Tried to draw a card with an invalid texture handle");
+        return;
+    }
+
+    if(CardInstances.size() >= MAX_CARD_COUNT)
+    {
+        Log(Warning, "renderer::DrawCard() - Reached MAX_CARD_COUNT (%d), card will not be drawn", MAX_CARD_COUNT);
+        return;
+    }
+
+    // Model = Translate * Rotate * Scale, the card is scaled first, then rotated, then moved into place
+    glm::mat4 Model = glm::translate(glm::mat4(1.0f), Position);
+    Model = glm::rotate(Model, Angle, Axis);
+    Model = glm::scale(Model, Scale);
+
+    card_instance Card = {};
+    Card.FrontTexture = Front->BindlessTextureHandle;
+    Card.BackTexture = Back->BindlessTextureHandle;
+    Card.Model = Model;
+
+    CardInstances.push_back(Card);
 }
 
 // X, Y is the top-left of the text block, Size is the font size (em size) in pixels
@@ -469,10 +519,11 @@ void renderer::CreateCardMesh()
     glCreateBuffers(1, &CardEBO);
 
     // Upload Vertex Data, format -> f32 Pos[3], f32 Normal[3], f32 Uv[2]
-    glNamedBufferStorage(CardVBO, sizeof(kCardVertices), kCardVertices, GL_DYNAMIC_STORAGE_BIT);
+    // The mesh never changes, so the buffers are immutable (no storage flags)
+    glNamedBufferStorage(CardVBO, sizeof(kCardVertices), kCardVertices, 0);
 
     // Upload Index Data
-    glNamedBufferStorage(CardEBO, sizeof(kCardIndices), kCardIndices, GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferStorage(CardEBO, sizeof(kCardIndices), kCardIndices, 0);
 
     // Vertex Buffer Binding
     glVertexArrayVertexBuffer(CardVAO, 0, CardVBO, 0, sizeof(card_vertex));
@@ -494,6 +545,41 @@ void renderer::CreateCardMesh()
     glEnableVertexArrayAttrib(CardVAO, 2);
     glVertexArrayAttribFormat(CardVAO, 2, 2, GL_FLOAT, GL_FALSE, offsetof(card_vertex, Uv));
     glVertexArrayAttribBinding(CardVAO, 2, 0);
+
+    { // Per instance data, uploaded every frame in DrawCards()
+
+        CardInstances.reserve(MAX_CARD_COUNT);
+
+        glCreateBuffers(1, &CardInstanceVBO);
+        u32 BufferSize = sizeof(card_instance) * MAX_CARD_COUNT;
+        glNamedBufferStorage(CardInstanceVBO, BufferSize, NULL, GL_DYNAMIC_STORAGE_BIT);
+        Log(Info, "renderer::CreateCardMesh() - Allocating %d bytes to CardInstanceVBO", BufferSize);
+
+        // Binding point 1 advances once per instance instead of once per vertex
+        u32 BindingPoint = 1;
+        glVertexArrayVertexBuffer(CardVAO, BindingPoint, CardInstanceVBO, 0, sizeof(card_instance));
+        glVertexArrayBindingDivisor(CardVAO, BindingPoint, 1);
+
+        // Model Matrix - Locations 3, 4, 5, 6
+        // NOTE: An attribute holds at most 4 floats, so a mat4 takes 4 locations, one per column
+        for(u32 Column = 0; Column < 4; ++Column)
+        {
+            u32 Location = 3 + Column;
+            glEnableVertexArrayAttrib(CardVAO, Location);
+            glVertexArrayAttribFormat(CardVAO, Location, 4, GL_FLOAT, GL_FALSE, offsetof(card_instance, Model) + Column * sizeof(glm::vec4));
+            glVertexArrayAttribBinding(CardVAO, Location, BindingPoint);
+        }
+
+        // Front Texture Handle - Location 7
+        glEnableVertexArrayAttrib(CardVAO, 7);
+        glVertexArrayAttribIFormat(CardVAO, 7, 2, GL_UNSIGNED_INT, offsetof(card_instance, FrontTexture));
+        glVertexArrayAttribBinding(CardVAO, 7, BindingPoint);
+
+        // Back Texture Handle - Location 8
+        glEnableVertexArrayAttrib(CardVAO, 8);
+        glVertexArrayAttribIFormat(CardVAO, 8, 2, GL_UNSIGNED_INT, offsetof(card_instance, BackTexture));
+        glVertexArrayAttribBinding(CardVAO, 8, BindingPoint);
+    }
 }
 
 void renderer::UseShader(u32 Shader)
