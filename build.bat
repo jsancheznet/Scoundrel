@@ -37,6 +37,7 @@ clang-cl /Zi /Od -W4 -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter 
 	 ..\src\asset_manager.cpp ^
 	 ..\src\bitmap_font.cpp ^
 	 ..\src\helpers.cpp ^
+	 ..\src\card.cpp ^
 	 ..\libraries\glad\src\glad.c ^
 	 %IncludeDirectories% ^
 	 /Fe:scoundrel.exe ^

@@ -27,14 +27,13 @@ void application::Init()
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-    // PERF: MSAA off. With thousands of overlapping full-screen quads, 8x MSAA multiplied
-    // ROP/blend bandwidth ~8x for almost no visual gain (interior edges are occluded).
-    // Re-enable a low sample count (2-4) for the final game, which draws only a few cards.
+    // MSAA OFF
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 
-    // TODO(Jsanchez): Disable this on release builds
+#ifndef NDEBUG
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+#endif
 }
 
 void application::CreateWindow(const char *Title, u32 Width, u32 Height)
