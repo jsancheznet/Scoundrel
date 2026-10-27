@@ -12,6 +12,8 @@
 #include "typedefs.h"
 #include "camera.h"
 
+#include "card.h"
+
 #define HOT_PINK color{1.0f, 0.0f, 1.0f, 1.0f}
 #define ORANGE   color{1.0f, 0.647f, 0.0f, 1.0f}
 
@@ -107,7 +109,7 @@ struct renderer
 
     void DrawTexture(u64 AssetHandle, vec3 Position, vec2 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f}, glm::vec4 Tint = {1.0f, 1.0f, 1.0f, 0.0f});
     void DrawText(u64 Font, f32 X, f32 Y, f32 Size, const char *Text, color Color = {1.0f, 1.0f, 1.0f, 1.0f});
-    void DrawCard(u64 FrontTexture, u64 BackTexture, vec3 Position, vec3 Scale, f32 Angle, vec3 Axis); // Angle in radians
+    void DrawCard(card &Card);
 
     void ClearScreen(color Color);
     void EndFrame();

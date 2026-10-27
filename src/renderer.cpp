@@ -1,9 +1,13 @@
 #include <stdio.h>
 
+#include <glm/gtc/constants.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "renderer.h"
 #include "log.h"
 #include "../assets/Meshes/card.hpp"
 #include "asset_manager.h"
+#include "card.h"
 
 extern asset_manager AssetMgr;
 
@@ -223,10 +227,10 @@ void renderer::DrawTexture(u64 AssetHandle, vec3 Position, vec2 Scale, f32 Rotat
 }
 
 // Angle is in radians, Axis doesn't need to be normalized (glm::rotate normalizes it)
-void renderer::DrawCard(u64 FrontTexture, u64 BackTexture, vec3 Position, vec3 Scale, f32 Angle, vec3 Axis)
+void renderer::DrawCard(card &Card)
 {
-    texture *Front = (texture*)AssetMgr.ResolveHandle(FrontTexture);
-    texture *Back = (texture*)AssetMgr.ResolveHandle(BackTexture);
+    texture *Front = (texture*)AssetMgr.ResolveHandle(Card.Texture);
+    texture *Back = (texture*)AssetMgr.ResolveHandle(Card.BackTexture);
     if(Front == nullptr || Back == nullptr)
     {
         Log(Warning, "renderer::DrawCard() - Tried to draw a card with an invalid texture handle");
@@ -240,16 +244,17 @@ void renderer::DrawCard(u64 FrontTexture, u64 BackTexture, vec3 Position, vec3 S
     }
 
     // Model = Translate * Rotate * Scale, the card is scaled first, then rotated, then moved into place
-    glm::mat4 Model = glm::translate(glm::mat4(1.0f), Position);
-    Model = glm::rotate(Model, Angle, Axis);
-    Model = glm::scale(Model, Scale);
+    glm::mat4 Model = glm::translate(glm::mat4(1.0f), Card.Position);
+    Model = glm::rotate(Model, Card.Angle, Card.Axis);
+    // Model = glm::scale(Model, Card.Scale);
+    Model = glm::scale(Model, glm::vec3(CardMeshScale));
 
-    card_instance Card = {};
-    Card.FrontTexture = Front->BindlessTextureHandle;
-    Card.BackTexture = Back->BindlessTextureHandle;
-    Card.Model = Model;
+    card_instance CardInst = {};
+    CardInst.FrontTexture = Front->BindlessTextureHandle;
+    CardInst.BackTexture = Back->BindlessTextureHandle;
+    CardInst.Model = Model;
 
-    CardInstances.push_back(Card);
+    CardInstances.push_back(CardInst);
 }
 
 // X, Y is the top-left of the text block, Size is the font size (em size) in pixels

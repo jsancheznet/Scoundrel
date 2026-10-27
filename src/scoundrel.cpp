@@ -7,6 +7,7 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "camera.h"
+#include "card.h"
 
 #include <stdio.h>
 #include <cfloat>
@@ -23,56 +24,7 @@ mouse         Mouse;
 keyboard      Keyboard;
 audio_system  Audio;
 
-enum card_suit
-{
-    Suit_Clubs,
-    Suit_Spades,
-    Suit_Diamonds,
-    Suit_Hearts,
 
-    Suit_Count
-};
-
-enum card_type
-{
-    Card_Monster,   // Clubs and Spades
-    Card_Weapon,    // Diamonds
-    Card_Potion,    // Hearts
-};
-
-struct card
-{
-    u64 Texture;        // Front
-    u64 BackTexture;
-    glm::vec3 Position;
-    f32 Angle;          // Radians, rotation around Axis
-    glm::vec3 Axis;
-    glm::vec2 Scale;    // Size of the card in world units, used for hit detection
-    glm::vec4 Tint;
-
-    card_suit Suit;
-    card_type Type;
-    i32 Value;          // 2-10, J = 11, Q = 12, K = 13, A = 14. Damage for monsters, strength for weapons, health for potions
-};
-
-constexpr f32 CardMeshScale = 0.13f; // The card mesh is 6.3 x 8.8 units, this scales it down to the table size
-constexpr glm::vec2 CardSize = glm::vec2(6.3f * CardMeshScale, 8.8f * CardMeshScale);
-constexpr f32 CardThickness = 0.03f * CardMeshScale; // The card mesh is 0.03 units thick
-
-card CreateCard(u64 Texture, u64 BackTexture, glm::vec3 Position, f32 Angle, glm::vec3 Axis, glm::vec4 Tint)
-{
-    card Result = {};
-
-    Result.Texture = Texture;
-    Result.BackTexture = BackTexture;
-    Result.Position = Position;
-    Result.Angle = Angle;
-    Result.Axis = Axis;
-    Result.Scale = CardSize;
-    Result.Tint = Tint;
-
-    return Result;
-}
 
 // Loads every card used by Scoundrel and returns them as the Dungeon, face down, stacked on DungeonPosition.
 // NOTE: Red face cards (J, Q, K) and red Aces are not part of the game, so Hearts and Diamonds only go up to 10
@@ -115,9 +67,9 @@ std::vector<card> LoadDungeon(u64 BackTexture, glm::vec3 DungeonPosition)
     return Dungeon;
 }
 
-// The card rotation as a matrix, the same rotation DrawCard uses
-glm::mat3 CardRotation(card *Card)
+glm::mat3 GetCardRotationMatrix(card *Card)
 {
+    // mat3 is enough to get the rotation
     return glm::mat3(glm::rotate(glm::mat4(1.0f), Card->Angle, Card->Axis));
 }
 
@@ -125,7 +77,7 @@ b32 CardContainsPoint(card *Card, glm::vec3 Point)
 {
     // Point must be on the card plane, returns true if it lands inside the card rectangle
     // The card's own width and height directions in world space
-    glm::mat3 Rotation = CardRotation(Card);
+    glm::mat3 Rotation = GetCardRotationMatrix(Card);
     glm::vec3 Right = Rotation * glm::vec3(1.0f, 0.0f, 0.0f);
     glm::vec3 Up    = Rotation * glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -149,7 +101,7 @@ card *PickCard(std::vector<card> &Cards, glm::vec3 RayOrigin, glm::vec3 RayDirec
     for(card &Card : Cards)
     {
         // The plane the card lies on, it tilts with the card
-        glm::vec3 CardNormal = CardRotation(&Card) * glm::vec3(0.0f, 0.0f, 1.0f);
+        glm::vec3 CardNormal = GetCardRotationMatrix(&Card) * glm::vec3(0.0f, 0.0f, 1.0f);
 
         glm::vec3 Hit;
         if(RayPlaneIntersection(RayOrigin, RayDirection, Card.Position, CardNormal, &Hit) && CardContainsPoint(&Card, Hit))
@@ -238,14 +190,13 @@ i32 main(i32 Argc, char **Argv)
             card *ClickedCard = PickCard(Cards, Camera.Position, RayDirection);
             if(ClickedCard)
             {
-                // TODO: React to the click
                 Log(Info, "Clicked card at %.2f, %.2f", ClickedCard->Position.x, ClickedCard->Position.y);
             }
         }
 
         for(card &Card : Cards)
         {
-            Renderer.DrawCard(Card.Texture, Card.BackTexture, Card.Position, glm::vec3(CardMeshScale), Card.Angle, Card.Axis);
+            Renderer.DrawCard(Card);
         }
 
         f32 X = 0.0f;
