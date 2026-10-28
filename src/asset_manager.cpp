@@ -63,27 +63,26 @@ u64 asset_manager::LoadSound(const char *Filepath, audio_channel Channel)
         return InvalidHandle();
     }
 
-    asset *Asset = &Assets[Index];
+    // Load the wave file before claiming the slot, so a bad file doesn't leave a half loaded sound
+    sound Sound = {};
+    bool LoadSuccess = SDL_LoadWAV(Filepath, &Sound.AudioSpec, &Sound.DataBuffer, &Sound.DataBufferLength);
+    if(!LoadSuccess)
+    {
+        Log(Error, "asset_manager::LoadSound() - Failed to load wave file: %s, Error: %s", Filepath, SDL_GetError());
+        return InvalidHandle();
+    }
+    Sound.Channel = Channel;
+    Sound.Repeats = false;
 
     // Fill Asset related Data
+    asset *Asset = &Assets[Index];
     Asset->Type = Asset_Sound;
     Asset->Used = true;
     const char *Filename = FilenameFromPath(Filepath); Assert(Filename);
     snprintf(Asset->Name, sizeof(Asset->Name), "%s", Filename);
 
     // Fill Sound Related Data
-    {
-        // Load Wave file
-        bool Success = SDL_LoadWAV(Filepath, &Asset->Sound.AudioSpec, &Asset->Sound.DataBuffer, &Asset->Sound.DataBufferLength);
-        if(!Success)
-        {
-            Log(Error, "asset_manager::LoadSound() - Failed to load wave file: %s, Error: %s", Filepath, SDL_GetError());
-            return InvalidHandle();
-        }
-
-        Asset->Sound.Channel = Channel;
-        Asset->Sound.Repeats = false;
-    }
+    Asset->Sound = Sound;
 
     AssetCount++;
 
@@ -105,7 +104,17 @@ u64 asset_manager::LoadTexture(const char *Filepath)
     u32 Index = FindFreeIndex();
     if(Index == InvalidIndex)
     {
-        Log(Warning, "asset_manager::LoadSound(%s) - Found no free slot inside the asset_manager", Filepath);
+        Log(Warning, "asset_manager::LoadTexture(%s) - Found no free slot inside the asset_manager", Filepath);
+        return InvalidHandle();
+    }
+
+    // Load the image before claiming the slot, so a bad image doesn't leave a half loaded texture
+    texture Texture = {};
+    stbi_set_flip_vertically_on_load(true);
+    Texture.Data = stbi_load(Filepath, &Texture.Width, &Texture.Height, &Texture.ChannelCount, 4);
+    if(!Texture.Data)
+    {
+        Log(Error, "asset_manager::LoadTexture(%s) - Failed to load image: %s", Filepath, stbi_failure_reason());
         return InvalidHandle();
     }
 
@@ -115,12 +124,10 @@ u64 asset_manager::LoadTexture(const char *Filepath)
     Asset->Type = Asset_Texture;
     Asset->Used = true;
     const char *Filename = FilenameFromPath(Filepath); Assert(Filename);
-    strncpy_s(&Asset->Name[0], sizeof(Asset->Name), Filename, std::strlen(Filename));
+    snprintf(Asset->Name, sizeof(Asset->Name), "%s", Filename);
 
     // Set Texture Vars
-    stbi_set_flip_vertically_on_load(true);
-    Asset->Texture.Data = stbi_load(Filepath, &Asset->Texture.Width, &Asset->Texture.Height, &Asset->Texture.ChannelCount, 4);
-
+    Asset->Texture = Texture;
     Renderer.UploadTexture(Asset->Texture.Data,
                            Asset->Texture.Width,
                            Asset->Texture.Height,
@@ -334,13 +341,17 @@ void *asset_manager::ResolveHandle(u64 Handle)
 
     if(Index == InvalidIndex ||
        Generation == InvalidGeneration ||
-       Assets[Index].Generation != Generation)
+       Index > MaxAssetCount - 1||
+       Assets[Index].Generation != Generation ||
+       Assets[Index].Used == false)
     {
         Log(Warning, "asset_manager::ResolveHandle() - Trying to resolve invalid asset handle");
         return nullptr;
     }
 
-    return &Assets[Index].Sound; // Address of union storage
+    // The following line returns the address of the beggining of the union, pay
+    // no attention to the variable name
+    return &Assets[Index].Sound;
 }
 
 u64 asset_manager::CreateHandle(u32 Index, u32 Generation)
