@@ -69,7 +69,7 @@ u64 asset_manager::LoadSound(const char *Filepath, audio_channel Channel)
     Asset->Type = Asset_Sound;
     Asset->Used = true;
     const char *Filename = FilenameFromPath(Filepath); Assert(Filename);
-    strncpy_s(&Asset->Name[0], sizeof(Asset->Name), Filename, std::strlen(Filename));
+    snprintf(Asset->Name, sizeof(Asset->Name), "%s", Filename);
 
     // Fill Sound Related Data
     {
