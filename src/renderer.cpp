@@ -332,6 +332,24 @@ void renderer::ConfigureRenderer()
 {
     gladLoadGL();
 
+    // Every texture is drawn through bindless handles and every shader requires the extension,
+    // check it here so the player gets a clear message instead of a shader compile error or a crash
+    if(!GLAD_GL_ARB_bindless_texture)
+    {
+        char Message[512];
+        snprintf(Message, sizeof(Message),
+                 "Scoundrel needs a GPU that supports bindless textures (GL_ARB_bindless_texture).\n\n"
+                 "Your GPU: %s\n"
+                 "OpenGL version: %s\n\n"
+                 "Updating your graphics driver may add support.",
+                 (const char *)glGetString(GL_RENDERER), (const char *)glGetString(GL_VERSION));
+
+        // Message box too, Log compiles out in release builds
+        Log(Error, "%s", Message);
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Scoundrel", Message, nullptr);
+        exit(1);
+    }
+
     // List extensions
     if (0)
     {
