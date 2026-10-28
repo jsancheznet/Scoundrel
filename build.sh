@@ -35,6 +35,7 @@ clang++ -g -O0 -Wall -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter 
     ../src/asset_manager.cpp \
     ../src/helpers.cpp \
     ../src/bitmap_font.cpp \
+    ../src/card.cpp \
     -x c ../libraries/glad/src/glad.c \
     $IncludeDirectories \
     -L../libraries/SDL-release-3.4.8 \

@@ -4,6 +4,7 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>
 
 const char *FilenameFromPath(const char *Filepath)
 {

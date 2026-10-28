@@ -24,10 +24,9 @@ mouse         Mouse;
 keyboard      Keyboard;
 audio_system  Audio;
 
-
-
 // Loads every card used by Scoundrel and returns them as the Dungeon, face down, stacked on DungeonPosition.
 // NOTE: Red face cards (J, Q, K) and red Aces are not part of the game, so Hearts and Diamonds only go up to 10
+
 std::vector<card> LoadDungeon(u64 BackTexture, glm::vec3 DungeonPosition)
 {
     const char *SuitNames[Suit_Count] = {"Clubs", "Spades", "Diamonds", "Hearts"};
