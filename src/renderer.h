@@ -16,6 +16,7 @@
 
 #define HOT_PINK color{1.0f, 0.0f, 1.0f, 1.0f}
 #define ORANGE   color{1.0f, 0.647f, 0.0f, 1.0f}
+#define RED      color{1.0f, 0.0f, 0.0f, 1.0f}
 
 #define MAX_SPRITE_COUNT 10000
 #define MAX_GLYPH_COUNT 10000
