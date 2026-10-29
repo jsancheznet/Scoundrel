@@ -1,5 +1,5 @@
-#include "SDL3/SDL_scancode.h"
 #include "typedefs.h"
+#include "scoundrel.h"
 #include "application.h"
 #include "renderer.h"
 #include "asset_manager.h"
@@ -16,6 +16,7 @@
 #include <glm/gtc/constants.hpp>
 
 #include <SDL3/SDL.h>
+#include "SDL3/SDL_scancode.h"
 
 application   Application;
 renderer      Renderer;
@@ -23,9 +24,6 @@ asset_manager AssetMgr;
 mouse         Mouse;
 keyboard      Keyboard;
 audio_system  Audio;
-
-// Loads every card used by Scoundrel and returns them as the Dungeon, face down, stacked on DungeonPosition.
-// NOTE: Red face cards (J, Q, K) and red Aces are not part of the game, so Hearts and Diamonds only go up to 10
 
 std::vector<card> LoadDungeon(u64 BackTexture, glm::vec3 DungeonPosition)
 {
@@ -66,30 +64,6 @@ std::vector<card> LoadDungeon(u64 BackTexture, glm::vec3 DungeonPosition)
     return Dungeon;
 }
 
-glm::mat3 GetCardRotationMatrix(card *Card)
-{
-    // mat3 is enough to get the rotation
-    return glm::mat3(glm::rotate(glm::mat4(1.0f), Card->Angle, Card->Axis));
-}
-
-b32 CardContainsPoint(card *Card, glm::vec3 Point)
-{
-    // Point must be on the card plane, returns true if it lands inside the card rectangle
-    // The card's own width and height directions in world space
-    glm::mat3 Rotation = GetCardRotationMatrix(Card);
-    glm::vec3 Right = Rotation * glm::vec3(1.0f, 0.0f, 0.0f);
-    glm::vec3 Up    = Rotation * glm::vec3(0.0f, 1.0f, 0.0f);
-
-    // How far the point is from the card center along the card's width and height
-    // NOTE: Right and Up are unit length (pure rotation), so the dot products are distances
-    glm::vec3 Offset = Point - Card->Position;
-    f32 X = glm::dot(Offset, Right);
-    f32 Y = glm::dot(Offset, Up);
-
-    glm::vec2 HalfSize = 0.5f * Card->Scale;
-    return glm::abs(X) <= HalfSize.x && glm::abs(Y) <= HalfSize.y;
-}
-
 // Returns the card closest to the camera under the ray, nullptr if the ray doesn't hit any card
 // NOTE: The pointer is only valid until Cards is resized, use it in the same frame
 card *PickCard(std::vector<card> &Cards, glm::vec3 RayOrigin, glm::vec3 RayDirection)
@@ -100,10 +74,10 @@ card *PickCard(std::vector<card> &Cards, glm::vec3 RayOrigin, glm::vec3 RayDirec
     for(card &Card : Cards)
     {
         // The plane the card lies on, it tilts with the card
-        glm::vec3 CardNormal = GetCardRotationMatrix(&Card) * glm::vec3(0.0f, 0.0f, 1.0f);
+        glm::vec3 CardNormal = Card.RotationMatrix() * glm::vec3(0.0f, 0.0f, 1.0f);
 
         glm::vec3 Hit;
-        if(RayPlaneIntersection(RayOrigin, RayDirection, Card.Position, CardNormal, &Hit) && CardContainsPoint(&Card, Hit))
+        if(RayPlaneIntersection(RayOrigin, RayDirection, Card.Position, CardNormal, &Hit) && Card.ContainsPoint(Hit))
         {
             // NOTE: Strict < keeps the first card on ties, cards at the same Z are drawn first on top (depth test is GL_LESS)
             f32 Distance = glm::length(Hit - RayOrigin);
