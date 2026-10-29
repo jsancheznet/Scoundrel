@@ -1,7 +1,7 @@
 #include "typedefs.h"
 #include "card.h"
 
-card CreateCard(u64 Texture, u64 BackTexture, glm::vec3 Position, f32 Angle, glm::vec3 Axis, glm::vec4 Tint)
+card CreateCard(u64 Texture, u64 BackTexture, glm::vec3 Position, f32 Angle, glm::vec3 Axis, glm::vec4 Tint, card_pile Pile)
 {
     card Result = {};
 
@@ -12,6 +12,7 @@ card CreateCard(u64 Texture, u64 BackTexture, glm::vec3 Position, f32 Angle, glm
     Result.Axis = Axis;
     Result.Scale = CardSize;
     Result.Tint = Tint;
+    Result.Pile = Pile;
 
     return Result;
 }

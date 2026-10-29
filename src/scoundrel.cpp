@@ -11,6 +11,10 @@
 
 #include <stdio.h>
 #include <cfloat>
+#include <algorithm>
+#include <ranges>
+#include <random>
+#include <vector>
 
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/constants.hpp>
@@ -25,10 +29,17 @@ mouse         Mouse;
 keyboard      Keyboard;
 audio_system  Audio;
 
-std::vector<card> LoadDungeon(u64 BackTexture, glm::vec3 DungeonPosition)
+// Game Globals
+u64 CardBackTexture;
+const glm::vec3 DungeonPosition = glm::vec3(-1.5f, 0.0f, 0.0f);
+u32 PlayerHealth = 20;
+
+std::vector<card> LoadDungeon(glm::vec3 DungeonPosition)
 {
     const char *SuitNames[Suit_Count] = {"Clubs", "Spades", "Diamonds", "Hearts"};
     const char *RankNames[] = {"", "", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"}; // Indexed by Value
+
+    CardBackTexture = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Back.jpg");
 
     std::vector<card> Dungeon;
     Dungeon.reserve(44);
@@ -49,7 +60,7 @@ std::vector<card> LoadDungeon(u64 BackTexture, glm::vec3 DungeonPosition)
             glm::vec3 Position = DungeonPosition + glm::vec3(0.0f, 0.0f, CardThickness * (f32)Dungeon.size());
 
             // Face down, the back faces the camera
-            card Card = CreateCard(FrontTexture, BackTexture, Position, glm::pi<f32>(), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(0.0f));
+            card Card = CreateCard(FrontTexture, CardBackTexture, Position, glm::pi<f32>(), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(0.0f), Pile_Dungeon);
             Card.Suit = (card_suit)Suit;
             Card.Type = (Suit == Suit_Diamonds) ? Card_Weapon : (Suit == Suit_Hearts) ? Card_Potion : Card_Monster;
             Card.Value = Value;
@@ -60,6 +71,11 @@ std::vector<card> LoadDungeon(u64 BackTexture, glm::vec3 DungeonPosition)
 
     Log(Info, "LoadDungeon() - Loaded %zu cards", Dungeon.size());
     Assert(Dungeon.size() == 44);
+
+    // Shuffle the cards
+    std::random_device RandomDevice;
+    std::mt19937 Generator(RandomDevice());
+    std::shuffle(Dungeon.begin(), Dungeon.end(), Generator);
 
     return Dungeon;
 }
@@ -92,6 +108,16 @@ card *PickCard(std::vector<card> &Cards, glm::vec3 RayOrigin, glm::vec3 RayDirec
     return Closest;
 }
 
+void DrawHealth(u32 Health, u64 Font)
+{
+    glm::vec2 ScreenPos = glm::vec2(0.0f, 0.0f);
+    f32 Size = 40.0f;
+
+    char TextBuffer[128];
+    snprintf(TextBuffer, sizeof(TextBuffer), "Health: %d", Health);
+    Renderer.DrawText(Font, ScreenPos.x, ScreenPos.y, Size, TextBuffer, RED);
+}
+
 i32 main(i32 Argc, char **Argv)
 {
     Application.Init();
@@ -106,10 +132,9 @@ i32 main(i32 Argc, char **Argv)
     camera Camera = CreateCamera();
     Camera.Position = glm::vec3(0.0f, 0.0f, 2.0f);
 
-    u64 CardBackTexture       = AssetMgr.LoadTexture("assets/Textures/Scoundrel-Back.jpg");
-    u64 MarcellusFont         = AssetMgr.LoadBitmapFont("assets/Fonts/Marcellus_sc.png", "assets/Fonts/Marcellus_sc.json");
+    u64 MarcellusFont = AssetMgr.LoadBitmapFont("assets/Fonts/Marcellus_sc.png", "assets/Fonts/Marcellus_sc.json");
 
-    std::vector<card> Cards = LoadDungeon(CardBackTexture, glm::vec3(-1.5f, 0.0f, 0.0f)); // Dungeon pile on the left, like the table layout in the rules
+    std::vector<card> Cards = LoadDungeon(DungeonPosition);
 
     while(Application.IsRunning)
     {
@@ -172,10 +197,7 @@ i32 main(i32 Argc, char **Argv)
             Renderer.DrawCard(Card);
         }
 
-        f32 X = 0.0f;
-        f32 Y = 0.0f;
-        Renderer.DrawText(MarcellusFont, X + 6, Y + 6, 50.0f, "The quick brown fox jumps over the lazy dog.", color{0.0f, 0.0f, 0.0f, 0.6f});
-        Renderer.DrawText(MarcellusFont, X,     Y,     50.0f, "The quick brown fox jumps over the lazy dog", HOT_PINK);
+        DrawHealth(PlayerHealth, MarcellusFont);
 
         { // DEBUG
             char Buff[200];
