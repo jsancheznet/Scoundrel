@@ -29,10 +29,11 @@ mouse         Mouse;
 keyboard      Keyboard;
 audio_system  Audio;
 
-// Game Globals
+// Game Vars
 u64 CardBackTexture;
-const glm::vec3 DungeonPosition = glm::vec3(-1.5f, 0.0f, 0.0f);
+const glm::vec3 DungeonPosition = glm::vec3(-2.5f, -1.15, 0.0f);
 u32 PlayerHealth = 20;
+b32 GameHasStarted = false;
 
 std::vector<card> LoadDungeon(glm::vec3 DungeonPosition)
 {
@@ -108,6 +109,14 @@ card *PickCard(std::vector<card> &Cards, glm::vec3 RayOrigin, glm::vec3 RayDirec
     return Closest;
 }
 
+void DrawCards(const std::vector<card> &Cards)
+{
+    for(const card &Card : Cards)
+    {
+        Renderer.DrawCard(Card);
+    }
+}
+
 void DrawHealth(u32 Health, u64 Font)
 {
     glm::vec2 ScreenPos = glm::vec2(0.0f, 0.0f);
@@ -139,71 +148,42 @@ i32 main(i32 Argc, char **Argv)
     while(Application.IsRunning)
     {
         Application.BeginFrame();
-
         Application.ProcessEvents();
 
-        Mouse.Update();
-        Keyboard.Update();
-
-        if(Keyboard.IsPressed(SDL_SCANCODE_LALT) && Keyboard.IsReleased(SDL_SCANCODE_RETURN))
-        {
-            Application.ToggleFullscreen();
-        }
-
-        if(Keyboard.IsPressed(SDL_SCANCODE_D))
-        {
-            Camera.Position.x += 0.05f;
-        }
-
-        if(Keyboard.IsPressed(SDL_SCANCODE_A))
-        {
-            Camera.Position.x -= 0.05f;
-        }
-
-        if(Keyboard.IsPressed(SDL_SCANCODE_SPACE))
-        {
-            Camera.Position.x = 0.0f;
-            Camera.Position.y = 0.0f;
-        }
-
-        if(Keyboard.IsPressed(SDL_SCANCODE_W))
-        {
-            Camera.Position.y += 0.05f;
-        }
-
-        if(Keyboard.IsPressed(SDL_SCANCODE_S))
-        {
-            Camera.Position.y -= 0.05f;
-        }
-
-        Renderer.ClearScreen(ORANGE);
         Camera.Update();
 
         b32 MouseDown    = Mouse.IsButtonPressed(SDL_BUTTON_LEFT);
         b32 MouseWasDown = Mouse.WasButtonPressed(SDL_BUTTON_LEFT);
-
-        if(MouseDown && !MouseWasDown) // Just clicked
+        if(MouseDown && !MouseWasDown)
         {
             glm::vec3 RayDirection = ScreenToWorldRay(&Mouse, &Renderer, &Camera);
             card *ClickedCard = PickCard(Cards, Camera.Position, RayDirection);
-            if(ClickedCard)
+            if(ClickedCard && ClickedCard->Pile == Pile_Dungeon && !GameHasStarted)
             {
-                Log(Info, "Clicked card at %.2f, %.2f", ClickedCard->Position.x, ClickedCard->Position.y);
+                Log(Info, "Clicked the dungeon");
+                GameHasStarted == false;
+
             }
         }
 
-        for(card &Card : Cards)
-        {
-            Renderer.DrawCard(Card);
-        }
+        // TODO: In the future it might be a good idea to create a scoundrel struct and place everything game-related there
+        // Maybe create a game.h/cpp and put all game releated code there, variable name "game Scoundrel".
+        // Move the things that are not particular to game outisde, such as ray casting
+        // Scoundrel.Update();
+        // Scoundrel.Render();
+
+        Renderer.BeginFrame();
 
         DrawHealth(PlayerHealth, MarcellusFont);
+        DrawCards(Cards);
 
-        { // DEBUG
-            char Buff[200];
-            snprintf(Buff, sizeof(Buff), "Scoundrel - %.0fps", 1.0f / Application.DeltaTime);
-            const char *Ptr = &Buff[0];
-            SDL_SetWindowTitle(Application.Window, Ptr);
+        { // Draw UI, just testing
+            f32 Size = 40.0f;
+            glm::vec3 Position = DungeonPosition;
+            Position.x -= 0.30f;
+            Position.y += 1.0f;
+            Position.z = 0.25f;
+            Renderer.DrawText3D(MarcellusFont, Position, 0.25f, "Dungeon", RED);
         }
 
         Renderer.EndFrame();

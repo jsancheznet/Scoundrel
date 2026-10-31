@@ -2,8 +2,13 @@
 #include "SDL3/SDL_video.h"
 #include "log.h"
 #include "random.h"
+#include "mouse.h"
+#include "keyboard.h"
 
 #include <glad/glad.h>
+
+extern mouse Mouse;
+extern keyboard Keyboard;
 
 void application::Init()
 {
@@ -56,6 +61,8 @@ void application::CreateWindow(const char *Title, u32 Width, u32 Height)
 
 void application::Quit()
 {
+    Log(Info, "application::Quit()");
+
     SDL_Quit();
 }
 
@@ -88,6 +95,14 @@ void application::ProcessEvents()
             {
             } break;
         }
+    }
+
+    Mouse.Update();
+    Keyboard.Update();
+
+    if(Keyboard.IsPressed(SDL_SCANCODE_LALT) && Keyboard.IsReleased(SDL_SCANCODE_RETURN))
+    {
+        ToggleFullscreen();
     }
 }
 
@@ -144,4 +159,11 @@ void application::EndFrame()
 {
     FrameEndTime = SDL_GetPerformanceCounter();
     DeltaTime = ((f64)FrameEndTime - (f64)FrameBeginTime) / (f64)SDL_GetPerformanceFrequency();
+
+    { // Draw FPS in window title
+        char Buff[200];
+        snprintf(Buff, sizeof(Buff), "Scoundrel - %.0fps", 1.0f / DeltaTime);
+        const char *Ptr = &Buff[0];
+        SDL_SetWindowTitle(Window, Ptr);
+    }
 }
