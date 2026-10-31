@@ -26,7 +26,7 @@ echo.
 
 REM Debug build
 clang-cl /Zi /Od -W4 -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter -Wno-unused-value^
-	 ..\src\scoundrel.cpp ^
+	 ..\src\main.cpp ^
 	 ..\src\log.cpp ^
 	 ..\src\application.cpp ^
 	 ..\src\renderer.cpp ^
@@ -38,6 +38,7 @@ clang-cl /Zi /Od -W4 -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter 
 	 ..\src\bitmap_font.cpp ^
 	 ..\src\helpers.cpp ^
 	 ..\src\card.cpp ^
+	 ..\src\scoundrel.cpp ^
 	 ..\libraries\glad\src\glad.c ^
 	 %IncludeDirectories% ^
 	 /Fe:scoundrel.exe ^
