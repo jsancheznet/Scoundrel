@@ -11,8 +11,7 @@
 
 #include "typedefs.h"
 #include "camera.h"
-
-#include "scoundrel.h"
+#include "card.h"
 
 #define HOT_PINK color{1.0f, 0.0f, 1.0f, 1.0f}
 #define ORANGE   color{1.0f, 0.647f, 0.0f, 1.0f}
