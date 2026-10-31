@@ -7,11 +7,12 @@ layout(location = 0) in vec3 VertexPosition;
 layout(location = 1) in vec2 UV;
 
 // Instance Data per sprite
-layout(location = 2) in vec2 ScreenPosition;
+layout(location = 2) in vec3 Position; // Pixels for screen text, world units for world text
 layout(location = 3) in vec4 Rect; // UV rect in the texture atlas (left, bottom, right, top)
 layout(location = 4) in vec2 Size;
 layout(location = 5) in vec4 Color;
 layout(location = 6) in uvec2 TextureHandle;
+layout(location = 7) in int WorldSpace;
 
 layout (std140, binding = 50) uniform CameraMatrices
 {
@@ -26,8 +27,16 @@ flat out vec4 fsColor;
 
 void main()
 {
-    vec2 Corner = ScreenPosition + UV * Size;
-    gl_Position = Orthographic * vec4(Corner, 0.0, 1.0);
+    vec3 Corner = vec3(Position.xy + UV * Size, Position.z);
+    if(WorldSpace != 0)
+    {
+        gl_Position = Perspective * View * vec4(Corner, 1.0);
+    }
+    else
+    {
+        gl_Position = Orthographic * vec4(Corner, 1.0);
+        gl_Position.z = -gl_Position.w; // Screen text on the near plane, always passes the depth test
+    }
     // Flip V: the atlas is loaded flipped vertically and the ortho projection has Y pointing down
     TexCoord = mix(Rect.xy, Rect.zw, vec2(UV.x, 1.0 - UV.y));
     fsTextureHandle = TextureHandle;

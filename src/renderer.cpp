@@ -55,7 +55,11 @@ void renderer::DrawSprites()
 void renderer::DrawTexts()
 {
     UseShader(TextShader);
-    glDisable(GL_DEPTH_TEST);
+
+    // Depth test on so world text is hidden behind cards, depth writes off so overlapping glyph quads don't cut each other.
+    // Screen text is placed on the near plane in the shader, so it always stays on top
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
     glBindVertexArray(TextVAO);
     if(Glyphs.size() != 0)
@@ -64,6 +68,7 @@ void renderer::DrawTexts()
         glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, Glyphs.size());
     }
     glDisable(GL_BLEND);
+    glDepthMask(GL_TRUE);
     Glyphs.clear();
 }
 
@@ -85,6 +90,11 @@ void renderer::DrawCards()
 
     glDisable(GL_CULL_FACE);
     CardInstances.clear();
+}
+
+void renderer::BeginFrame()
+{
+    ClearScreen(ClearColor);
 }
 
 void renderer::EndFrame()
@@ -227,7 +237,7 @@ void renderer::DrawTexture(u64 AssetHandle, vec3 Position, vec2 Scale, f32 Rotat
 }
 
 // Angle is in radians, Axis doesn't need to be normalized (glm::rotate normalizes it)
-void renderer::DrawCard(card &Card)
+void renderer::DrawCard(const card &Card)
 {
     texture *Front = (texture*)AssetMgr.ResolveHandle(Card.Texture);
     texture *Back = (texture*)AssetMgr.ResolveHandle(Card.BackTexture);
@@ -255,6 +265,21 @@ void renderer::DrawCard(card &Card)
     CardInst.Model = Model;
 
     CardInstances.push_back(CardInst);
+}
+
+// Lays the text out with DrawText (em size = Height, so the layout is in world units), then moves those glyphs into the world
+void renderer::DrawText3D(u64 Font, vec3 Position, f32 Height, const char *Text, color Color)
+{
+    size_t First = Glyphs.size();
+    DrawText(Font, 0.0f, 0.0f, Height, Text, Color);
+
+    for(size_t i = First; i < Glyphs.size(); ++i)
+    {
+        character_glyph *Glyph = &Glyphs[i];
+        Glyph->Position = Position + vec3(Glyph->Position.x, -Glyph->Position.y, 0.0f); // Layout is Y down, world is Y up
+        Glyph->Size.y = -Glyph->Size.y;                                                // The glyph quad grows down from its top
+        Glyph->WorldSpace = true;
+    }
 }
 
 // X, Y is the top-left of the text block, Size is the font size (em size) in pixels
@@ -308,7 +333,7 @@ void renderer::DrawText(u64 Font, f32 X, f32 Y, f32 Size, const char *Text, colo
             character_glyph Character = {};
             Character.TextureHandle = BitmapFont->Texture.BindlessTextureHandle;
             // Plane bounds are y-up from the baseline, the screen is y-down
-            Character.ScreenPosition = {PenX + Plane->Left * Size, Baseline - Plane->Top * Size};
+            Character.Position = {PenX + Plane->Left * Size, Baseline - Plane->Top * Size, 0.0f};
             Character.Size = glm::vec2((Plane->Right - Plane->Left) * Size, (Plane->Top - Plane->Bottom) * Size);
             Character.Rect = glm::vec4(Atlas->Left  / AtlasWidth, Atlas->Bottom / AtlasHeight,
                                        Atlas->Right / AtlasWidth, Atlas->Top    / AtlasHeight);
@@ -385,6 +410,9 @@ void renderer::ConfigureRenderer()
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+
+    // Set Clear Color
+    ClearColor = ORANGE;
 }
 
 void renderer::LoadShaders()
@@ -508,7 +536,7 @@ void renderer::CreateTextMesh()
 
     // Screen Position
     glEnableVertexArrayAttrib(TextVAO, 2);
-    glVertexArrayAttribFormat(TextVAO, 2, 2, GL_FLOAT, GL_FALSE, offsetof(character_glyph, ScreenPosition));
+    glVertexArrayAttribFormat(TextVAO, 2, 3, GL_FLOAT, GL_FALSE, offsetof(character_glyph, Position));
     glVertexArrayAttribBinding(TextVAO, 2, 1);
 
     // Rect
@@ -530,6 +558,11 @@ void renderer::CreateTextMesh()
     glEnableVertexArrayAttrib(TextVAO, 6);
     glVertexArrayAttribIFormat(TextVAO, 6, 2, GL_UNSIGNED_INT, offsetof(character_glyph, TextureHandle));
     glVertexArrayAttribBinding(TextVAO, 6, 1);
+
+    // World Space
+    glEnableVertexArrayAttrib(TextVAO, 7);
+    glVertexArrayAttribIFormat(TextVAO, 7, 1, GL_INT, offsetof(character_glyph, WorldSpace));
+    glVertexArrayAttribBinding(TextVAO, 7, 1);
 
     glVertexArrayBindingDivisor(TextVAO, 1, 1);
 }
