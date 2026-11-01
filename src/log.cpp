@@ -40,7 +40,7 @@ void Log(log_category Category, const char *Fmt, ...)
     }
 
     //
-    //     1- Write ColorString + CategoryString to buffer
+    //     1- Write ColorString + Time + CategoryString to buffer
     //     2- Write The Actual string
     //     3- Write the reset terminal color code
     //
@@ -50,7 +50,14 @@ void Log(log_category Category, const char *Fmt, ...)
     char Buffer[4096];
     i32 MaxCount = (i32)sizeof(Buffer) - 2; // Leaves room for the newline written to the log file
 
-    i32 CharCount = snprintf(Buffer, sizeof(Buffer), "%s[%s]: ", Color, CategoryString);
+    // Local time of day, with milliseconds so logs within the same frame can still be told apart
+    SDL_Time Now = 0;
+    SDL_DateTime Time = {};
+    SDL_GetCurrentTime(&Now);
+    SDL_TimeToDateTime(Now, &Time, true);
+
+    i32 CharCount = snprintf(Buffer, sizeof(Buffer), "%s[%02d:%02d:%02d.%03d] [%s]: ", Color,
+                             Time.hour, Time.minute, Time.second, Time.nanosecond / 1000000, CategoryString);
     if(CharCount < 0) CharCount = 0;
     if(CharCount > MaxCount) CharCount = MaxCount;
 
