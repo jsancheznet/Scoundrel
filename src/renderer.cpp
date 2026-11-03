@@ -217,7 +217,7 @@ void renderer::DestroyTexture(u32 *ID, u64 *Handle)
 
 void renderer::DrawTexture(u64 AssetHandle, vec3 Position, vec2 Scale, f32 Rotation, rect SrcRect, glm::vec4 Tint)
 {
-    texture *Texture = (texture*)AssetMgr.ResolveHandle(AssetHandle);
+    texture *Texture = AssetMgr.GetTexture(AssetHandle);
     if(Texture == nullptr)
     {
         Log(Warning, "renderer::DrawTexture() - Tried to draw an invalid texture handle");
@@ -239,8 +239,8 @@ void renderer::DrawTexture(u64 AssetHandle, vec3 Position, vec2 Scale, f32 Rotat
 // Angle is in radians, Axis doesn't need to be normalized (glm::rotate normalizes it)
 void renderer::DrawCard(const card &Card)
 {
-    texture *Front = (texture*)AssetMgr.ResolveHandle(Card.Texture);
-    texture *Back = (texture*)AssetMgr.ResolveHandle(Card.BackTexture);
+    texture *Front = AssetMgr.GetTexture(Card.Texture);
+    texture *Back = AssetMgr.GetTexture(Card.BackTexture);
     if(Front == nullptr || Back == nullptr)
     {
         Log(Warning, "renderer::DrawCard() - Tried to draw a card with an invalid texture handle");
@@ -285,7 +285,7 @@ void renderer::DrawText3D(u64 Font, vec3 Position, f32 Height, const char *Text,
 // X, Y is the top-left of the text block, Size is the font size (em size) in pixels
 void renderer::DrawText(u64 Font, f32 X, f32 Y, f32 Size, const char *Text, color Color)
 {
-    bitmap_font *BitmapFont = (bitmap_font*)AssetMgr.ResolveHandle(Font);
+    bitmap_font *BitmapFont = AssetMgr.GetFont(Font);
     if(BitmapFont == nullptr)
     {
         Log(Warning, "renderer:DrawText() - Tried to draw text using an invalid font handle.");

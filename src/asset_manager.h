@@ -1,17 +1,18 @@
 #pragma once
 
-#include <string>
-
 #include "typedefs.h"
 #include "audio.h"
 #include "renderer.h"
 #include "bitmap_font.h"
 
 constexpr u32 InvalidIndex = UINT32_MAX;
-constexpr u32 InvalidGeneration = UINT32_MAX;
-constexpr u32 MaxAssetCount = 64;
 
-enum asset_type
+constexpr u32 MaxTextureCount = 128;
+constexpr u32 MaxSoundCount   = 32;
+constexpr u32 MaxFontCount    = 4;
+
+// Fixed u8 underlying type so any byte read from a handle (e.g. 0xFF from InvalidHandle) is a valid asset_type value
+enum asset_type : u8
 {
     Asset_None = 0,
     Asset_Sound = 1,
@@ -21,20 +22,17 @@ enum asset_type
     Asset_Count
 };
 
-struct asset
+// Bookkeeping stored at the start of every asset slot
+struct asset_header
 {
-    asset_type Type;
     b32 Used;
     u32 Generation;
-    char Name[256];
-
-    union
-    {
-        sound Sound;
-        texture Texture;
-        bitmap_font Font;
-    };
+    char Name[64];
 };
+
+struct texture_asset { asset_header Header; texture Texture; };
+struct sound_asset   { asset_header Header; sound Sound; };
+struct font_asset    { asset_header Header; bitmap_font Font; };
 
 struct asset_manager
 {
@@ -50,18 +48,23 @@ struct asset_manager
     // Asset Unloading
     b32 Unload(u64 Handle);
 
-    // Handle stuff
-    void *ResolveHandle(u64 Handle);
+    // Return nullptr for invalid, stale or wrong type handles
+    texture     *GetTexture(u64 Handle);
+    sound       *GetSound(u64 Handle);
+    bitmap_font *GetFont(u64 Handle);
 
 private:
 
-    asset Assets[MaxAssetCount];
+    texture_asset Textures[MaxTextureCount];
+    sound_asset   Sounds[MaxSoundCount];
+    font_asset    Fonts[MaxFontCount];
 
-    inline u64 CreateHandle(u32 Index, u32 Generation);
+    // Handle layout: [Type 8 bits][Index 24 bits][Generation 32 bits]
+    inline u64 CreateHandle(asset_type Type, u32 Index, u32 Generation);
     inline u64 InvalidHandle();
-    b32 IsValid(u64 Handle);
+    inline asset_type GetTypeFromHandle(u64 Handle);
     inline u32 GetIndexFromHandle(u64 Handle);
     inline u32 GetGenerationFromHandle(u64 Handle);
 
-    u32 FindFreeIndex();
+    b32 IsValid(u64 Handle, asset_type Type, asset_header *Header);
 };

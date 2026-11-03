@@ -39,8 +39,10 @@ void asset_manager::Init()
 {
     Log(Info, "asset_manager::Init()");
 
-    // Zero the asset array
-    memset(Assets, 0, sizeof(asset) * MaxAssetCount);
+    // Zero the asset arrays
+    memset(Textures, 0, sizeof(Textures));
+    memset(Sounds, 0, sizeof(Sounds));
+    memset(Fonts, 0, sizeof(Fonts));
 
     return;
 }
@@ -56,10 +58,19 @@ u64 asset_manager::LoadSound(const char *Filepath, audio_channel Channel)
     }
 
     // Find a free slot, return if nothing was found
-    u32 Index = FindFreeIndex();
+    u32 Index = InvalidIndex;
+    for(u32 i = 0; i < MaxSoundCount; ++i)
+    {
+        if(!Sounds[i].Header.Used)
+        {
+            Index = i;
+            break;
+        }
+    }
+
     if(Index == InvalidIndex)
     {
-        Log(Warning, "asset_manager::LoadSound(%s) - Found no free slot inside the asset_manager", Filepath);
+        Log(Warning, "asset_manager::LoadSound(%s) - Found no free sound slot", Filepath);
         return InvalidHandle();
     }
 
@@ -75,18 +86,17 @@ u64 asset_manager::LoadSound(const char *Filepath, audio_channel Channel)
     Sound.Repeats = false;
 
     // Fill Asset related Data
-    asset *Asset = &Assets[Index];
-    Asset->Type = Asset_Sound;
-    Asset->Used = true;
+    sound_asset *Asset = &Sounds[Index];
+    Asset->Header.Used = true;
     const char *Filename = FilenameFromPath(Filepath); Assert(Filename);
-    snprintf(Asset->Name, sizeof(Asset->Name), "%s", Filename);
+    snprintf(Asset->Header.Name, sizeof(Asset->Header.Name), "%s", Filename);
 
     // Fill Sound Related Data
     Asset->Sound = Sound;
 
     AssetCount++;
 
-    return CreateHandle(Index, Asset->Generation);
+    return CreateHandle(Asset_Sound, Index, Asset->Header.Generation);
 
 }
 
@@ -101,10 +111,19 @@ u64 asset_manager::LoadTexture(const char *Filepath)
     }
 
     // Find a free slot, return if nothing was found
-    u32 Index = FindFreeIndex();
+    u32 Index = InvalidIndex;
+    for(u32 i = 0; i < MaxTextureCount; ++i)
+    {
+        if(!Textures[i].Header.Used)
+        {
+            Index = i;
+            break;
+        }
+    }
+
     if(Index == InvalidIndex)
     {
-        Log(Warning, "asset_manager::LoadTexture(%s) - Found no free slot inside the asset_manager", Filepath);
+        Log(Warning, "asset_manager::LoadTexture(%s) - Found no free texture slot", Filepath);
         return InvalidHandle();
     }
 
@@ -118,13 +137,12 @@ u64 asset_manager::LoadTexture(const char *Filepath)
         return InvalidHandle();
     }
 
-    asset *Asset = &Assets[Index];
+    texture_asset *Asset = &Textures[Index];
 
     // Set Asset Vars
-    Asset->Type = Asset_Texture;
-    Asset->Used = true;
+    Asset->Header.Used = true;
     const char *Filename = FilenameFromPath(Filepath); Assert(Filename);
-    snprintf(Asset->Name, sizeof(Asset->Name), "%s", Filename);
+    snprintf(Asset->Header.Name, sizeof(Asset->Header.Name), "%s", Filename);
 
     // Set Texture Vars
     Asset->Texture = Texture;
@@ -136,7 +154,7 @@ u64 asset_manager::LoadTexture(const char *Filepath)
 
     AssetCount++;
 
-    return CreateHandle(Index, Asset->Generation);
+    return CreateHandle(Asset_Texture, Index, Asset->Header.Generation);
 }
 
 u64 asset_manager::LoadBitmapFont(const char *Image, const char *Json)
@@ -147,10 +165,20 @@ u64 asset_manager::LoadBitmapFont(const char *Image, const char *Json)
         return InvalidHandle();
     }
 
-    u32 Index = FindFreeIndex();
+    // Find a free slot, return if nothing was found
+    u32 Index = InvalidIndex;
+    for(u32 i = 0; i < MaxFontCount; ++i)
+    {
+        if(!Fonts[i].Header.Used)
+        {
+            Index = i;
+            break;
+        }
+    }
+
     if(Index == InvalidIndex)
     {
-        Log(Warning, "asset_manager::LoadBitmapFont(%s, %s) - Found no free slot inside the asset_manager", Image, Json);
+        Log(Warning, "asset_manager::LoadBitmapFont(%s, %s) - Found no free font slot", Image, Json);
         return InvalidHandle();
     }
 
@@ -181,11 +209,10 @@ u64 asset_manager::LoadBitmapFont(const char *Image, const char *Json)
     }
 
     // Fill the Asset Data
-    asset *Asset = &Assets[Index];
-    Asset->Type = Asset_BitmapFont;
-    Asset->Used = true;
+    font_asset *Asset = &Fonts[Index];
+    Asset->Header.Used = true;
     const char *Name = FilenameFromPath(Image); Assert(Name);
-    std::snprintf(Asset->Name, sizeof(Asset->Name), "%s", Name);
+    std::snprintf(Asset->Header.Name, sizeof(Asset->Header.Name), "%s", Name);
 
     // Fill the font data
     bitmap_font *Font = &Asset->Font;
@@ -269,133 +296,139 @@ u64 asset_manager::LoadBitmapFont(const char *Image, const char *Json)
 
     AssetCount++;
 
-    return CreateHandle(Index, Asset->Generation);
+    return CreateHandle(Asset_BitmapFont, Index, Asset->Header.Generation);
 }
 
 b32 asset_manager::Unload(u64 Handle)
 {
     u32 Index = GetIndexFromHandle(Handle);
-    u32 Generation = GetGenerationFromHandle(Handle);
+    asset_header *Header = nullptr;
 
-    // Reject out of range, already free, or stale handles (slot reused by another asset)
-    if(Index >= MaxAssetCount ||
-       !Assets[Index].Used ||
-       Assets[Index].Generation != Generation)
+    switch(GetTypeFromHandle(Handle))
+    {
+        case Asset_Sound:
+        {
+            if(Index >= MaxSoundCount || !IsValid(Handle, Asset_Sound, &Sounds[Index].Header)) break;
+
+            sound *Sound = &Sounds[Index].Sound;
+            Sound->AudioSpec = {};
+            Sound->Channel = Channel_None;
+            Sound->DataBufferLength = 0;
+            SDL_free(Sound->DataBuffer);
+            Sound->DataBuffer = nullptr;
+            for(int i = 0; i < MaxConcurrentStreams; ++i)
+            {
+                SDL_DestroyAudioStream(Sound->Streams[i]);
+                Sound->Streams[i] = nullptr;
+            }
+
+            Header = &Sounds[Index].Header;
+        } break;
+        case Asset_Texture:
+        {
+            if(Index >= MaxTextureCount || !IsValid(Handle, Asset_Texture, &Textures[Index].Header)) break;
+
+            ReleaseTexture(&Textures[Index].Texture);
+
+            Header = &Textures[Index].Header;
+        } break;
+        case Asset_BitmapFont:
+        {
+            if(Index >= MaxFontCount || !IsValid(Handle, Asset_BitmapFont, &Fonts[Index].Header)) break;
+
+            ReleaseTexture(&Fonts[Index].Font.Texture);
+            std::memset(&Fonts[Index].Font, 0, sizeof(bitmap_font));
+
+            Header = &Fonts[Index].Header;
+        } break;
+        default:
+        {
+        } break;
+    }
+
+    // Rejects out of range, already free, stale (slot reused by another asset) and invalid type handles
+    if(!Header)
     {
         Log(Warning, "asset_manager::Unload() - Tried to unload an invalid or stale asset handle");
         return false;
     }
 
-    asset *Asset = &Assets[Index];
+    Log(Info, "asset_manager::Unload(%s)", Header->Name);
 
-    Log(Info, "asset_manager::Unload(%s)", Asset->Name);
-
-    switch(Asset->Type)
-    {
-        case Asset_Sound:
-        {
-            Asset->Sound.AudioSpec = {};
-            Asset->Sound.Channel = Channel_None;
-            Asset->Sound.DataBufferLength = 0;
-            SDL_free(Asset->Sound.DataBuffer);
-            Asset->Sound.DataBuffer = nullptr;
-            for(int i = 0; i < MaxConcurrentStreams; ++i)
-            {
-                SDL_DestroyAudioStream(Asset->Sound.Streams[i]);
-                Asset->Sound.Streams[i] = nullptr;
-            }
-
-            break;
-        }
-        case Asset_Texture:
-        {
-            ReleaseTexture(&Asset->Texture);
-            break;
-        }
-        case Asset_BitmapFont:
-        {
-            ReleaseTexture(&Asset->Font.Texture);
-            std::memset(&Asset->Font, 0, sizeof(bitmap_font));
-            break;
-        }
-        default:
-        {
-            Log(Warning, "asset_manager::Unload() - Invalid Asset Type");
-            break;
-        }
-    }
-
-    Asset->Used = false;
-    std::memset(Asset->Name, 0, sizeof(Asset->Name));
-    Asset->Type = Asset_None;
-    Asset->Generation++;
+    Header->Used = false;
+    std::memset(Header->Name, 0, sizeof(Header->Name));
+    Header->Generation++;
     AssetCount--;
 
     return true;
 }
 
-void *asset_manager::ResolveHandle(u64 Handle)
+texture *asset_manager::GetTexture(u64 Handle)
 {
     u32 Index = GetIndexFromHandle(Handle);
-    u32 Generation = GetGenerationFromHandle(Handle);
-
-    if(Index == InvalidIndex ||
-       Generation == InvalidGeneration ||
-       Index > MaxAssetCount - 1||
-       Assets[Index].Generation != Generation ||
-       Assets[Index].Used == false)
+    if(Index >= MaxTextureCount || !IsValid(Handle, Asset_Texture, &Textures[Index].Header))
     {
-        Log(Warning, "asset_manager::ResolveHandle() - Trying to resolve invalid asset handle");
+        Log(Warning, "asset_manager::GetTexture() - Trying to resolve an invalid texture handle");
         return nullptr;
     }
 
-    // The following line returns the address of the beggining of the union, pay
-    // no attention to the variable name
-    return &Assets[Index].Sound;
+    return &Textures[Index].Texture;
 }
 
-u64 asset_manager::CreateHandle(u32 Index, u32 Generation)
+sound *asset_manager::GetSound(u64 Handle)
 {
-    return ((u64)Index << 32) | ((u64)Generation);
+    u32 Index = GetIndexFromHandle(Handle);
+    if(Index >= MaxSoundCount || !IsValid(Handle, Asset_Sound, &Sounds[Index].Header))
+    {
+        Log(Warning, "asset_manager::GetSound() - Trying to resolve an invalid sound handle");
+        return nullptr;
+    }
+
+    return &Sounds[Index].Sound;
+}
+
+bitmap_font *asset_manager::GetFont(u64 Handle)
+{
+    u32 Index = GetIndexFromHandle(Handle);
+    if(Index >= MaxFontCount || !IsValid(Handle, Asset_BitmapFont, &Fonts[Index].Header))
+    {
+        Log(Warning, "asset_manager::GetFont() - Trying to resolve an invalid font handle");
+        return nullptr;
+    }
+
+    return &Fonts[Index].Font;
+}
+
+// Header must belong to the slot the handle's index points at, the caller does the bounds check
+b32 asset_manager::IsValid(u64 Handle, asset_type Type, asset_header *Header)
+{
+    return GetTypeFromHandle(Handle) == Type &&
+           Header->Used &&
+           Header->Generation == GetGenerationFromHandle(Handle);
+}
+
+u64 asset_manager::CreateHandle(asset_type Type, u32 Index, u32 Generation)
+{
+    return ((u64)Type << 56) | ((u64)(Index & 0xFFFFFF) << 32) | ((u64)Generation);
 }
 
 u64 asset_manager::InvalidHandle()
 {
-    return ((u64)UINT32_MAX << 32) | ((u64)UINT32_MAX);
+    // Type 0xFF never matches a real asset type, so this handle is always rejected
+    return UINT64_MAX;
 }
 
-b32 asset_manager::IsValid(u64 Handle)
+asset_type asset_manager::GetTypeFromHandle(u64 Handle)
 {
-    u32 Index = GetIndexFromHandle(Handle);
-    u32 Gen = GetGenerationFromHandle(Handle);
-
-    if(Index != UINT32_MAX && Gen != UINT32_MAX)
-    {
-        return true;
-    }
-
-    return false;
+    return (asset_type)(Handle >> 56);
 }
 
 u32 asset_manager::GetIndexFromHandle(u64 Handle)
 {
-    return Handle >> 32;
+    return (Handle >> 32) & 0xFFFFFF;
 }
 
 u32 asset_manager::GetGenerationFromHandle(u64 Handle)
 {
     return Handle & 0xFFFFFFFF;
-}
-
-u32 asset_manager::FindFreeIndex()
-{
-    for(u32 i = 0; i < MaxAssetCount; ++i)
-    {
-        if(!Assets[i].Used)
-        {
-            return i;
-        }
-    }
-
-    return InvalidIndex;
 }

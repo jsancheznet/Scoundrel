@@ -55,7 +55,7 @@ void audio_system::SetChannelVolume(audio_channel Channel, f32 Volume)
 
 void audio_system::Play(u64 Handle)
 {
-    sound *Sound = (sound*)AssetMgr.ResolveHandle(Handle);
+    sound *Sound = AssetMgr.GetSound(Handle);
     if(Sound == nullptr)
         return;
 
@@ -102,7 +102,7 @@ void audio_system::Play(u64 Handle)
 
 void audio_system::Pause(u64 Handle)
 {
-    sound *Sound = (sound*)AssetMgr.ResolveHandle(Handle);
+    sound *Sound = AssetMgr.GetSound(Handle);
     if(Sound == nullptr)
         return;
 
@@ -113,7 +113,7 @@ void audio_system::Pause(u64 Handle)
 
 void audio_system::Resume(u64 Handle)
 {
-    sound *Sound = (sound*)AssetMgr.ResolveHandle(Handle);
+    sound *Sound = AssetMgr.GetSound(Handle);
     if(Sound == nullptr)
         return;
 
@@ -130,7 +130,7 @@ void audio_system::Resume(u64 Handle)
 
 void audio_system::SetRepeat(u64 Handle, b32 ShouldRepeat)
 {
-    sound *Sound = (sound*)AssetMgr.ResolveHandle(Handle);
+    sound *Sound = AssetMgr.GetSound(Handle);
     if(Sound == nullptr)
         return;
 
