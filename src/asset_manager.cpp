@@ -15,16 +15,6 @@
 
 extern renderer Renderer;
 
-// Fills Bounds from a json object with "left", "right", "bottom" and "top", NULL leaves them zeroed
-static void JsonGetBounds(json_object_s *Object, font_glyph_bounds *Bounds)
-{
-    Bounds->Left   = (f32)JsonGetNumber(Object, "left");
-    Bounds->Right  = (f32)JsonGetNumber(Object, "right");
-    Bounds->Bottom = (f32)JsonGetNumber(Object, "bottom");
-    Bounds->Top    = (f32)JsonGetNumber(Object, "top");
-}
-
-// Frees the GPU texture and the CPU image data
 static void ReleaseTexture(texture *Texture)
 {
     Renderer.DestroyTexture(&Texture->ID, &Texture->BindlessTextureHandle);
@@ -292,7 +282,7 @@ u64 asset_manager::LoadBitmapFont(const char *Image, const char *Json)
         Log(Warning, "asset_manager::LoadBitmapFont(%s, %s) - Font has %zu kerning pairs, kerning is not implemented", Image, Json, KerningArray->length);
     }
 
-    free(JsonRoot); // json.h allocates the whole tree in a single block
+    free(JsonRoot);
 
     AssetCount++;
 
