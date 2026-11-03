@@ -73,3 +73,11 @@ const char *JsonGetString(json_object_s *Object, const char *Key)
     json_string_s *String = Value ? json_value_as_string(Value) : NULL;
     return String ? String->string : NULL;
 }
+
+void JsonGetBounds(json_object_s *Object, font_glyph_bounds *Bounds)
+{
+    Bounds->Left   = (f32)JsonGetNumber(Object, "left");
+    Bounds->Right  = (f32)JsonGetNumber(Object, "right");
+    Bounds->Bottom = (f32)JsonGetNumber(Object, "bottom");
+    Bounds->Top    = (f32)JsonGetNumber(Object, "top");
+}
