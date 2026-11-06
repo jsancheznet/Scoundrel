@@ -7,19 +7,19 @@
 extern application Application;
 extern renderer Renderer;
 
-camera CreateCamera()
+camera CreateCamera(glm::vec3 Position, glm::vec3 Target, glm::vec3 Up, f32 Near, f32 Far, f32 FoV)
 {
     camera Camera;
 
-    Camera.Position = vec3(0.0f, 0.0f, 1.0f);
-    Camera.Target = vec3(0.0f);
-    Camera.Up = vec3(0.0f, 1.0f, 0.0f);
+    Camera.Position = Position;
+    Camera.Target = Target;
+    Camera.Up = Up;
 
     Camera.View = glm::lookAt(Camera.Position, Camera.Target, Camera.Up);
 
-    Camera.Fov = 90.0f;
-    Camera.Near = 0.01f;
-    Camera.Far = 1000.0f;
+    Camera.Fov = FoV;
+    Camera.Near = Near;
+    Camera.Far = Far;
 
     Camera.AspectRatio = (f32)Application.WindowWidth / (f32)Application.WindowHeight;
     Camera.Perspective = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);

@@ -8,9 +8,9 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-constexpr f32 CardMeshScale = 0.13f; // The card mesh is 6.3 x 8.8 units, this scales it down to the table size
-constexpr glm::vec2 CardSize = glm::vec2(6.3f * CardMeshScale, 8.8f * CardMeshScale);
-constexpr f32 CardThickness = 0.03f * CardMeshScale; // The card mesh is 0.03 units thick
+// World units are centimetres, card.hpp is a real 63 x 88 mm card so it's drawn without scaling
+constexpr glm::vec2 CardSize = glm::vec2(6.3f, 8.8f);   // cm, used for hit detection
+constexpr f32 CardThickness = 0.03f;                    // cm, used to stack the piles
 
 enum card_suit
 {

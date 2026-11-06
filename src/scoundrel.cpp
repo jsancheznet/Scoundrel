@@ -1,5 +1,6 @@
 #include "scoundrel.h"
 
+#include "SDL3/SDL_scancode.h"
 #include "asset_manager.h"
 #include "camera.h"
 #include "typedefs.h"
@@ -23,32 +24,88 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
     CardBackTexture = AssetMgr->LoadTexture("assets/Textures/Scoundrel-Back.jpg");
 
     // Setup game vars
+    GameStarted = false;
     PlayerHealth = 20;
-    DungeonPosition = glm::vec3(-2.5f, -1.15f, 0.0f);
 
-    Camera = CreateCamera();
-    Camera.Position = glm::vec3(0.0f, 0.0f, 2.0f);
+    DungeonPosition = glm::vec3(-22.1f, -10.0f, 0.0f);
+    DiscardPosition = glm::vec3(22.1f, -10.0f, 0.0f);
+    WeaponPosition = glm::vec3(12.1f, -10.0f, 0.0f);
+
+    // TODO: Dibujar los textos arriba de cada deck
+    // TODO: Dibujar todos los deck en Render()
+    // TODO: Iniciar el juego mueve 4 cartas y las da vuelta al room
+
+    Room1 = glm::vec3(-14.0, 10.0f, 0.0f);
+    Room2 = glm::vec3(-14.0 + 8.5f, 10.0f, 0.0f);
+    Room3 = glm::vec3(-14.0 + 8.5f * 2, 10.0f, 0.0f);
+    Room4 = glm::vec3(-14.0 + 8.5f * 3, 10.0f, 0.0f);
+
+    // DungeonTextPosition = ;
+    // RoomTextPosition = ;
+    // DiscardTextPosition = ;
+
+    // Camera
+    glm::vec3 CameraPosition = glm::vec3(0.0f, 0.0f, 45.0f);
+    glm::vec3 CameraTarget = glm::vec3(0.0f);
+    glm::vec3 CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+    f32 CameraNear = 1.0f;
+    f32 CameraFar = 1000.0f;
+    f32 CameraFoV = 40.0f;
+    Camera = CreateCamera(CameraPosition, CameraTarget, CameraUp, CameraNear, CameraFar, CameraFoV);
+
     LoadDungeon();
+
+    Dungeon[Dungeon.size() - 1].Position = Room1;
+    Dungeon[Dungeon.size() - 2].Position = Room2;
+    Dungeon[Dungeon.size() - 3].Position = Room3;
+    Dungeon[Dungeon.size() - 4].Position = Room4;
+}
+
+card *game::PickCard(glm::vec3 RayOrigin, glm::vec3 RayDirection)
+{
+    card *Closest = nullptr;
+    f32 ClosestDistance = FLT_MAX;
+
+    for(card &Card : Dungeon)
+    {
+        // The plane the card lies on, it tilts with the card
+        glm::vec3 CardNormal = Card.RotationMatrix() * glm::vec3(0.0f, 0.0f, 1.0f);
+
+        glm::vec3 Hit;
+        if(RayPlaneIntersection(RayOrigin, RayDirection, Card.Position, CardNormal, &Hit) && Card.ContainsPoint(Hit))
+        {
+            // NOTE: Strict < keeps the first card on ties, cards at the same Z are drawn first on top (depth test is GL_LESS)
+            f32 Distance = glm::length(Hit - RayOrigin);
+            if(Distance < ClosestDistance)
+            {
+                ClosestDistance = Distance;
+                Closest = &Card;
+            }
+        }
+    }
+
+    return Closest;
 }
 
 void game::Update()
 {
     Camera.Update();
 
-    // TODO: Make this work!, Move PickCard and ScreenToWorldRay somewhere else
-    #if 0
     b32 MouseDown    = Mouse->IsButtonPressed(SDL_BUTTON_LEFT);
     b32 MouseWasDown = Mouse->WasButtonPressed(SDL_BUTTON_LEFT);
     if(MouseDown && !MouseWasDown)
     {
         glm::vec3 RayDirection = ScreenToWorldRay(Mouse, Renderer, &Camera);
-        card *ClickedCard = PickCard(Dungeon, Camera.Position, RayDirection);
+        card *ClickedCard = PickCard(Camera.Position, RayDirection);
         if(ClickedCard && ClickedCard->Pile == Pile_Dungeon)
         {
-            Log(Info, "Clicked the dungeon");
+            if(!GameStarted)
+            {
+                MoveCards(Dungeon, Room, 4);
+                GameStarted = true;
+            }
         }
     }
-    #endif
 }
 
 void game::Render()
@@ -115,4 +172,10 @@ void game::DrawHealth()
     char TextBuffer[128];
     snprintf(TextBuffer, sizeof(TextBuffer), "Health: %d", PlayerHealth);
     Renderer->DrawText(MarcellusFont, ScreenPos.x, ScreenPos.y, Size, TextBuffer, RED);
+}
+
+void game::MoveCards(std::vector<card> &Src, std::vector<card> &Dst, u32 Count)
+{
+    // Moves cards from one pile to the other
+    Log(Info, "Moving Cards!\n");
 }

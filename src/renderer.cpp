@@ -253,11 +253,9 @@ void renderer::DrawCard(const card &Card)
         return;
     }
 
-    // Model = Translate * Rotate * Scale, the card is scaled first, then rotated, then moved into place
+    // Model = Translate * Rotate, the card mesh is already in world units (cm)
     glm::mat4 Model = glm::translate(glm::mat4(1.0f), Card.Position);
     Model = glm::rotate(Model, Card.Angle, Card.Axis);
-    // Model = glm::scale(Model, Card.Scale);
-    Model = glm::scale(Model, glm::vec3(CardMeshScale));
 
     card_instance CardInst = {};
     CardInst.FrontTexture = Front->BindlessTextureHandle;

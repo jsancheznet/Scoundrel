@@ -22,14 +22,26 @@ struct game
     void DrawHealth();
     void DrawCards();
 
+    card *PickCard(glm::vec3 RayOrigin, glm::vec3 RayDirection);
+
     camera Camera;
 
     u64 MarcellusFont;
 
     u32 PlayerHealth;
+    b32 GameStarted;
 
     glm::vec3 DungeonPosition;
+    glm::vec3 DiscardPosition;
+    glm::vec3 WeaponPosition;
+
+    glm::vec3 Room1;
+    glm::vec3 Room2;
+    glm::vec3 Room3;
+    glm::vec3 Room4;
+
     std::vector<card> Dungeon;
+    std::vector<card> Room;
 
 private:
     renderer *Renderer;
@@ -39,4 +51,6 @@ private:
     asset_manager *AssetMgr;
 
     u64 CardBackTexture;
+
+    void MoveCards(std::vector<card> &Src, std::vector<card> &Dst, u32 Count);
 };

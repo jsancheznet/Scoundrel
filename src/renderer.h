@@ -13,6 +13,7 @@
 #include "camera.h"
 #include "card.h"
 
+#define BLACK    color{0.0f, 0.0f, 0.0f, 1.0f}
 #define HOT_PINK color{1.0f, 0.0f, 1.0f, 1.0f}
 #define ORANGE   color{1.0f, 0.647f, 0.0f, 1.0f}
 #define RED      color{1.0f, 0.0f, 0.0f, 1.0f}
@@ -57,7 +58,7 @@ struct character_glyph
 {
     u64 TextureHandle;
     glm::vec3 Position;     // Pixels for screen text (z = 0), world units for world text
-    glm::vec4 Rect; // Atlas UVs (left, bottom, right, top)
+    glm::vec4 Rect;         // Atlas UVs (left, bottom, right, top)
     glm::vec2 Size;
     glm::vec4 Color;
     b32 WorldSpace;         // false: Position is in screen pixels, true: Position is in the world
@@ -112,7 +113,7 @@ struct renderer
 
     void DrawTexture(u64 AssetHandle, vec3 Position, vec2 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f}, glm::vec4 Tint = {1.0f, 1.0f, 1.0f, 0.0f});
     void DrawText(u64 Font, f32 X, f32 Y, f32 Size, const char *Text, color Color = {1.0f, 1.0f, 1.0f, 1.0f});
-    void DrawText3D(u64 Font, vec3 Position, f32 Height, const char *Text, color Color = {1.0f, 1.0f, 1.0f, 1.0f}); // Position is the top-left, the text faces +Z
+    void DrawText3D(u64 Font, vec3 Position, f32 Height, const char *Text, color Color = {1.0f, 1.0f, 1.0f, 1.0f}); // Position is the top-left, the text faces +Z, Height in cm
     void DrawCard(const card &Card);
 
     void ClearScreen(color Color);

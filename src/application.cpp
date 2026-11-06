@@ -150,6 +150,8 @@ void application::BeginFrame()
 {
     FrameBeginTime = SDL_GetPerformanceCounter();
 
+    ProcessEvents();
+
     // char TitleBuffer[1024];
     // snprintf(TitleBuffer, sizeof(TitleBuffer), "Scoundrel - FPS: %d", (u32)(1.0f / DeltaTime));
     // SDL_SetWindowTitle(Window, (const char*)&TitleBuffer);
