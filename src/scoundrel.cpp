@@ -1,6 +1,5 @@
 #include "scoundrel.h"
 
-#include "SDL3/SDL_scancode.h"
 #include "asset_manager.h"
 #include "camera.h"
 #include "typedefs.h"
@@ -33,7 +32,6 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
 
     // TODO: Dibujar los textos arriba de cada deck
     // TODO: Dibujar todos los deck en Render()
-    // TODO: Iniciar el juego mueve 4 cartas y las da vuelta al room
 
     Room1 = glm::vec3(-14.0, 10.0f, 0.0f);
     Room2 = glm::vec3(-14.0 + 8.5f, 10.0f, 0.0f);
@@ -54,11 +52,6 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
     Camera = CreateCamera(CameraPosition, CameraTarget, CameraUp, CameraNear, CameraFar, CameraFoV);
 
     LoadDungeon();
-
-    Dungeon[Dungeon.size() - 1].Position = Room1;
-    Dungeon[Dungeon.size() - 2].Position = Room2;
-    Dungeon[Dungeon.size() - 3].Position = Room3;
-    Dungeon[Dungeon.size() - 4].Position = Room4;
 }
 
 card *game::PickCard(glm::vec3 RayOrigin, glm::vec3 RayDirection)
@@ -97,13 +90,11 @@ void game::Update()
     {
         glm::vec3 RayDirection = ScreenToWorldRay(Mouse, Renderer, &Camera);
         card *ClickedCard = PickCard(Camera.Position, RayDirection);
-        if(ClickedCard && ClickedCard->Pile == Pile_Dungeon)
+        // NOTE: ClickedCard points into Dungeon, don't use it after DealRoom() changes Dungeon
+        if(ClickedCard && ClickedCard->Pile == Pile_Dungeon && !GameStarted)
         {
-            if(!GameStarted)
-            {
-                MoveCards(Dungeon, Room, 4);
-                GameStarted = true;
-            }
+            DealRoom();
+            GameStarted = true;
         }
     }
 }
@@ -111,8 +102,10 @@ void game::Update()
 void game::Render()
 {
     Renderer->BeginFrame();
+
     DrawHealth();
     DrawCards();
+
     Renderer->EndFrame();
 }
 
@@ -135,11 +128,8 @@ void game::LoadDungeon()
 
             u64 FrontTexture = AssetMgr->LoadTexture(Path);
 
-            // Stack the cards, each one slightly above the previous one so the top of the pile is the closest to the camera
-            glm::vec3 Position = DungeonPosition + glm::vec3(0.0f, 0.0f, CardThickness * (f32)Dungeon.size());
-
-            // Face down, the back faces the camera
-            card Card = CreateCard(FrontTexture, CardBackTexture, Position, glm::pi<f32>(), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(0.0f), Pile_Dungeon);
+            // Face down, the back faces the camera. The pile height is set after shuffling
+            card Card = CreateCard(FrontTexture, CardBackTexture, DungeonPosition, glm::pi<f32>(), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(0.0f), Pile_Dungeon);
             Card.Suit = (card_suit)Suit;
             Card.Type = (Suit == Suit_Diamonds) ? Card_Weapon : (Suit == Suit_Hearts) ? Card_Potion : Card_Monster;
             Card.Value = Value;
@@ -155,11 +145,36 @@ void game::LoadDungeon()
     std::random_device RandomDevice;
     std::mt19937 Generator(RandomDevice());
     std::shuffle(Dungeon.begin(), Dungeon.end(), Generator);
+
+    // Stack the shuffled cards, the last card is the top of the pile (closest to the camera)
+    for(size_t i = 0; i < Dungeon.size(); ++i)
+    {
+        Dungeon[i].Position = DungeonPosition + glm::vec3(0.0f, 0.0f, CardThickness * (f32)i);
+    }
+}
+
+void game::DealRoom()
+{
+    glm::vec3 RoomPositions[4] = {Room1, Room2, Room3, Room4};
+
+    u32 Missing = 4 - (u32)Room.size();
+    MoveCards(Dungeon, Room, Missing, Pile_Room);
+
+    for(size_t i = 0; i < Room.size(); ++i)
+    {
+        Room[i].Position = RoomPositions[i];
+        Room[i].Angle = 0.0f; // Face up
+    }
 }
 
 void game::DrawCards()
 {
     for(const auto &Card : Dungeon)
+    {
+        Renderer->DrawCard(Card);
+    }
+
+    for(const auto &Card : Room)
     {
         Renderer->DrawCard(Card);
     }
@@ -174,8 +189,14 @@ void game::DrawHealth()
     Renderer->DrawText(MarcellusFont, ScreenPos.x, ScreenPos.y, Size, TextBuffer, RED);
 }
 
-void game::MoveCards(std::vector<card> &Src, std::vector<card> &Dst, u32 Count)
+// Moves the top Count cards of Src (the back of the vector) to the back of Dst, one by one like dealing
+void game::MoveCards(std::vector<card> &Src, std::vector<card> &Dst, u32 Count, card_pile DstPile)
 {
-    // Moves cards from one pile to the other
-    Log(Info, "Moving Cards!\n");
+    for(u32 i = 0; i < Count && !Src.empty(); ++i)
+    {
+        card Card = Src.back();
+        Src.pop_back();
+        Card.Pile = DstPile;
+        Dst.push_back(Card);
+    }
 }
