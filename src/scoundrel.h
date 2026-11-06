@@ -18,6 +18,7 @@ struct game
     void Render();
 
     void LoadDungeon();
+    void DealRoom();
 
     void DrawHealth();
     void DrawCards();
@@ -52,5 +53,5 @@ private:
 
     u64 CardBackTexture;
 
-    void MoveCards(std::vector<card> &Src, std::vector<card> &Dst, u32 Count);
+    void MoveCards(std::vector<card> &Src, std::vector<card> &Dst, u32 Count, card_pile DstPile);
 };
