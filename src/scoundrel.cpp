@@ -1,8 +1,11 @@
 #include "scoundrel.h"
 
 #include "asset_manager.h"
+#include "bitmap_font.h"
 #include "camera.h"
 #include "typedefs.h"
+
+#include <SDL3/SDL.h>
 
 #include <algorithm>
 #include <random>
@@ -25,12 +28,13 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
     // Table layout from the rules: Dungeon on the left, Room in a row, Discard on the right, Weapon below the Room
     DungeonPosition = glm::vec3(-22.1f, -10.0f, 0.0f);
     DiscardPosition = glm::vec3(22.1f, -10.0f, 0.0f);
-    WeaponPosition = glm::vec3(12.1f, -10.0f, 0.0f);
+    WeaponPosition = glm::vec3(-4.0f, -10.0f, 0.0f);
 
-    Room1 = glm::vec3(-14.0, 10.0f, 0.0f);
-    Room2 = glm::vec3(-14.0 + 8.5f, 10.0f, 0.0f);
-    Room3 = glm::vec3(-14.0 + 8.5f * 2, 10.0f, 0.0f);
-    Room4 = glm::vec3(-14.0 + 8.5f * 3, 10.0f, 0.0f);
+    f32 RoomY = 8.5f;
+    RoomCardPosition1 = glm::vec3(-14.0, RoomY, 0.0f);
+    RoomCardPosition2 = glm::vec3(-14.0 + 8.5f, RoomY, 0.0f);
+    RoomCardPosition3 = glm::vec3(-14.0 + 8.5f * 2, RoomY, 0.0f);
+    RoomCardPosition4 = glm::vec3(-14.0 + 8.5f * 3, RoomY, 0.0f);
 
     // Camera
     glm::vec3 CameraPosition = glm::vec3(0.0f, 0.0f, 45.0f);
@@ -126,10 +130,13 @@ void game::Update()
 
 void game::Render()
 {
+    // Refreshed here so the hint always matches this frame's state, Update() can return early
+    UpdateActionHint();
+
     Renderer->BeginFrame();
 
     DrawHealth();
-    DrawStatus();
+    DrawActionHint();
     DrawCards();
     DrawLabels();
 
@@ -211,7 +218,7 @@ void game::StackDungeon()
 // Flips cards off the top of the Dungeon until the Room has 4 face up cards, this starts a new turn
 void game::DealRoom()
 {
-    glm::vec3 RoomPositions[RoomSize] = {Room1, Room2, Room3, Room4};
+    glm::vec3 RoomPositions[RoomSize] = {RoomCardPosition1, RoomCardPosition2, RoomCardPosition3, RoomCardPosition4};
 
     u32 Missing = RoomSize - (u32)Room.size();
     MoveCards(Dungeon, Room, Missing, Pile_Room);
@@ -325,10 +332,10 @@ void game::FightMonster(card Monster, b32 Barehanded)
         i32 Damage = glm::max(Monster.Value - Weapon[0].Value, 0);
         PlayerHealth -= Damage;
 
-        // Staggered on top of the weapon so the weapon's number is still showing
+        // Staggered to the right and stacked below the weapon, so the weapon always stays on top
         f32 Stagger = 1.5f * (f32)(SlainMonsters.size() + 1);
         Monster.Pile = Pile_SlainMonsters;
-        Monster.Position = WeaponPosition + glm::vec3(Stagger, 0.0f, CardThickness * (f32)(SlainMonsters.size() + 1));
+        Monster.Position = WeaponPosition + glm::vec3(Stagger, 0.0f, -CardThickness * (f32)(SlainMonsters.size() + 1));
         SlainMonsters.push_back(Monster);
 
         Log(Info, "game::FightMonster() - Slew a %d with a %d weapon, took %d damage, Health: %d", Monster.Value, Weapon[0].Value, Damage, PlayerHealth);
@@ -397,7 +404,7 @@ void game::CheckEndOfTurn()
 
 void game::DrawCards()
 {
-    std::vector<card> *Piles[] = {&Dungeon, &Room, &Weapon, &SlainMonsters, &DiscardPile};
+    std::vector<card> *Piles[] = {&Dungeon, &Room, &SlainMonsters, &Weapon, &DiscardPile};
     for(std::vector<card> *Pile : Piles)
     {
         for(const card &Card : *Pile)
@@ -407,63 +414,113 @@ void game::DrawCards()
     }
 }
 
-// Labels above each pile, in world space so they stay with the table
+// Labels above each pile, in world space so they stay with the table. They float up and down together
 void game::DrawLabels()
 {
-    f32 TextHeight = 1.2f; // cm
-    glm::vec3 AboveCard = glm::vec3(-CardSize.x * 0.5f, CardSize.y * 0.5f + 2.0f, 0.0f);
-    color LabelColor = color{1.0f, 1.0f, 1.0f, 1.0f};
+    f32 Time = (f32)SDL_GetTicks() / 1000.0f;
+    f32 Wave = glm::sin(Time * LabelFloatSpeed); // -1 at the lowest point, +1 at the highest
+
+    glm::vec3 AboveCard = glm::vec3(0.0f, CardSize.y * 0.5f + LabelGapAboveCard, 0.0f);
+    glm::vec3 RoomCenter = glm::vec3((RoomCardPosition1.x + RoomCardPosition4.x) * 0.5f, RoomCardPosition1.y, RoomCardPosition1.z);
 
     char Text[64];
-    snprintf(Text, sizeof(Text), "Dungeon %zu", Dungeon.size());
-    Renderer->DrawText3D(MarcellusFont, DungeonPosition + AboveCard, TextHeight, Text, LabelColor);
+    snprintf(Text, sizeof(Text), "Dungeon (%zu)", Dungeon.size());
+    DrawFloatingLabel(DungeonPosition + AboveCard, Text, Wave);
 
-    snprintf(Text, sizeof(Text), "Discard %zu", DiscardPile.size());
-    Renderer->DrawText3D(MarcellusFont, DiscardPosition + AboveCard, TextHeight, Text, LabelColor);
+    snprintf(Text, sizeof(Text), "Discard (%zu)", DiscardPile.size());
+    DrawFloatingLabel(DiscardPosition + AboveCard, Text, Wave);
 
-    Renderer->DrawText3D(MarcellusFont, WeaponPosition + AboveCard, TextHeight, "Weapon", LabelColor);
-    Renderer->DrawText3D(MarcellusFont, Room1 + AboveCard, TextHeight, "Room", LabelColor);
+    DrawFloatingLabel(WeaponPosition + AboveCard, "Weapon", Wave);
+    DrawFloatingLabel(RoomCenter + AboveCard, "Room", Wave);
 }
 
+// Center is the center X and the top Y of the label at rest. Wave goes from -1 (lowest) to +1 (highest).
+// Like a real shadow, the black shadow follows the label part of the way, so the gap grows as the label rises,
+// and it gets a bit larger and lighter as the label moves away from the table
+void game::DrawFloatingLabel(glm::vec3 Center, const char *Text, f32 Wave)
+{
+    f32 TextHeight = 1.2f; // cm
+    bitmap_font *Font = AssetMgr->GetFont(MarcellusFont);
+
+    // Shadow first, so the label is drawn on top of it
+    f32 Height = (1.0f + Wave) * 0.5f; // 0 at the lowest point, 1 at the highest
+    f32 ShadowHeight = TextHeight * glm::mix(1.0f, LabelShadowMaxScale, Height);
+    f32 ShadowAlpha = glm::mix(LabelShadowAlphaLow, LabelShadowAlphaHigh, Height);
+    f32 ShadowCenterY = Center.y - LabelShadowOffset - TextHeight * 0.5f + Wave * LabelFloatHeight * LabelShadowFollow; // Grows from its center in all directions
+    glm::vec3 ShadowTopLeft = glm::vec3(Center.x - TextWidth(Font, ShadowHeight, Text) * 0.5f, ShadowCenterY + ShadowHeight * 0.5f, Center.z);
+    Renderer->DrawText3D(MarcellusFont, ShadowTopLeft, ShadowHeight, Text, color{0.0f, 0.0f, 0.0f, ShadowAlpha});
+
+    glm::vec3 TopLeft = glm::vec3(Center.x - TextWidth(Font, TextHeight, Text) * 0.5f, Center.y + Wave * LabelFloatHeight, Center.z);
+    Renderer->DrawText3D(MarcellusFont, TopLeft, TextHeight, Text, color{1.0f, 1.0f, 1.0f, 1.0f});
+}
+
+// World text centered on the window X (the camera looks at X = 0), halfway between the bottom of the Room
+// and the top of the lower row labels, so it scales with the table like the cards do
 void game::DrawHealth()
 {
-    glm::vec2 ScreenPos = glm::vec2(0.0f, 0.0f);
-    f32 Size = 40.0f;
-    char TextBuffer[128];
-    snprintf(TextBuffer, sizeof(TextBuffer), "Health: %d", PlayerHealth);
-    Renderer->DrawText(MarcellusFont, ScreenPos.x, ScreenPos.y, Size, TextBuffer, RED);
+    bitmap_font *Font = AssetMgr->GetFont(MarcellusFont);
+    if(!Font) return;
+
+    f32 Height = 1.7f; // cm, about 40 pixels at the starting window size
+
+    char Text[128];
+    snprintf(Text, sizeof(Text), "Health: %d", PlayerHealth);
+
+    f32 RoomBottom = RoomCardPosition1.y - CardSize.y * 0.5f;
+    f32 LowerRowTop = DungeonPosition.y + CardSize.y * 0.5f + LabelGapAboveCard;
+    f32 MidY = (RoomBottom + LowerRowTop) * 0.5f;
+
+    glm::vec3 TopLeft = glm::vec3(-TextWidth(Font, Height, Text) * 0.5f, MidY + Height * Font->Metrics.LineHeight * 0.5f, 0.0f);
+    Renderer->DrawText3D(MarcellusFont, TopLeft, Height, Text, RED);
+}
+
+// Screen text sizes are in pixels for a ReferenceWindowHeight tall window, this scales them to the current window
+f32 game::ScreenTextScale()
+{
+    return (f32)Renderer->ViewportHeight / ReferenceWindowHeight;
 }
 
 // What the player can do right now, and the score once the game is over
-void game::DrawStatus()
+void game::UpdateActionHint()
 {
-    f32 Size = 28.0f;
-    f32 Y = 50.0f;
-    char Text[256];
-
     switch(State)
     {
         case Game_WaitingToStart:
         {
-            snprintf(Text, sizeof(Text), "Click the Dungeon to enter");
+            snprintf(ActionHint, sizeof(ActionHint), "Click the Dungeon to enter");
         } break;
         case Game_Playing:
         {
+            // NOTE: No trailing separator when the Room can't be avoided, it would push the centered text to the left
             b32 CanAvoid = (CardsFacedThisRoom == 0 && !AvoidedLastRoom && Room.size() == RoomSize && !Dungeon.empty());
-            snprintf(Text, sizeof(Text), "Left click: face a card (monsters with your weapon)   Right click: fight barehanded   %s",
-                     CanAvoid ? "Click the Dungeon: avoid the Room" : "");
+            snprintf(ActionHint, sizeof(ActionHint), "Left click: face a card (monsters with your weapon)   Right click: fight barehanded%s",
+                     CanAvoid ? "   Click the Dungeon: avoid the Room" : "");
         } break;
         case Game_Won:
         {
-            snprintf(Text, sizeof(Text), "You made it through the Dungeon! Score: %d   Press R to play again", Score);
+            snprintf(ActionHint, sizeof(ActionHint), "You made it through the Dungeon! Score: %d   Press R to play again", Score);
         } break;
         case Game_Lost:
         {
-            snprintf(Text, sizeof(Text), "You died. Score: %d   Press R to play again", Score);
+            snprintf(ActionHint, sizeof(ActionHint), "You died. Score: %d   Press R to play again", Score);
         } break;
     }
+}
 
-    Renderer->DrawText(MarcellusFont, 0.0f, Y, Size, Text, color{1.0f, 1.0f, 1.0f, 1.0f});
+// Bottom center of the screen, centered on the text width
+void game::DrawActionHint()
+{
+    bitmap_font *Font = AssetMgr->GetFont(MarcellusFont);
+    if(!Font) return;
+
+    f32 Scale = ScreenTextScale();
+    f32 Size = 28.0f * Scale;
+    f32 Margin = 20.0f * Scale;
+
+    f32 X = ((f32)Renderer->ViewportWidth - TextWidth(Font, Size, ActionHint)) * 0.5f;
+    f32 Y = (f32)Renderer->ViewportHeight - Margin - Size * Font->Metrics.LineHeight; // DrawText's Y is the top of the line
+
+    Renderer->DrawText(MarcellusFont, X, Y, Size, ActionHint, color{1.0f, 1.0f, 1.0f, 1.0f});
 }
 
 // Moves the top Count cards of Src (the back of the vector) to the back of Dst, one by one like dealing

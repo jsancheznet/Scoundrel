@@ -64,3 +64,4 @@ struct bitmap_font
 };
 
 font_glyph *GetGlyph(bitmap_font *Font, char Character);
+f32 TextWidth(bitmap_font *Font, f32 Size, const char *Text); // Width of the widest line, in the same units as Size
