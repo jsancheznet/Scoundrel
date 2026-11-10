@@ -17,7 +17,7 @@ constexpr u32 CardsToFacePerRoom = 3; // A turn ends once 3 of the 4 Room cards 
 // Screen text sizes are given for this window height, they scale with the window like the table does
 constexpr f32 ReferenceWindowHeight = 768.0f;
 
-// Floating pile labels
+// Floating Text Labels
 constexpr f32 LabelGapAboveCard   = 2.0f;  // cm from the top edge of a card to the top of its label
 constexpr f32 LabelFloatSpeed     = 2.0f;  // rad/s, higher is faster (2.0 is about one cycle every 3 s)
 constexpr f32 LabelFloatHeight    = 0.08f; // cm above and below the rest position
@@ -67,28 +67,32 @@ struct game
     i32 PlayerHealth;
     i32 Score;
 
-    char ActionHint[256]; // What the player can do next, drawn at the bottom center of the screen
+    // Text Buffer - Used to tell the player what to do / what's possible
+    char ActionHint[256];
 
     // Turn state
     u32 CardsFacedThisRoom;
-    b32 PotionUsedThisTurn;     // Only one potion heals per turn, the second one is simply discarded
-    b32 AvoidedLastRoom;        // Two Rooms in a row can't be avoided
-    b32 LastCardWasPotion;      // For the score, a full health win adds the value of the last potion
+    b32 PotionUsedThisTurn;
+    b32 AvoidedLastRoom;
+    b32 LastCardWasPotion;
     i32 LastPotionValue;
 
+    // Pile Positions
     glm::vec3 DungeonPosition;
     glm::vec3 DiscardPosition;
     glm::vec3 WeaponPosition;
 
+    // Room Card Positions
     glm::vec3 RoomCardPosition1;
     glm::vec3 RoomCardPosition2;
     glm::vec3 RoomCardPosition3;
     glm::vec3 RoomCardPosition4;
 
-    std::vector<card> Dungeon;          // The back of the vector is the top of the pile
+    // Card Piles
+    std::vector<card> Dungeon;
     std::vector<card> Room;
-    std::vector<card> Weapon;           // 0 or 1 cards, the equipped weapon
-    std::vector<card> SlainMonsters;    // Monsters slain by the equipped weapon, the back is the last one
+    std::vector<card> Weapon;
+    std::vector<card> SlainMonsters;
     std::vector<card> DiscardPile;
 
 private:
