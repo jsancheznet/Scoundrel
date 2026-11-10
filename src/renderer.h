@@ -57,18 +57,18 @@ struct sprite_instance
 struct character_glyph
 {
     u64 TextureHandle;
-    glm::vec3 Position;     // Pixels for screen text (z = 0), world units for world text
-    glm::vec4 Rect;         // Atlas UVs (left, bottom, right, top)
+    glm::vec3 Position;
+    glm::vec4 Rect;
     glm::vec2 Size;
     glm::vec4 Color;
-    b32 WorldSpace;         // false: Position is in screen pixels, true: Position is in the world
+    b32 WorldSpace;
 };
 
 struct card_instance
 {
-    u64 FrontTexture;   // Bindless handles first, same layout idea as sprite_instance
+    u64 FrontTexture;
     u64 BackTexture;
-    glm::mat4 Model;    // Built on the CPU, the shader just multiplies by it
+    glm::mat4 Model;
 };
 
 struct renderer
@@ -78,6 +78,10 @@ struct renderer
     u32 ViewportHeight;
 
     color ClearColor = HOT_PINK;
+
+    // NOTE(Jsanchez): Should the VAO, VBO's that have anything to do with cards
+    // be on the scoundrel file? Ideally the renderer should not know anything
+    // about scoundrel or cards, I'm not sure how to split them right now.
 
     u32 QuadVBO;
 
@@ -113,7 +117,7 @@ struct renderer
 
     void DrawTexture(u64 AssetHandle, vec3 Position, vec2 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f}, glm::vec4 Tint = {1.0f, 1.0f, 1.0f, 0.0f});
     void DrawText(u64 Font, f32 X, f32 Y, f32 Size, const char *Text, color Color = {1.0f, 1.0f, 1.0f, 1.0f});
-    void DrawText3D(u64 Font, vec3 Position, f32 Height, const char *Text, color Color = {1.0f, 1.0f, 1.0f, 1.0f}); // Position is the top-left, the text faces +Z, Height in cm
+    void DrawText3D(u64 Font, vec3 Position, f32 Height, const char *Text, color Color = {1.0f, 1.0f, 1.0f, 1.0f});
     void DrawCard(const card &Card);
 
     void ClearScreen(color Color);
