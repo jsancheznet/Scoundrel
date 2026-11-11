@@ -12,7 +12,10 @@
 
 constexpr i32 MaxHealth = 20;
 constexpr u32 RoomSize = 4;
+constexpr f32 SfxVolume = 0.4f;
+constexpr f32 MusicVolume = SfxVolume * 0.5f; // The music plays at half the volume of the sound effects
 constexpr u32 CardsToFacePerRoom = 3; // A turn ends once 3 of the 4 Room cards were faced, the 4th stays for the next Room
+constexpr f32 SlainMonsterStagger = 1.8f; // cm between slain monsters on the weapon, wider than the number box of a card
 
 // Screen text sizes are given for this window height, they scale with the window like the table does
 constexpr f32 ReferenceWindowHeight = 768.0f;
@@ -39,6 +42,7 @@ struct game
 {
     void Init(renderer *Renderer, audio_system *Audio, keyboard *Keyboard, mouse *Mouse, asset_manager *AssetMgr);
     void Update();
+    void ProcessInput();
     void Render();
 
     void LoadDungeon();
@@ -63,6 +67,15 @@ struct game
 
     u64 MarcellusFont;
 
+    // Sound Effects
+    u64 SlashSound;
+    u64 PunchSound;
+    u64 DamageSound;
+    u64 HealthPotionSound;
+    u64 ErrorSound;
+
+    u64 Music;
+
     game_state State;
     i32 PlayerHealth;
     i32 Score;
@@ -72,7 +85,7 @@ struct game
 
     // Turn state
     u32 CardsFacedThisRoom;
-    b32 PotionUsedThisTurn;
+    b32 PotionUsedThisRoom;
     b32 AvoidedLastRoom;
     b32 LastCardWasPotion;
     i32 LastPotionValue;
