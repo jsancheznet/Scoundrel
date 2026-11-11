@@ -37,12 +37,16 @@ clang-cl /Zi /Od -W4 -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter 
 	 ..\src\asset_manager.cpp ^
 	 ..\src\bitmap_font.cpp ^
 	 ..\src\helpers.cpp ^
+	 ..\src\animation.cpp ^
 	 ..\src\card.cpp ^
 	 ..\src\scoundrel.cpp ^
 	 ..\libraries\glad\src\glad.c ^
 	 %IncludeDirectories% ^
 	 /Fe:scoundrel.exe ^
 	 /link /LIBPATH:"..\libraries\SDL-release-3.4.8\Release" -SUBSYSTEM:CONSOLE SDL3.lib
+REM     /link /LIBPATH:"..\libraries\SDL-release-3.4.8\Release" /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup SDL3.lib
+
+
 
 if errorlevel 1 (
    popd

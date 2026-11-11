@@ -21,7 +21,6 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
     Audio = AudioPtr;
     AssetMgr = AssetMgrPtr;
 
-    // Load Assets
     MarcellusFont = AssetMgr->LoadBitmapFont("assets/Fonts/Marcellus_sc.png", "assets/Fonts/Marcellus_sc.json");
     CardBackTexture = AssetMgr->LoadTexture("assets/Textures/Scoundrel-Back.jpg");
 
@@ -38,7 +37,6 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
     Audio->SetRepeat(Music, true);
     Audio->Play(Music);
 
-    // Table layout from the rules: Dungeon on the left, Room in a row, Discard on the right, Weapon below the Room
     DungeonPosition = glm::vec3(-22.1f, -10.0f, 0.0f);
     DiscardPosition = glm::vec3(22.1f, -10.0f, 0.0f);
     WeaponPosition = glm::vec3(-8.0f, -10.0f, 0.0f); // Left of the center, the slain monsters stack to the right of it
@@ -51,7 +49,6 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
     RoomCardPosition3 = glm::vec3(RoomX + RoomSpacing * 2, RoomY, 0.0f);
     RoomCardPosition4 = glm::vec3(RoomX + RoomSpacing * 3, RoomY, 0.0f);
 
-    // Camera
     glm::vec3 CameraPosition = glm::vec3(0.0f, 0.0f, 45.0f);
     glm::vec3 CameraTarget = glm::vec3(0.0f);
     glm::vec3 CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -64,7 +61,6 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
     NewGame();
 }
 
-// Returns the clickable card closest to the camera under the ray (Dungeon or Room), nullptr if nothing was hit
 // NOTE: The pointer is only valid until the piles change, use it before moving any card
 card *game::PickCard(glm::vec3 RayOrigin, glm::vec3 RayDirection)
 {
@@ -76,7 +72,6 @@ card *game::PickCard(glm::vec3 RayOrigin, glm::vec3 RayDirection)
     {
         for(card &Card : *Pile)
         {
-            // The plane the card lies on, it tilts with the card
             glm::vec3 CardNormal = Card.RotationMatrix() * glm::vec3(0.0f, 0.0f, 1.0f);
 
             glm::vec3 Hit;
@@ -96,26 +91,41 @@ card *game::PickCard(glm::vec3 RayOrigin, glm::vec3 RayDirection)
     return Closest;
 }
 
-void game::Update()
+void game::Update(f32 DeltaTime)
 {
     Camera.Update();
     ProcessInput();
+
+    // After the input, so a card that was just moved starts its animation this tick
+    UpdateCards(DeltaTime);
 
     // After the input, so the hint always matches the state this frame is drawn with
     UpdateActionHint();
 }
 
-// Handles the R key and the clicks on the Dungeon and the Room
+void game::UpdateCards(f32 DeltaTime)
+{
+    // A long frame (loading, a dragged window) must not make the cards jump to their targets
+    DeltaTime = glm::min(DeltaTime, MaxAnimationDeltaTime);
+
+    std::vector<card> *Piles[] = {&Dungeon, &Room, &Weapon, &SlainMonsters, &DiscardPile};
+    for(std::vector<card> *Pile : Piles)
+    {
+        for(card &Card : *Pile)
+        {
+            Card.Update(DeltaTime);
+        }
+    }
+}
+
 void game::ProcessInput()
 {
-    // R starts a new game once the current one is over
     if((State == Game_Won || State == Game_Lost) && Keyboard->IsReleased(SDL_SCANCODE_R))
     {
         NewGame();
         return;
     }
 
-    // Left click: use the weapon on monsters when possible. Right click: fight monsters barehanded
     b32 LeftClicked  = Mouse->IsButtonPressed(SDL_BUTTON_LEFT) && !Mouse->WasButtonPressed(SDL_BUTTON_LEFT);
     b32 RightClicked = Mouse->IsButtonPressed(SDL_BUTTON_RIGHT) && !Mouse->WasButtonPressed(SDL_BUTTON_RIGHT);
     if(!LeftClicked && !RightClicked)
@@ -124,8 +134,9 @@ void game::ProcessInput()
     }
 
     glm::vec3 RayDirection = ScreenToWorldRay(Mouse, Renderer, &Camera);
+    // A card can only be clicked once it is at its final position
     card *ClickedCard = PickCard(Camera.Position, RayDirection);
-    if(!ClickedCard)
+    if(!ClickedCard || ClickedCard->Animation.IsActive)
     {
         return;
     }
@@ -140,7 +151,6 @@ void game::ProcessInput()
         }
         else if(State == Game_Playing)
         {
-            // Clicking the Dungeon during a turn runs away from the Room
             AvoidRoom();
         }
     }
@@ -197,7 +207,6 @@ void game::LoadDungeon()
     Assert(Dungeon.size() == 44);
 }
 
-// Gathers every card back into the Dungeon, shuffles it and resets the player. The textures are only loaded once
 void game::NewGame()
 {
     std::vector<card> *Piles[] = {&Room, &Weapon, &SlainMonsters, &DiscardPile};
@@ -206,7 +215,6 @@ void game::NewGame()
         MoveCards(*Pile, Dungeon, (u32)Pile->size(), Pile_Dungeon);
     }
 
-    // Shuffle the cards
     std::random_device RandomDevice;
     std::mt19937 Generator(RandomDevice());
     std::shuffle(Dungeon.begin(), Dungeon.end(), Generator);
@@ -223,37 +231,35 @@ void game::NewGame()
     LastPotionValue = 0;
 }
 
-// Places the Dungeon cards face down, stacked so the last card is the top of the pile (closest to the camera)
 void game::StackDungeon()
 {
     for(size_t i = 0; i < Dungeon.size(); ++i)
     {
         Dungeon[i].Pile = Pile_Dungeon;
-        Dungeon[i].Position = DungeonPosition + glm::vec3(0.0f, 0.0f, CardThickness * (f32)i);
-        Dungeon[i].Angle = glm::pi<f32>();
         Dungeon[i].Axis = glm::vec3(0.0f, 1.0f, 0.0f);
+        Dungeon[i].Animation.Animate(Dungeon[i].Position, Dungeon[i].Angle, DungeonPosition + glm::vec3(0.0f, 0.0f, CardThickness * (f32)i), glm::pi<f32>());
     }
 }
 
-// Flips cards off the top of the Dungeon until the Room has 4 face up cards, this starts a new turn
 void game::DealRoom()
 {
     glm::vec3 RoomPositions[RoomSize] = {RoomCardPosition1, RoomCardPosition2, RoomCardPosition3, RoomCardPosition4};
 
-    u32 Missing = RoomSize - (u32)Room.size();
+    size_t KeptCount = Room.size();
+    u32 Missing = RoomSize - (u32)KeptCount;
     MoveCards(Dungeon, Room, Missing, Pile_Room);
 
     for(size_t i = 0; i < Room.size(); ++i)
     {
-        Room[i].Position = RoomPositions[i];
-        Room[i].Angle = 0.0f; // Face up
+        // The new cards leave the Dungeon one by one, a card kept from the last Room moves at once
+        f32 Delay = (i >= KeptCount) ? CardDealDelay * (f32)(i - KeptCount) : 0.0f;
+        Room[i].Animation.Animate(Room[i].Position, Room[i].Angle, RoomPositions[i], 0.0f, Delay);
     }
 
     CardsFacedThisRoom = 0;
     PotionUsedThisRoom = false;
 }
 
-// Scoops the whole Room to the bottom of the Dungeon and deals a new one.
 // Only allowed before facing any card of the Room, and never for two Rooms in a row
 void game::AvoidRoom()
 {
@@ -274,7 +280,6 @@ void game::AvoidRoom()
     AvoidedLastRoom = true;
 }
 
-// Faces the Room card at Index: weapons are equipped, potions are drunk, monsters are fought
 void game::FaceRoomCard(u32 Index, b32 Barehanded)
 {
     Assert(Index < Room.size());
@@ -313,7 +318,7 @@ void game::EquipWeapon(card NewWeapon)
     SlainMonsters.clear();
 
     NewWeapon.Pile = Pile_EquippedWeapon;
-    NewWeapon.Position = WeaponPosition;
+    NewWeapon.Animation.Animate(NewWeapon.Position, NewWeapon.Angle, WeaponPosition, 0.0f);
     Weapon.push_back(NewWeapon);
 
     Log(Info, "game::EquipWeapon() - Equipped a %d weapon", NewWeapon.Value);
@@ -360,7 +365,8 @@ void game::FightMonster(card Monster, b32 Barehanded)
         // Stacked on top of the weapon and staggered to the right, so the number of every card below stays visible
         f32 Count = (f32)(SlainMonsters.size() + 1);
         Monster.Pile = Pile_SlainMonsters;
-        Monster.Position = WeaponPosition + glm::vec3(SlainMonsterStagger * Count, 0.0f, CardThickness * Count);
+        glm::vec3 StackPosition = WeaponPosition + glm::vec3(SlainMonsterStagger * Count, 0.0f, CardThickness * Count);
+        Monster.Animation.Animate(Monster.Position, Monster.Angle, StackPosition, 0.0f);
         SlainMonsters.push_back(Monster);
 
         Audio->Play(SlashSound);
@@ -380,7 +386,6 @@ void game::FightMonster(card Monster, b32 Barehanded)
     }
 }
 
-// Ends the game when the health runs out or the Dungeon is cleared, and deals the next Room after facing 3 cards
 void game::CheckEndOfTurn()
 {
     if(PlayerHealth <= 0)
@@ -465,12 +470,12 @@ void game::DrawLabels()
     DrawFloatingLabel(RoomCenter + AboveCard, "Room", Wave);
 }
 
-// Center is the center X and the top Y of the label at rest. Wave goes from -1 (lowest) to +1 (highest).
+// Wave goes from -1 (lowest) to +1 (highest).
 // Like a real shadow, the black shadow follows the label part of the way, so the gap grows as the label rises,
 // and it gets a bit larger and lighter as the label moves away from the table
 void game::DrawFloatingLabel(glm::vec3 Center, const char *Text, f32 Wave)
 {
-    f32 TextHeight = 1.2f; // cm
+    f32 TextHeight = 1.2f; // Centimeters
     bitmap_font *Font = AssetMgr->GetFont(MarcellusFont);
 
     // Shadow first, so the label is drawn on top of it
@@ -492,7 +497,7 @@ void game::DrawHealth()
     bitmap_font *Font = AssetMgr->GetFont(MarcellusFont);
     if(!Font) return;
 
-    f32 Height = 1.7f; // cm, about 40 pixels at the starting window size
+    f32 Height = 1.7f; // Centimeters
 
     char Text[128];
     snprintf(Text, sizeof(Text), "Health: %d", PlayerHealth);
@@ -505,13 +510,11 @@ void game::DrawHealth()
     Renderer->DrawText3D(MarcellusFont, TopLeft, Height, Text, RED);
 }
 
-// Screen text sizes are in pixels for a ReferenceWindowHeight tall window, this scales them to the current window
 f32 game::ScreenTextScale()
 {
     return (f32)Renderer->ViewportHeight / ReferenceWindowHeight;
 }
 
-// What the player can do right now, and the score once the game is over
 void game::UpdateActionHint()
 {
     switch(State)
@@ -538,7 +541,6 @@ void game::UpdateActionHint()
     }
 }
 
-// Bottom center of the screen, centered on the text width
 void game::DrawActionHint()
 {
     bitmap_font *Font = AssetMgr->GetFont(MarcellusFont);
@@ -554,7 +556,6 @@ void game::DrawActionHint()
     Renderer->DrawText(MarcellusFont, X, Y, Size, ActionHint, color{1.0f, 1.0f, 1.0f, 1.0f});
 }
 
-// Moves the top Count cards of Src (the back of the vector) to the back of Dst, one by one like dealing
 void game::MoveCards(std::vector<card> &Src, std::vector<card> &Dst, u32 Count, card_pile DstPile)
 {
     for(u32 i = 0; i < Count && !Src.empty(); ++i)
@@ -566,12 +567,11 @@ void game::MoveCards(std::vector<card> &Src, std::vector<card> &Dst, u32 Count, 
     }
 }
 
-// Cards are discarded face down on top of the discard pile
 void game::Discard(card Card)
 {
     Card.Pile = Pile_DiscardPile;
-    Card.Position = DiscardPosition + glm::vec3(0.0f, 0.0f, CardThickness * (f32)DiscardPile.size());
-    Card.Angle = glm::pi<f32>();
     Card.Axis = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 TopOfPile = DiscardPosition + glm::vec3(0.0f, 0.0f, CardThickness * (f32)DiscardPile.size());
+    Card.Animation.Animate(Card.Position, Card.Angle, TopOfPile, glm::pi<f32>());
     DiscardPile.push_back(Card);
 }
