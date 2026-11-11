@@ -25,16 +25,31 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
     MarcellusFont = AssetMgr->LoadBitmapFont("assets/Fonts/Marcellus_sc.png", "assets/Fonts/Marcellus_sc.json");
     CardBackTexture = AssetMgr->LoadTexture("assets/Textures/Scoundrel-Back.jpg");
 
+    SlashSound        = AssetMgr->LoadSound("assets/Sounds/Slash.wav", Channel_SFX);
+    PunchSound        = AssetMgr->LoadSound("assets/Sounds/Punch.wav", Channel_SFX);
+    DamageSound       = AssetMgr->LoadSound("assets/Sounds/Damage.wav", Channel_SFX);
+    HealthPotionSound = AssetMgr->LoadSound("assets/Sounds/HealthPotion.wav", Channel_SFX);
+    ErrorSound        = AssetMgr->LoadSound("assets/Sounds/Error.wav", Channel_SFX);
+    Music             = AssetMgr->LoadSound("assets/Sounds/Music.wav", Channel_Music);
+
+    // The music starts once here and repeats for the whole session, NewGame() doesn't restart it
+    Audio->SetChannelVolume(Channel_SFX, SfxVolume);
+    Audio->SetChannelVolume(Channel_Music, MusicVolume);
+    Audio->SetRepeat(Music, true);
+    Audio->Play(Music);
+
     // Table layout from the rules: Dungeon on the left, Room in a row, Discard on the right, Weapon below the Room
     DungeonPosition = glm::vec3(-22.1f, -10.0f, 0.0f);
     DiscardPosition = glm::vec3(22.1f, -10.0f, 0.0f);
-    WeaponPosition = glm::vec3(-4.0f, -10.0f, 0.0f);
+    WeaponPosition = glm::vec3(-8.0f, -10.0f, 0.0f); // Left of the center, the slain monsters stack to the right of it
 
     f32 RoomY = 8.5f;
-    RoomCardPosition1 = glm::vec3(-14.0, RoomY, 0.0f);
-    RoomCardPosition2 = glm::vec3(-14.0 + 8.5f, RoomY, 0.0f);
-    RoomCardPosition3 = glm::vec3(-14.0 + 8.5f * 2, RoomY, 0.0f);
-    RoomCardPosition4 = glm::vec3(-14.0 + 8.5f * 3, RoomY, 0.0f);
+    f32 RoomSpacing = 8.5f;
+    f32 RoomX = -RoomSpacing * 1.5f; // Centers the row of 4 cards on X = 0
+    RoomCardPosition1 = glm::vec3(RoomX, RoomY, 0.0f);
+    RoomCardPosition2 = glm::vec3(RoomX + RoomSpacing, RoomY, 0.0f);
+    RoomCardPosition3 = glm::vec3(RoomX + RoomSpacing * 2, RoomY, 0.0f);
+    RoomCardPosition4 = glm::vec3(RoomX + RoomSpacing * 3, RoomY, 0.0f);
 
     // Camera
     glm::vec3 CameraPosition = glm::vec3(0.0f, 0.0f, 45.0f);
@@ -84,7 +99,15 @@ card *game::PickCard(glm::vec3 RayOrigin, glm::vec3 RayDirection)
 void game::Update()
 {
     Camera.Update();
+    ProcessInput();
 
+    // After the input, so the hint always matches the state this frame is drawn with
+    UpdateActionHint();
+}
+
+// Handles the R key and the clicks on the Dungeon and the Room
+void game::ProcessInput()
+{
     // R starts a new game once the current one is over
     if((State == Game_Won || State == Game_Lost) && Keyboard->IsReleased(SDL_SCANCODE_R))
     {
@@ -130,9 +153,6 @@ void game::Update()
 
 void game::Render()
 {
-    // Refreshed here so the hint always matches this frame's state, Update() can return early
-    UpdateActionHint();
-
     Renderer->BeginFrame();
 
     DrawHealth();
@@ -197,7 +217,7 @@ void game::NewGame()
     Score = 0;
 
     CardsFacedThisRoom = 0;
-    PotionUsedThisTurn = false;
+    PotionUsedThisRoom = false;
     AvoidedLastRoom = false;
     LastCardWasPotion = false;
     LastPotionValue = 0;
@@ -230,7 +250,7 @@ void game::DealRoom()
     }
 
     CardsFacedThisRoom = 0;
-    PotionUsedThisTurn = false;
+    PotionUsedThisRoom = false;
 }
 
 // Scoops the whole Room to the bottom of the Dungeon and deals a new one.
@@ -241,6 +261,7 @@ void game::AvoidRoom()
     if(CardsFacedThisRoom > 0 || AvoidedLastRoom || Room.size() != RoomSize || Dungeon.empty())
     {
         Log(Info, "game::AvoidRoom() - This Room can't be avoided");
+        Audio->Play(ErrorSound);
         return;
     }
 
@@ -298,45 +319,52 @@ void game::EquipWeapon(card NewWeapon)
     Log(Info, "game::EquipWeapon() - Equipped a %d weapon", NewWeapon.Value);
 }
 
-// Heals up to MaxHealth. Only the first potion of each turn heals, the rest are simply discarded
+// Heals up to MaxHealth. Only the first potion of each Room heals, the rest are simply discarded
 void game::DrinkPotion(card Potion)
 {
-    if(!PotionUsedThisTurn)
+    if(!PotionUsedThisRoom)
     {
+        i32 HealthBefore = PlayerHealth;
         PlayerHealth = glm::min(PlayerHealth + Potion.Value, MaxHealth);
-        PotionUsedThisTurn = true;
+        PotionUsedThisRoom = true;
 
         // Only a potion that healed counts for the full health win bonus
         LastCardWasPotion = true;
         LastPotionValue = Potion.Value;
 
+        // No sound at full health, the potion healed nothing
+        if(PlayerHealth > HealthBefore) Audio->Play(HealthPotionSound);
+
         Log(Info, "game::DrinkPotion() - Healed %d, Health: %d", Potion.Value, PlayerHealth);
     }
     else
     {
-        Log(Info, "game::DrinkPotion() - Already drank a potion this turn, discarding it");
+        Log(Info, "game::DrinkPotion() - Already drank a potion this Room, discarding it");
     }
 
     Discard(Potion);
 }
 
 // With the weapon: the damage is what the monster has over the weapon, and the monster goes on top of the weapon.
-// Once the weapon slays a monster, it can only be used on monsters of equal or lower value than the last one it slew.
+// Once the weapon slays a monster, it can only be used on monsters of lower value than the last one it slew.
 // Barehanded: the full monster value is taken as damage and the monster is discarded
 void game::FightMonster(card Monster, b32 Barehanded)
 {
-    b32 CanUseWeapon = !Weapon.empty() && (SlainMonsters.empty() || Monster.Value <= SlainMonsters.back().Value);
+    b32 CanUseWeapon = !Weapon.empty() && (SlainMonsters.empty() || Monster.Value < SlainMonsters.back().Value);
 
     if(!Barehanded && CanUseWeapon)
     {
         i32 Damage = glm::max(Monster.Value - Weapon[0].Value, 0);
         PlayerHealth -= Damage;
 
-        // Staggered to the right and stacked below the weapon, so the weapon always stays on top
-        f32 Stagger = 1.5f * (f32)(SlainMonsters.size() + 1);
+        // Stacked on top of the weapon and staggered to the right, so the number of every card below stays visible
+        f32 Count = (f32)(SlainMonsters.size() + 1);
         Monster.Pile = Pile_SlainMonsters;
-        Monster.Position = WeaponPosition + glm::vec3(Stagger, 0.0f, -CardThickness * (f32)(SlainMonsters.size() + 1));
+        Monster.Position = WeaponPosition + glm::vec3(SlainMonsterStagger * Count, 0.0f, CardThickness * Count);
         SlainMonsters.push_back(Monster);
+
+        Audio->Play(SlashSound);
+        if(Damage > 0) Audio->Play(DamageSound);
 
         Log(Info, "game::FightMonster() - Slew a %d with a %d weapon, took %d damage, Health: %d", Monster.Value, Weapon[0].Value, Damage, PlayerHealth);
     }
@@ -344,6 +372,9 @@ void game::FightMonster(card Monster, b32 Barehanded)
     {
         PlayerHealth -= Monster.Value;
         Discard(Monster);
+
+        Audio->Play(PunchSound);
+        Audio->Play(DamageSound);
 
         Log(Info, "game::FightMonster() - Fought a %d barehanded, Health: %d", Monster.Value, PlayerHealth);
     }
@@ -397,14 +428,14 @@ void game::CheckEndOfTurn()
         {
             // Nothing left to deal, the last Room cards are faced as a new turn
             CardsFacedThisRoom = 0;
-            PotionUsedThisTurn = false;
+            PotionUsedThisRoom = false;
         }
     }
 }
 
 void game::DrawCards()
 {
-    std::vector<card> *Piles[] = {&Dungeon, &Room, &SlainMonsters, &Weapon, &DiscardPile};
+    std::vector<card> *Piles[] = {&Dungeon, &Room, &Weapon, &SlainMonsters, &DiscardPile};
     for(std::vector<card> *Pile : Piles)
     {
         for(const card &Card : *Pile)
