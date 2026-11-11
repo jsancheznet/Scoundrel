@@ -43,7 +43,7 @@ i32 main(i32 Argc, char **Argv)
     {
         Application.BeginFrame();
 
-        Scoundrel.Update();
+        Scoundrel.Update((f32)Application.DeltaTime);
         Scoundrel.Render();
 
         Application.EndFrame();

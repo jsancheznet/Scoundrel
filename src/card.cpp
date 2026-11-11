@@ -14,7 +14,15 @@ card CreateCard(u64 Texture, u64 BackTexture, glm::vec3 Position, f32 Angle, glm
     Result.Tint = Tint;
     Result.Pile = Pile;
 
+    Result.Animation.Duration = CardMoveDuration;
+    Result.Animation.MaxLift = CardMaxLift;
+
     return Result;
+}
+
+void card::Update(f32 DeltaTime)
+{
+    Animation.Update(DeltaTime, &Position, &Angle);
 }
 
 glm::mat3 card::RotationMatrix()
@@ -24,13 +32,11 @@ glm::mat3 card::RotationMatrix()
 
 b32 card::ContainsPoint(glm::vec3 Point)
 {
-    // Point must be on the card plane, returns true if it lands inside the card rectangle
-    // The card's own width and height directions in world space
+    // NOTE: Point must be on the card plane
     glm::mat3 Rotation = RotationMatrix();
     glm::vec3 Right = Rotation * glm::vec3(1.0f, 0.0f, 0.0f);
     glm::vec3 Up    = Rotation * glm::vec3(0.0f, 1.0f, 0.0f);
 
-    // How far the point is from the card center along the card's width and height
     // NOTE: Right and Up are unit length (pure rotation), so the dot products are distances
     glm::vec3 Offset = Point - Position;
     f32 X = glm::dot(Offset, Right);
