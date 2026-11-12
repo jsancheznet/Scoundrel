@@ -21,6 +21,9 @@ constexpr f32 MaxAnimationDeltaTime = 0.05f; // Seconds, longer frames are cut t
 // Screen text sizes are given for this window height, they scale with the window like the table does
 constexpr f32 ReferenceWindowHeight = 768.0f;
 
+// The camera is above the center of the table, so the table is lower on the screen and the action hint fits above the Room label
+constexpr f32 CameraHeight = 1.4f; // Centimeters
+
 constexpr f32 LabelGapAboveCard   = 2.0f;  // Centimeters
 constexpr f32 LabelFloatSpeed     = 2.0f;  // Radians per second
 constexpr f32 LabelFloatHeight    = 0.08f; // Centimeters
