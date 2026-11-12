@@ -49,8 +49,8 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
     RoomCardPosition3 = glm::vec3(RoomX + RoomSpacing * 2, RoomY, 0.0f);
     RoomCardPosition4 = glm::vec3(RoomX + RoomSpacing * 3, RoomY, 0.0f);
 
-    glm::vec3 CameraPosition = glm::vec3(0.0f, 0.0f, 45.0f);
-    glm::vec3 CameraTarget = glm::vec3(0.0f);
+    glm::vec3 CameraPosition = glm::vec3(0.0f, CameraHeight, 45.0f);
+    glm::vec3 CameraTarget = glm::vec3(0.0f, CameraHeight, 0.0f);
     glm::vec3 CameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
     f32 CameraNear = 1.0f;
     f32 CameraFar = 1000.0f;
@@ -548,10 +548,15 @@ void game::DrawActionHint()
 
     f32 Scale = ScreenTextScale();
     f32 Size = 28.0f * Scale;
-    f32 Margin = 20.0f * Scale;
+    f32 Margin = 16.0f * Scale;
 
-    f32 X = ((f32)Renderer->ViewportWidth - TextWidth(Font, Size, ActionHint)) * 0.5f;
-    f32 Y = (f32)Renderer->ViewportHeight - Margin - Size * Font->Metrics.LineHeight; // DrawText's Y is the top of the line
+    // The size follows the window height only, a long hint in a narrow window would go out of the screen
+    f32 WidthAtSizeOne = TextWidth(Font, 1.0f, ActionHint);
+    f32 MaxWidth = (f32)Renderer->ViewportWidth - Margin * 2.0f;
+    if(WidthAtSizeOne * Size > MaxWidth) Size = MaxWidth / WidthAtSizeOne;
+
+    f32 X = ((f32)Renderer->ViewportWidth - WidthAtSizeOne * Size) * 0.5f;
+    f32 Y = Margin; // DrawText's Y is the top of the line
 
     Renderer->DrawText(MarcellusFont, X, Y, Size, ActionHint, color{1.0f, 1.0f, 1.0f, 1.0f});
 }
