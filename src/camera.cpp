@@ -3,6 +3,7 @@
 #include "renderer.h"
 #include "mouse.h"
 #include "log.h"
+#include "random.h"
 
 extern application Application;
 extern renderer Renderer;
@@ -25,17 +26,44 @@ camera CreateCamera(glm::vec3 Position, glm::vec3 Target, glm::vec3 Up, f32 Near
     Camera.Perspective = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
     Camera.Orthographic = glm::ortho(0.0f, (f32)Application.WindowWidth, (f32)Application.WindowHeight, 0.0f);
 
+    Camera.ShakeStrength = 0.0f;
+    Camera.ShakeDuration = 0.0f;
+    Camera.ShakeElapsed = 0.0f;
+
     Log(Info, "CreateCamera() - Created Camera, Position: %.2f %.2f, %.2f, Target: %.2f %.2f, %.2f",
 	Camera.Position.x, Camera.Position.y, Camera.Position.z, Camera.Target.x, Camera.Target.y, Camera.Target.z);
 
     return Camera;
 }
 
+void camera::Shake(f32 Strength, f32 Duration)
+{
+    ShakeStrength = Strength;
+    ShakeDuration = Duration;
+    ShakeElapsed = 0.0f;
+
+    Log(Info, "camera::Shake(%.2f, %.2f)", Strength, Duration);
+}
+
 void camera::Update()
 {
     AspectRatio = (f32)Application.WindowWidth / (f32)Application.WindowHeight;
 
-    View = glm::lookAt(Position, Target, Up);
+    // The shake offset goes only into the View matrix, Position and Target stay the same.
+    // So there is nothing to restore when the shake ends, and the offset is a pure translation
+    // that keeps the directions of ScreenToWorldRay() correct.
+    vec3 ShakeOffset = vec3(0.0f);
+    if(ShakeElapsed < ShakeDuration)
+    {
+        ShakeElapsed += (f32)Application.DeltaTime;
+
+        f32 Falloff = glm::max(1.0f - ShakeElapsed / ShakeDuration, 0.0f);
+        vec3 Right = glm::normalize(glm::cross(Target - Position, Up));
+
+        ShakeOffset = (Right * RandomBetween(-1.0f, 1.0f) + Up * RandomBetween(-1.0f, 1.0f)) * ShakeStrength * Falloff;
+    }
+
+    View = glm::lookAt(Position + ShakeOffset, Target + ShakeOffset, Up);
     Perspective = glm::perspective(glm::radians(Fov), AspectRatio, Near, Far);
     Orthographic = glm::ortho(0.0f, (f32)Application.WindowWidth, (f32)Application.WindowHeight, 0.0f);
 
@@ -44,8 +72,6 @@ void camera::Update()
 
 vec3 ScreenToWorldRay(mouse *Mouse, renderer *Renderer, camera *Camera)
 {
-    // TODO(Jsanchez): Tomar nota de los pasos y subirlo a un gist
-
     // Step 1 - Mouse NDC Coords
     f32 X_NDC = (Mouse->X * 2.0f) / Renderer->ViewportWidth - 1.0f;
     f32 Y_NDC = 1.0f - (2.0f * Mouse->Y) / Renderer->ViewportHeight;

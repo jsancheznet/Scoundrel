@@ -98,7 +98,6 @@ struct renderer
 
     u32 CameraUBO;
 
-    // Shaders
     u32 SpriteShader;
     u32 TextShader;
     u32 CardShader;

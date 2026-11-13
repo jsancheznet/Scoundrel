@@ -11,6 +11,7 @@
 #include "camera.h"
 
 constexpr i32 MaxHealth = 20;
+constexpr u32 DeckSize = 44;
 constexpr u32 RoomSize = 4;
 constexpr f32 SfxVolume = 0.4f;
 constexpr f32 MusicVolume = SfxVolume * 0.5f;
@@ -23,6 +24,12 @@ constexpr f32 ReferenceWindowHeight = 768.0f;
 
 // The camera is above the center of the table, so the table is lower on the screen and the action hint fits above the Room label
 constexpr f32 CameraHeight = 1.4f; // Centimeters
+
+constexpr f32 DamageShakeStrength = 0.45f; // Centimeters
+constexpr f32 DamageShakeDuration = 0.25f; // Seconds
+
+// With the perspective, a label on the table would not line up with a tall pile
+constexpr f32 LabelHeight = CardThickness * (f32)(DeckSize - 1); // Centimeters
 
 constexpr f32 LabelGapAboveCard   = 2.0f;  // Centimeters
 constexpr f32 LabelFloatSpeed     = 2.0f;  // Radians per second

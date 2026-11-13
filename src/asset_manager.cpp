@@ -29,7 +29,6 @@ void asset_manager::Init()
 {
     Log(Info, "asset_manager::Init()");
 
-    // Zero the asset arrays
     memset(Textures, 0, sizeof(Textures));
     memset(Sounds, 0, sizeof(Sounds));
     memset(Fonts, 0, sizeof(Fonts));
@@ -47,7 +46,6 @@ u64 asset_manager::LoadSound(const char *Filepath, audio_channel Channel)
         return InvalidHandle();
     }
 
-    // Find a free slot, return if nothing was found
     u32 Index = InvalidIndex;
     for(u32 i = 0; i < MaxSoundCount; ++i)
     {
@@ -75,13 +73,11 @@ u64 asset_manager::LoadSound(const char *Filepath, audio_channel Channel)
     Sound.Channel = Channel;
     Sound.Repeats = false;
 
-    // Fill Asset related Data
     sound_asset *Asset = &Sounds[Index];
     Asset->Header.Used = true;
     const char *Filename = FilenameFromPath(Filepath); Assert(Filename);
     snprintf(Asset->Header.Name, sizeof(Asset->Header.Name), "%s", Filename);
 
-    // Fill Sound Related Data
     Asset->Sound = Sound;
 
     AssetCount++;
@@ -100,7 +96,6 @@ u64 asset_manager::LoadTexture(const char *Filepath)
         return InvalidHandle();
     }
 
-    // Find a free slot, return if nothing was found
     u32 Index = InvalidIndex;
     for(u32 i = 0; i < MaxTextureCount; ++i)
     {
@@ -129,12 +124,10 @@ u64 asset_manager::LoadTexture(const char *Filepath)
 
     texture_asset *Asset = &Textures[Index];
 
-    // Set Asset Vars
     Asset->Header.Used = true;
     const char *Filename = FilenameFromPath(Filepath); Assert(Filename);
     snprintf(Asset->Header.Name, sizeof(Asset->Header.Name), "%s", Filename);
 
-    // Set Texture Vars
     Asset->Texture = Texture;
     Renderer.UploadTexture(Asset->Texture.Data,
                            Asset->Texture.Width,
@@ -155,7 +148,6 @@ u64 asset_manager::LoadBitmapFont(const char *Image, const char *Json)
         return InvalidHandle();
     }
 
-    // Find a free slot, return if nothing was found
     u32 Index = InvalidIndex;
     for(u32 i = 0; i < MaxFontCount; ++i)
     {
@@ -198,13 +190,11 @@ u64 asset_manager::LoadBitmapFont(const char *Image, const char *Json)
         return InvalidHandle();
     }
 
-    // Fill the Asset Data
     font_asset *Asset = &Fonts[Index];
     Asset->Header.Used = true;
     const char *Name = FilenameFromPath(Image); Assert(Name);
     std::snprintf(Asset->Header.Name, sizeof(Asset->Header.Name), "%s", Name);
 
-    // Fill the font data
     bitmap_font *Font = &Asset->Font;
     Font->Texture = Texture;
     Renderer.UploadTexture(Font->Texture.Data, Font->Texture.Width, Font->Texture.Height, &Font->Texture.ID, &Font->Texture.BindlessTextureHandle);
@@ -212,7 +202,6 @@ u64 asset_manager::LoadBitmapFont(const char *Image, const char *Json)
     const char *FontName = JsonGetString(RootObject, "name");
     std::snprintf(Font->Name, sizeof(Font->Name), "%s", FontName ? FontName : "");
 
-    // Font Atlas
     font_atlas *Atlas = &Font->Atlas;
     const char *AtlasType = JsonGetString(AtlasObject, "type");
     std::snprintf(Atlas->Type, sizeof(Atlas->Type), "%s", AtlasType ? AtlasType : "");
@@ -222,7 +211,6 @@ u64 asset_manager::LoadBitmapFont(const char *Image, const char *Json)
     Atlas->Height              = (i32)JsonGetNumber(AtlasObject, "height");
     Atlas->Size                = (f32)JsonGetNumber(AtlasObject, "size");
 
-    // Font Metrics
     json_object_s *MetricsObject = JsonGetObject(RootObject, "metrics");
     if(!MetricsObject)
     {
@@ -237,7 +225,6 @@ u64 asset_manager::LoadBitmapFont(const char *Image, const char *Json)
     Metrics->UnderlineY = (f32)JsonGetNumber(MetricsObject, "underlineY");
     Metrics->Thickness  = (f32)JsonGetNumber(MetricsObject, "underlineThickness");
 
-    // Glyphs
     Font->GlyphCount = 0;
     std::memset(Font->GlyphLookupTable, InvalidGlyph, sizeof(Font->GlyphLookupTable));
 
@@ -247,7 +234,6 @@ u64 asset_manager::LoadBitmapFont(const char *Image, const char *Json)
         Log(Warning, "asset_manager::LoadBitmapFont(%s, %s) - Missing \"glyphs\" array", Image, Json);
     }
 
-    // Loop over all the glyphs, extract the data.
     for(json_array_element_s *Element = GlyphsArray ? GlyphsArray->start : NULL; Element; Element = Element->next)
     {
         json_object_s *GlyphObject = json_value_as_object(Element->value);

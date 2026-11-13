@@ -39,12 +39,6 @@ void Log(log_category Category, const char *Fmt, ...)
         }
     }
 
-    //
-    //     1- Write ColorString + Time + CategoryString to buffer
-    //     2- Write The Actual string
-    //     3- Write the reset terminal color code
-    //
-
     // NOTE: snprintf/vsnprintf return the length the string would have had, not what was written,
     // so CharCount has to be clamped, otherwise a long message moves the write pointer past the buffer
     char Buffer[4096];

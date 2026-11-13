@@ -12,7 +12,7 @@ void audio_system::Init()
 {
     Log(Info, "AudioSystem::Init()");
 
-    { // Print Audio Devices to Log
+    {
         i32 AudioDeviceCount = 0;
         SDL_AudioDeviceID *Devices = SDL_GetAudioPlaybackDevices(&AudioDeviceCount);
         Log(Info, "AudioSystem::Init - Printing available audio devices");
@@ -23,7 +23,6 @@ void audio_system::Init()
     }
 
 
-    // Create all the channels on the default device
     for(int i = 0; i < Channel_Count; ++i)
     {
         Channels[i] = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
@@ -59,7 +58,6 @@ void audio_system::Play(u64 Handle)
     if(Sound == nullptr)
         return;
 
-    // Find a free stream
     i32 Index = -1;
     for(i32 i = 0; i < MaxConcurrentStreams; ++i)
     {
@@ -95,7 +93,6 @@ void audio_system::Play(u64 Handle)
 
     if(Sound->Repeats)
     {
-        // Set the callback
         SDL_SetAudioStreamGetCallback(Sound->Streams[Index], audio_system::AudioStreamGetCallback, Sound);
     }
 }
@@ -145,12 +142,10 @@ void audio_system::SetRepeat(u64 Handle, b32 ShouldRepeat)
             {
                 if(ShouldRepeat)
                 {
-                    // Assign the callback that copies the audio again once it finishes
                     SDL_SetAudioStreamGetCallback(Sound->Streams[i], AudioStreamGetCallback, Sound);
                 }
                 else
                 {
-                    // Turn off the callback
                     SDL_SetAudioStreamGetCallback(Sound->Streams[i], NULL, Sound);
                 }
             }

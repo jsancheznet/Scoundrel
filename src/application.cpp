@@ -32,7 +32,6 @@ void application::Init()
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-    // MSAA OFF
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 
@@ -50,7 +49,6 @@ void application::CreateWindow(const char *Title, u32 Width, u32 Height)
 
     Log(Info, "application::CreateWindow() - Created Window, Width: %d, Height: %d", Width, Height);
 
-    // Disable Vsync
     i32 Interval = 1;
     bool VSyncConfigured = SDL_GL_SetSwapInterval(Interval);
     if(!VSyncConfigured)
@@ -151,10 +149,6 @@ void application::BeginFrame()
     FrameBeginTime = SDL_GetPerformanceCounter();
 
     ProcessEvents();
-
-    // char TitleBuffer[1024];
-    // snprintf(TitleBuffer, sizeof(TitleBuffer), "Scoundrel - FPS: %d", (u32)(1.0f / DeltaTime));
-    // SDL_SetWindowTitle(Window, (const char*)&TitleBuffer);
 }
 
 void application::EndFrame()
@@ -162,7 +156,7 @@ void application::EndFrame()
     FrameEndTime = SDL_GetPerformanceCounter();
     DeltaTime = ((f64)FrameEndTime - (f64)FrameBeginTime) / (f64)SDL_GetPerformanceFrequency();
 
-    { // Draw FPS in window title
+    {
         char Buff[200];
         snprintf(Buff, sizeof(Buff), "Scoundrel - %.0fps", 1.0f / DeltaTime);
         const char *Ptr = &Buff[0];
