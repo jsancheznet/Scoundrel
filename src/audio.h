@@ -33,14 +33,12 @@ struct audio_system
 {
     void Init();
 
-    // Channel Functions
     void PlayChannel(audio_channel Channel);
     void PauseChannel(audio_channel Channel);
     void SetChannelVolume(audio_channel Channel, f32 Volume);
     void PauseAllChannels();
     void ResumeAllChannels();
 
-    // Sound Functions
     void Play(u64 Handle);
     void Pause(u64 Handle);
     void Resume(u64 Handle);

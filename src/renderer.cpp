@@ -109,7 +109,6 @@ u64 renderer::CompileShader(const char *Filename)
 {
     Assert(Filename);
 
-    // Check if the file exists
     b32 FileExists = SDL_GetPathInfo(Filename, NULL);
     if(!FileExists)
     {
@@ -373,7 +372,6 @@ void renderer::ConfigureRenderer()
         exit(1);
     }
 
-    // List extensions
     if (0)
     {
         i32 ExtensionCount = 0;
@@ -386,7 +384,6 @@ void renderer::ConfigureRenderer()
         printf("\n");
     }
 
-    // Log OpenGL info
     i32 MaxUniformBufferBindings = -1;
     glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &MaxUniformBufferBindings);
     Log(Info, "OpenGL Max Uniform Buffer Bindings: %d", MaxUniformBufferBindings);
@@ -409,7 +406,6 @@ void renderer::ConfigureRenderer()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    // Set Clear Color
     ClearColor = ORANGE;
 }
 
@@ -443,18 +439,14 @@ void renderer::CreateSpriteMesh()
 
     Sprites.reserve(MAX_SPRITE_COUNT);
 
-    { // Bind the QuadVBO as vertex data
-
-        // Bind the QuadVBO to binding point 0
+    {
         u32 BindingPoint = 0;
-        glVertexArrayVertexBuffer(SpritesVAO, BindingPoint, QuadVBO, 0, sizeof(f32) * 5); // 5 floats
+        glVertexArrayVertexBuffer(SpritesVAO, BindingPoint, QuadVBO, 0, sizeof(f32) * 5);
 
-        // Vertex Attribute - Configure Vertex Attribute 0 (Position) from the interleaved buffer data
         glEnableVertexArrayAttrib(SpritesVAO, 0);
         glVertexArrayAttribFormat(SpritesVAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
         glVertexArrayAttribBinding(SpritesVAO, 0, 0);
 
-        // UV Attribute - Configure Vertex Attribute 1 (UV) from the interleaved buffer data
         glEnableVertexArrayAttrib(SpritesVAO, 1);
         glVertexArrayAttribFormat(SpritesVAO, 1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 3);
         glVertexArrayAttribBinding(SpritesVAO, 1, 0);
@@ -468,32 +460,26 @@ void renderer::CreateSpriteMesh()
     u32 BindingPoint = 3;
     glVertexArrayVertexBuffer(SpritesVAO, BindingPoint, SpritesVBO, 0, sizeof(sprite_instance));
 
-    // Position
     glEnableVertexArrayAttrib(SpritesVAO, 2);
     glVertexArrayAttribFormat(SpritesVAO, 2, 3, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Position));
     glVertexArrayAttribBinding(SpritesVAO, 2, BindingPoint);
 
-    // Scale
     glEnableVertexArrayAttrib(SpritesVAO, 3);
     glVertexArrayAttribFormat(SpritesVAO, 3, 2, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Scale));
     glVertexArrayAttribBinding(SpritesVAO, 3, BindingPoint);
 
-    // Rotation
     glEnableVertexArrayAttrib(SpritesVAO, 4);
     glVertexArrayAttribFormat(SpritesVAO, 4, 1, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Rotation));
     glVertexArrayAttribBinding(SpritesVAO, 4, BindingPoint);
 
-    // Texture Handle
     glEnableVertexArrayAttrib(SpritesVAO, 5);
     glVertexArrayAttribIFormat(SpritesVAO, 5, 2, GL_UNSIGNED_INT, offsetof(sprite_instance, TextureHandle));
     glVertexArrayAttribBinding(SpritesVAO, 5, BindingPoint);
 
-    // Src Rect
     glEnableVertexArrayAttrib(SpritesVAO, 6);
     glVertexArrayAttribFormat(SpritesVAO, 6, 4, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, SrcRect));
     glVertexArrayAttribBinding(SpritesVAO, 6, BindingPoint);
 
-    // Tint
     glEnableVertexArrayAttrib(SpritesVAO, 7);
     glVertexArrayAttribFormat(SpritesVAO, 7, 4, GL_FLOAT, GL_FALSE, offsetof(sprite_instance, Tint));
     glVertexArrayAttribBinding(SpritesVAO, 7, BindingPoint);
@@ -507,7 +493,6 @@ void renderer::CreateTextMesh()
 
     Glyphs.reserve(MAX_GLYPH_COUNT);
 
-    // VBO Creation
     glCreateBuffers(1, &TextVBO);
     u32 BufferSize = sizeof(character_glyph) * MAX_GLYPH_COUNT;
     glNamedBufferStorage(TextVBO, BufferSize, NULL, GL_DYNAMIC_STORAGE_BIT);
@@ -515,49 +500,39 @@ void renderer::CreateTextMesh()
 
     glVertexArrayVertexBuffer(TextVAO, 1, TextVBO, 0, sizeof(character_glyph));
 
-    { // Bind the QuadVBO as vertex data
-
-        // Bind the recently created VBO to binding point 0
+    {
         u32 BindingPoint = 0;
-        glVertexArrayVertexBuffer(TextVAO, BindingPoint, QuadVBO, 0, sizeof(f32) * 5); // 5 floats
+        glVertexArrayVertexBuffer(TextVAO, BindingPoint, QuadVBO, 0, sizeof(f32) * 5);
 
-        // Vertex Attribute - Configure Vertex Attribute 0 (Position) from the interleaved buffer data
         glEnableVertexArrayAttrib(TextVAO, 0);
         glVertexArrayAttribFormat(TextVAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
         glVertexArrayAttribBinding(TextVAO, 0, 0);
 
-        // UV Attribute - Configure Vertex Attribute 1 (UV) from the interleaved buffer data
         glEnableVertexArrayAttrib(TextVAO, 1);
         glVertexArrayAttribFormat(TextVAO, 1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 3);
         glVertexArrayAttribBinding(TextVAO, 1, 0);
     }
 
-    // Screen Position
     glEnableVertexArrayAttrib(TextVAO, 2);
     glVertexArrayAttribFormat(TextVAO, 2, 3, GL_FLOAT, GL_FALSE, offsetof(character_glyph, Position));
     glVertexArrayAttribBinding(TextVAO, 2, 1);
 
-    // Rect
     glEnableVertexArrayAttrib(TextVAO, 3);
     glVertexArrayAttribFormat(TextVAO, 3, 4, GL_FLOAT, GL_FALSE, offsetof(character_glyph, Rect));
     glVertexArrayAttribBinding(TextVAO, 3, 1);
 
-    // Size
     glEnableVertexArrayAttrib(TextVAO, 4);
     glVertexArrayAttribFormat(TextVAO, 4, 2, GL_FLOAT, GL_FALSE, offsetof(character_glyph, Size));
     glVertexArrayAttribBinding(TextVAO, 4, 1);
 
-    // Color
     glEnableVertexArrayAttrib(TextVAO, 5);
     glVertexArrayAttribFormat(TextVAO, 5, 4, GL_FLOAT, GL_FALSE, offsetof(character_glyph, Color));
     glVertexArrayAttribBinding(TextVAO, 5, 1);
 
-    // Texture Handle
     glEnableVertexArrayAttrib(TextVAO, 6);
     glVertexArrayAttribIFormat(TextVAO, 6, 2, GL_UNSIGNED_INT, offsetof(character_glyph, TextureHandle));
     glVertexArrayAttribBinding(TextVAO, 6, 1);
 
-    // World Space
     glEnableVertexArrayAttrib(TextVAO, 7);
     glVertexArrayAttribIFormat(TextVAO, 7, 1, GL_INT, offsetof(character_glyph, WorldSpace));
     glVertexArrayAttribBinding(TextVAO, 7, 1);
@@ -567,35 +542,28 @@ void renderer::CreateTextMesh()
 
 void renderer::CreateCardMesh()
 {
-    // Create Buffers
     glCreateVertexArrays(1, &CardVAO);
     glCreateBuffers(1, &CardVBO);
     glCreateBuffers(1, &CardEBO);
 
-    // Upload Vertex Data, format -> f32 Pos[3], f32 Normal[3], f32 Uv[2]
     // The mesh never changes, so the buffers are immutable (no storage flags)
     glNamedBufferStorage(CardVBO, sizeof(kCardVertices), kCardVertices, 0);
 
-    // Upload Index Data
     glNamedBufferStorage(CardEBO, sizeof(kCardIndices), kCardIndices, 0);
 
-    // Vertex Buffer Binding
     glVertexArrayVertexBuffer(CardVAO, 0, CardVBO, 0, sizeof(card_vertex));
 
-    // Index Buffer - the VAO remembers it, so binding the VAO is enough to draw
+    // The VAO remembers the index buffer, so binding the VAO is enough to draw
     glVertexArrayElementBuffer(CardVAO, CardEBO);
 
-    // Position Attribute - Location 0
     glEnableVertexArrayAttrib(CardVAO, 0);
     glVertexArrayAttribFormat(CardVAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(card_vertex, Pos));
     glVertexArrayAttribBinding(CardVAO, 0, 0);
 
-    // Normal Attribute - Location 1
     glEnableVertexArrayAttrib(CardVAO, 1);
     glVertexArrayAttribFormat(CardVAO, 1, 3, GL_FLOAT, GL_FALSE, offsetof(card_vertex, Normal));
     glVertexArrayAttribBinding(CardVAO, 1, 0);
 
-    // Uv Attribute - Location 2
     glEnableVertexArrayAttrib(CardVAO, 2);
     glVertexArrayAttribFormat(CardVAO, 2, 2, GL_FLOAT, GL_FALSE, offsetof(card_vertex, Uv));
     glVertexArrayAttribBinding(CardVAO, 2, 0);
@@ -614,7 +582,6 @@ void renderer::CreateCardMesh()
         glVertexArrayVertexBuffer(CardVAO, BindingPoint, CardInstanceVBO, 0, sizeof(card_instance));
         glVertexArrayBindingDivisor(CardVAO, BindingPoint, 1);
 
-        // Model Matrix - Locations 3, 4, 5, 6
         // NOTE: An attribute holds at most 4 floats, so a mat4 takes 4 locations, one per column
         for(u32 Column = 0; Column < 4; ++Column)
         {
@@ -624,12 +591,10 @@ void renderer::CreateCardMesh()
             glVertexArrayAttribBinding(CardVAO, Location, BindingPoint);
         }
 
-        // Front Texture Handle - Location 7
         glEnableVertexArrayAttrib(CardVAO, 7);
         glVertexArrayAttribIFormat(CardVAO, 7, 2, GL_UNSIGNED_INT, offsetof(card_instance, FrontTexture));
         glVertexArrayAttribBinding(CardVAO, 7, BindingPoint);
 
-        // Back Texture Handle - Location 8
         glEnableVertexArrayAttrib(CardVAO, 8);
         glVertexArrayAttribIFormat(CardVAO, 8, 2, GL_UNSIGNED_INT, offsetof(card_instance, BackTexture));
         glVertexArrayAttribBinding(CardVAO, 8, BindingPoint);
@@ -643,8 +608,6 @@ void renderer::UseShader(u32 Shader)
 
 void renderer::UpdateCameraBuffer(camera *Camera)
 {
-    // Uploads the camera matrices to the CameraMatrices UBO, the matrices are computed by UpdateCamera() in camera.cpp
-
     glNamedBufferSubData(CameraUBO, 0                    , sizeof(glm::mat4), glm::value_ptr(Camera->Perspective));
     glNamedBufferSubData(CameraUBO, sizeof(glm::mat4) * 1, sizeof(glm::mat4), glm::value_ptr(Camera->Orthographic));
     glNamedBufferSubData(CameraUBO, sizeof(glm::mat4) * 2, sizeof(glm::mat4), glm::value_ptr(Camera->View));

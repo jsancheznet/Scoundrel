@@ -62,8 +62,6 @@ void main()
 {
     vec4 TextureColor = texture(sampler2D(fsTextureHandle), Uv);
     FragColor = mix(TextureColor, TintColor, TintColor.a);
-    // FragColor = (fsTextureHandle == uvec2(0u)) ? vec4(1,0,0,1)   // RED  = handle is zero
-    //                                            : vec4(0,1,0,1);  // GREEN = handle arrived
 }
 
 #endif

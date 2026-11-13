@@ -40,12 +40,10 @@ struct asset_manager
 
     void Init();
 
-    // Asset Loading
     u64 LoadSound(const char *Filepath, audio_channel Channel);
     u64 LoadTexture(const char *Filepath);
     u64 LoadBitmapFont(const char *Image, const char *Json);
 
-    // Asset Unloading
     b32 Unload(u64 Handle);
 
     // Return nullptr for invalid, stale or wrong type handles

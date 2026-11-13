@@ -61,9 +61,6 @@ void main()
     float Smoothing = fwidth(Distance); // Keeps the edge ~1px wide at any size
     float Alpha = smoothstep(0.5 - Smoothing, 0.5 + Smoothing, Distance);
     FragmentColor = vec4(fsColor.rgb, fsColor.a * Alpha);
-
-    // Debug: show the raw SDF cell
-    // FragmentColor = vec4(vec3(Distance), 1.0);
 }
 
 #endif

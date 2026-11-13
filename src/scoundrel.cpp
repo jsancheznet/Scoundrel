@@ -178,7 +178,7 @@ void game::LoadDungeon()
     const char *SuitNames[Suit_Count] = {"Clubs", "Spades", "Diamonds", "Hearts"};
     const char *RankNames[] = {"", "", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"}; // Indexed by Value
 
-    Dungeon.reserve(44);
+    Dungeon.reserve(DeckSize);
 
     for(i32 Suit = 0; Suit < Suit_Count; ++Suit)
     {
@@ -204,7 +204,7 @@ void game::LoadDungeon()
     }
 
     Log(Info, "LoadDungeon() - Loaded %zu cards", Dungeon.size());
-    Assert(Dungeon.size() == 44);
+    Assert(Dungeon.size() == DeckSize);
 }
 
 void game::NewGame()
@@ -370,7 +370,11 @@ void game::FightMonster(card Monster, b32 Barehanded)
         SlainMonsters.push_back(Monster);
 
         Audio->Play(SlashSound);
-        if(Damage > 0) Audio->Play(DamageSound);
+        if(Damage > 0)
+        {
+            Audio->Play(DamageSound);
+            Camera.Shake(DamageShakeStrength, DamageShakeDuration);
+        }
 
         Log(Info, "game::FightMonster() - Slew a %d with a %d weapon, took %d damage, Health: %d", Monster.Value, Weapon[0].Value, Damage, PlayerHealth);
     }
@@ -381,6 +385,7 @@ void game::FightMonster(card Monster, b32 Barehanded)
 
         Audio->Play(PunchSound);
         Audio->Play(DamageSound);
+        Camera.Shake(DamageShakeStrength, DamageShakeDuration);
 
         Log(Info, "game::FightMonster() - Fought a %d barehanded, Health: %d", Monster.Value, PlayerHealth);
     }
@@ -456,7 +461,7 @@ void game::DrawLabels()
     f32 Time = (f32)SDL_GetTicks() / 1000.0f;
     f32 Wave = glm::sin(Time * LabelFloatSpeed); // -1 at the lowest point, +1 at the highest
 
-    glm::vec3 AboveCard = glm::vec3(0.0f, CardSize.y * 0.5f + LabelGapAboveCard, 0.0f);
+    glm::vec3 AboveCard = glm::vec3(0.0f, CardSize.y * 0.5f + LabelGapAboveCard, LabelHeight);
     glm::vec3 RoomCenter = glm::vec3((RoomCardPosition1.x + RoomCardPosition4.x) * 0.5f, RoomCardPosition1.y, RoomCardPosition1.z);
 
     char Text[64];
