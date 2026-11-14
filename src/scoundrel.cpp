@@ -133,6 +133,14 @@ void game::ProcessInput()
         return;
     }
 
+    // A new attack before the hit would cancel the hit and its sounds. A new attack during the return
+    // would start in the air, and the weapon returns to where its attack started
+    b32 WeaponIsAttacking = !Weapon.empty() && Weapon[0].Animation.IsActive && Weapon[0].Animation.Type == Animation_Attack;
+    if(WeaponIsAttacking)
+    {
+        return;
+    }
+
     glm::vec3 RayDirection = ScreenToWorldRay(Mouse, Renderer, &Camera);
     // A card can only be clicked once it is at its final position
     card *ClickedCard = PickCard(Camera.Position, RayDirection);
@@ -229,6 +237,7 @@ void game::NewGame()
     AvoidedLastRoom = false;
     LastCardWasPotion = false;
     LastPotionValue = 0;
+    WeaponHitDamaged = false;
 }
 
 void game::StackDungeon()
@@ -237,7 +246,7 @@ void game::StackDungeon()
     {
         Dungeon[i].Pile = Pile_Dungeon;
         Dungeon[i].Axis = glm::vec3(0.0f, 1.0f, 0.0f);
-        Dungeon[i].Animation.Animate(Dungeon[i].Position, Dungeon[i].Angle, DungeonPosition + glm::vec3(0.0f, 0.0f, CardThickness * (f32)i), glm::pi<f32>());
+        Dungeon[i].Animation.Move(Dungeon[i].Position, Dungeon[i].Angle, DungeonPosition + glm::vec3(0.0f, 0.0f, CardThickness * (f32)i), glm::pi<f32>());
     }
 }
 
@@ -253,7 +262,7 @@ void game::DealRoom()
     {
         // The new cards leave the Dungeon one by one, a card kept from the last Room moves at once
         f32 Delay = (i >= KeptCount) ? CardDealDelay * (f32)(i - KeptCount) : 0.0f;
-        Room[i].Animation.Animate(Room[i].Position, Room[i].Angle, RoomPositions[i], 0.0f, Delay);
+        Room[i].Animation.Move(Room[i].Position, Room[i].Angle, RoomPositions[i], 0.0f, Delay);
     }
 
     CardsFacedThisRoom = 0;
@@ -312,13 +321,19 @@ void game::FaceRoomCard(u32 Index, b32 Barehanded)
 // Weapons are binding: the previous weapon and the monsters it slew go to the discard pile
 void game::EquipWeapon(card NewWeapon)
 {
-    for(card &Card : Weapon) Discard(Card);
-    for(card &Card : SlainMonsters) Discard(Card);
+    for(card &Card : Weapon)
+    {
+        Discard(Card);
+    }
+    for(card &Card : SlainMonsters)
+    {
+        Discard(Card);
+    }
     Weapon.clear();
     SlainMonsters.clear();
 
     NewWeapon.Pile = Pile_EquippedWeapon;
-    NewWeapon.Animation.Animate(NewWeapon.Position, NewWeapon.Angle, WeaponPosition, 0.0f);
+    NewWeapon.Animation.Move(NewWeapon.Position, NewWeapon.Angle, WeaponPosition, 0.0f);
     Weapon.push_back(NewWeapon);
 
     Log(Info, "game::EquipWeapon() - Equipped a %d weapon", NewWeapon.Value);
@@ -338,7 +353,10 @@ void game::DrinkPotion(card Potion)
         LastPotionValue = Potion.Value;
 
         // No sound at full health, the potion healed nothing
-        if(PlayerHealth > HealthBefore) Audio->Play(HealthPotionSound);
+        if(PlayerHealth > HealthBefore)
+        {
+            Audio->Play(HealthPotionSound);
+        }
 
         Log(Info, "game::DrinkPotion() - Healed %d, Health: %d", Potion.Value, PlayerHealth);
     }
@@ -366,15 +384,13 @@ void game::FightMonster(card Monster, b32 Barehanded)
         f32 Count = (f32)(SlainMonsters.size() + 1);
         Monster.Pile = Pile_SlainMonsters;
         glm::vec3 StackPosition = WeaponPosition + glm::vec3(SlainMonsterStagger * Count, 0.0f, CardThickness * Count);
-        Monster.Animation.Animate(Monster.Position, Monster.Angle, StackPosition, 0.0f);
-        SlainMonsters.push_back(Monster);
+        // The monster waits in the Room for the hit. The sounds and the camera shake also wait, see OnWeaponHit()
+        glm::vec3 HitPosition = Monster.Position + glm::vec3(0.0f, 0.0f, CardThickness);
+        Weapon[0].Animation.Attack(Weapon[0].Position, HitPosition, WeaponHitDuration, WeaponReturnDuration, OnWeaponHit, this);
+        WeaponHitDamaged = Damage > 0;
 
-        Audio->Play(SlashSound);
-        if(Damage > 0)
-        {
-            Audio->Play(DamageSound);
-            Camera.Shake(DamageShakeStrength, DamageShakeDuration);
-        }
+        Monster.Animation.Move(Monster.Position, Monster.Angle, StackPosition, 0.0f, WeaponHitDuration);
+        SlainMonsters.push_back(Monster);
 
         Log(Info, "game::FightMonster() - Slew a %d with a %d weapon, took %d damage, Health: %d", Monster.Value, Weapon[0].Value, Damage, PlayerHealth);
     }
@@ -391,6 +407,18 @@ void game::FightMonster(card Monster, b32 Barehanded)
     }
 }
 
+void game::OnWeaponHit(void *UserData)
+{
+    game *Game = (game *)UserData;
+
+    Game->Audio->Play(Game->SlashSound);
+    if(Game->WeaponHitDamaged)
+    {
+        Game->Audio->Play(Game->DamageSound);
+    }
+    Game->Camera.Shake(DamageShakeStrength, DamageShakeDuration);
+}
+
 void game::CheckEndOfTurn()
 {
     if(PlayerHealth <= 0)
@@ -402,7 +430,10 @@ void game::CheckEndOfTurn()
         {
             for(card &Card : *Pile)
             {
-                if(Card.Type == Card_Monster) Score -= Card.Value;
+                if(Card.Type == Card_Monster)
+                {
+                    Score -= Card.Value;
+                }
             }
         }
 
@@ -500,7 +531,10 @@ void game::DrawFloatingLabel(glm::vec3 Center, const char *Text, f32 Wave)
 void game::DrawHealth()
 {
     bitmap_font *Font = AssetMgr->GetFont(MarcellusFont);
-    if(!Font) return;
+    if(!Font)
+    {
+        return;
+    }
 
     f32 Height = 1.7f; // Centimeters
 
@@ -549,7 +583,10 @@ void game::UpdateActionHint()
 void game::DrawActionHint()
 {
     bitmap_font *Font = AssetMgr->GetFont(MarcellusFont);
-    if(!Font) return;
+    if(!Font)
+    {
+        return;
+    }
 
     f32 Scale = ScreenTextScale();
     f32 Size = 28.0f * Scale;
@@ -558,7 +595,10 @@ void game::DrawActionHint()
     // The size follows the window height only, a long hint in a narrow window would go out of the screen
     f32 WidthAtSizeOne = TextWidth(Font, 1.0f, ActionHint);
     f32 MaxWidth = (f32)Renderer->ViewportWidth - Margin * 2.0f;
-    if(WidthAtSizeOne * Size > MaxWidth) Size = MaxWidth / WidthAtSizeOne;
+    if(WidthAtSizeOne * Size > MaxWidth)
+    {
+        Size = MaxWidth / WidthAtSizeOne;
+    }
 
     f32 X = ((f32)Renderer->ViewportWidth - WidthAtSizeOne * Size) * 0.5f;
     f32 Y = Margin; // DrawText's Y is the top of the line
@@ -582,6 +622,6 @@ void game::Discard(card Card)
     Card.Pile = Pile_DiscardPile;
     Card.Axis = glm::vec3(0.0f, 1.0f, 0.0f);
     glm::vec3 TopOfPile = DiscardPosition + glm::vec3(0.0f, 0.0f, CardThickness * (f32)DiscardPile.size());
-    Card.Animation.Animate(Card.Position, Card.Angle, TopOfPile, glm::pi<f32>());
+    Card.Animation.Move(Card.Position, Card.Angle, TopOfPile, glm::pi<f32>());
     DiscardPile.push_back(Card);
 }

@@ -237,7 +237,10 @@ u64 asset_manager::LoadBitmapFont(const char *Image, const char *Json)
     for(json_array_element_s *Element = GlyphsArray ? GlyphsArray->start : NULL; Element; Element = Element->next)
     {
         json_object_s *GlyphObject = json_value_as_object(Element->value);
-        if(!GlyphObject) continue;
+        if(!GlyphObject)
+        {
+            continue;
+        }
 
         i32 UnicodeId = (i32)JsonGetNumber(GlyphObject, "unicode", -1);
         if(UnicodeId < 0 || UnicodeId >= MaxCodepoint)
@@ -284,7 +287,10 @@ b32 asset_manager::Unload(u64 Handle)
     {
         case Asset_Sound:
         {
-            if(Index >= MaxSoundCount || !IsValid(Handle, Asset_Sound, &Sounds[Index].Header)) break;
+            if(Index >= MaxSoundCount || !IsValid(Handle, Asset_Sound, &Sounds[Index].Header))
+            {
+                break;
+            }
 
             sound *Sound = &Sounds[Index].Sound;
             Sound->AudioSpec = {};
@@ -302,7 +308,10 @@ b32 asset_manager::Unload(u64 Handle)
         } break;
         case Asset_Texture:
         {
-            if(Index >= MaxTextureCount || !IsValid(Handle, Asset_Texture, &Textures[Index].Header)) break;
+            if(Index >= MaxTextureCount || !IsValid(Handle, Asset_Texture, &Textures[Index].Header))
+            {
+                break;
+            }
 
             ReleaseTexture(&Textures[Index].Texture);
 
@@ -310,7 +319,10 @@ b32 asset_manager::Unload(u64 Handle)
         } break;
         case Asset_BitmapFont:
         {
-            if(Index >= MaxFontCount || !IsValid(Handle, Asset_BitmapFont, &Fonts[Index].Header)) break;
+            if(Index >= MaxFontCount || !IsValid(Handle, Asset_BitmapFont, &Fonts[Index].Header))
+            {
+                break;
+            }
 
             ReleaseTexture(&Fonts[Index].Font.Texture);
             std::memset(&Fonts[Index].Font, 0, sizeof(bitmap_font));

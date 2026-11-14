@@ -97,10 +97,16 @@ vec3 ScreenToWorldRay(mouse *Mouse, renderer *Renderer, camera *Camera)
 b32 RayPlaneIntersection(vec3 RayOrigin, vec3 RayDirection, vec3 PlanePoint, vec3 PlaneNormal, vec3 *Hit)
 {
     f32 Denominator = glm::dot(PlaneNormal, RayDirection);
-    if(glm::abs(Denominator) < 0.0001f) return false;
+    if(glm::abs(Denominator) < 0.0001f)
+    {
+        return false;
+    }
 
     f32 T = glm::dot(PlanePoint - RayOrigin, PlaneNormal) / Denominator;
-    if(T < 0.0f) return false;
+    if(T < 0.0f)
+    {
+        return false;
+    }
 
     *Hit = RayOrigin + T * RayDirection;
     return true;

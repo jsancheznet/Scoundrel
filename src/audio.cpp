@@ -56,7 +56,9 @@ void audio_system::Play(u64 Handle)
 {
     sound *Sound = AssetMgr.GetSound(Handle);
     if(Sound == nullptr)
+    {
         return;
+    }
 
     i32 Index = -1;
     for(i32 i = 0; i < MaxConcurrentStreams; ++i)
@@ -101,7 +103,9 @@ void audio_system::Pause(u64 Handle)
 {
     sound *Sound = AssetMgr.GetSound(Handle);
     if(Sound == nullptr)
+    {
         return;
+    }
 
     Log(Info, "audio_system::Pause() - Pausing all instances of sound");
     SDL_UnbindAudioStreams(Sound->Streams, MaxConcurrentStreams);
@@ -112,7 +116,9 @@ void audio_system::Resume(u64 Handle)
 {
     sound *Sound = AssetMgr.GetSound(Handle);
     if(Sound == nullptr)
+    {
         return;
+    }
 
     Log(Info, "audio_system::Resume() - Resuming all instances of sound");
 
@@ -129,7 +135,9 @@ void audio_system::SetRepeat(u64 Handle, b32 ShouldRepeat)
 {
     sound *Sound = AssetMgr.GetSound(Handle);
     if(Sound == nullptr)
+    {
         return;
+    }
 
     if(ShouldRepeat != Sound->Repeats)
     {
