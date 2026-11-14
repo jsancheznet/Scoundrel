@@ -205,8 +205,14 @@ void renderer::DestroyTexture(u32 *ID, u64 *Handle)
     Assert(ID && Handle);
 
     // A resident bindless handle has to be made non resident before deleting its texture
-    if(*Handle) glMakeTextureHandleNonResidentARB(*Handle);
-    if(*ID) glDeleteTextures(1, ID);
+    if(*Handle)
+    {
+        glMakeTextureHandleNonResidentARB(*Handle);
+    }
+    if(*ID)
+    {
+        glDeleteTextures(1, ID);
+    }
 
     *ID = 0;
     *Handle = 0;
@@ -289,7 +295,10 @@ void renderer::DrawText(u64 Font, f32 X, f32 Y, f32 Size, const char *Text, colo
         return;
     }
 
-    if(!Text) return;
+    if(!Text)
+    {
+        return;
+    }
 
     f32 PenX     = X;
     f32 Baseline = Y + BitmapFont->Metrics.Ascender * Size; // Y is the top of the line
@@ -309,7 +318,11 @@ void renderer::DrawText(u64 Font, f32 X, f32 Y, f32 Size, const char *Text, colo
         if(Glyph == nullptr)
         {
             // Fonts generated without a space glyph still need the gap between words
-            if(*C == ' ') { PenX += 0.25f * Size; continue; }
+            if(*C == ' ')
+            {
+                PenX += 0.25f * Size;
+                continue;
+            }
 
             Log(Warning, "renderer::DrawText() - Character '%c' is not in the font", *C);
             continue;
@@ -704,7 +717,9 @@ void renderer::DebugCallback(GLenum Source, GLenum Type, GLuint Id,  GLenum Seve
 
     // 131185: OTHER of NOTIFICATION severity, raised from API: Buffer detailed info: Buffer object 2 (bound to GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING_ARB (3), usage hint is GL_DYNAMIC_DRAW) will use VIDEO memory as the source for buffer object operations
     if(Id == 131185)
+    {
         return;
+    }
 
     printf("[OPENGL DEBUG]: %d: %s of %s severity, raised from %s: %s\n", Id, _Type, _Severity, _Source, Message);
 }

@@ -28,6 +28,9 @@ constexpr f32 CameraHeight = 1.4f; // Centimeters
 constexpr f32 DamageShakeStrength = 0.45f; // Centimeters
 constexpr f32 DamageShakeDuration = 0.25f; // Seconds
 
+constexpr f32 WeaponHitDuration    = 0.3f; // Seconds
+constexpr f32 WeaponReturnDuration = 0.2f; // Seconds
+
 // With the perspective, a label on the table would not line up with a tall pile
 constexpr f32 LabelHeight = CardThickness * (f32)(DeckSize - 1); // Centimeters
 
@@ -66,6 +69,8 @@ struct game
     void DrinkPotion(card Potion);
     void CheckEndOfTurn();
 
+    static void OnWeaponHit(void *UserData);
+
     void DrawHealth();
     void DrawCards();
     void DrawLabels();
@@ -97,6 +102,7 @@ struct game
     b32 AvoidedLastRoom;
     b32 LastCardWasPotion;
     i32 LastPotionValue;
+    b32 WeaponHitDamaged;
 
     glm::vec3 DungeonPosition;
     glm::vec3 DiscardPosition;

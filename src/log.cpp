@@ -52,12 +52,24 @@ void Log(log_category Category, const char *Fmt, ...)
 
     i32 CharCount = snprintf(Buffer, sizeof(Buffer), "%s[%02d:%02d:%02d.%03d] [%s]: ", Color,
                              Time.hour, Time.minute, Time.second, Time.nanosecond / 1000000, CategoryString);
-    if(CharCount < 0) CharCount = 0;
-    if(CharCount > MaxCount) CharCount = MaxCount;
+    if(CharCount < 0)
+    {
+        CharCount = 0;
+    }
+    if(CharCount > MaxCount)
+    {
+        CharCount = MaxCount;
+    }
 
     i32 MessageCount = vsnprintf(Buffer + CharCount, sizeof(Buffer) - CharCount, Fmt, Args);
-    if(MessageCount > 0) CharCount += MessageCount;
-    if(CharCount > MaxCount) CharCount = MaxCount;
+    if(MessageCount > 0)
+    {
+        CharCount += MessageCount;
+    }
+    if(CharCount > MaxCount)
+    {
+        CharCount = MaxCount;
+    }
 
     snprintf(Buffer + CharCount, sizeof(Buffer) - CharCount, "%s", ResetColorCode);
 
@@ -97,7 +109,10 @@ void Log(log_category Category, const char *Fmt, ...)
         Line[LineLength] = Saved; // Put back the start of the reset color code for the console
 
         // NOTE: On Windows SDL_FlushIO waits for the disk (FlushFileBuffers), only pay that for errors
-        if(Category == Error) SDL_FlushIO(File);
+        if(Category == Error)
+        {
+            SDL_FlushIO(File);
+        }
     }
 
     puts(Buffer);

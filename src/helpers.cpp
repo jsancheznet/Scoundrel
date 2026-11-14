@@ -34,7 +34,10 @@ void PrintMat4(const glm::mat4& m)
 
 json_value_s *JsonFind(json_object_s *Object, const char *Key)
 {
-    if(!Object) return NULL;
+    if(!Object)
+    {
+        return NULL;
+    }
 
     for(json_object_element_s *Element = Object->start; Element; Element = Element->next)
     {
