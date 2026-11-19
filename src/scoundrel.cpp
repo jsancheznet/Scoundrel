@@ -4,11 +4,11 @@
 #include "bitmap_font.h"
 #include "camera.h"
 #include "typedefs.h"
+#include "random.h"
 
 #include <SDL3/SDL.h>
 
 #include <algorithm>
-#include <random>
 #include <vector>
 
 void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *KeyboardPtr, mouse *MousePtr, asset_manager *AssetMgrPtr)
@@ -21,9 +21,10 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
     Audio = AudioPtr;
     AssetMgr = AssetMgrPtr;
 
-    // Before NewGame(), which reads DamageFlashHeld
-    DamageFlashTimer = {};
-    DamageFlashHeld = false;
+    // Before NewGame(), which reads BackgroundFlashHeld
+    BackgroundFlashTimer = {};
+    BackgroundFlashColor = DamageFlashColor;
+    BackgroundFlashHeld = false;
 
     // The game opens on the start screen, so the first frame is already dark
     OverlayAmount = 1.0f;
@@ -31,12 +32,19 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
 
     MarcellusFont = AssetMgr->LoadBitmapFont("assets/Fonts/Marcellus_sc.png", "assets/Fonts/Marcellus_sc.json");
     CardBackTexture = AssetMgr->LoadTexture("assets/Textures/Scoundrel-Back.jpg");
+    HeartTexture = AssetMgr->LoadTexture("assets/Textures/Heart.png");
 
     SlashSound        = AssetMgr->LoadSound("assets/Sounds/Slash.wav", Channel_SFX);
     PunchSound        = AssetMgr->LoadSound("assets/Sounds/Punch.wav", Channel_SFX);
     DamageSound       = AssetMgr->LoadSound("assets/Sounds/Damage.wav", Channel_SFX);
     HealthPotionSound = AssetMgr->LoadSound("assets/Sounds/HealthPotion.wav", Channel_SFX);
     ErrorSound        = AssetMgr->LoadSound("assets/Sounds/Error.wav", Channel_SFX);
+    for(u32 i = 0; i < CardPlaceSoundCount; ++i)
+    {
+        char Path[64];
+        snprintf(Path, sizeof(Path), "assets/Sounds/CardPlace%u.wav", i + 1);
+        CardPlaceSounds[i] = AssetMgr->LoadSound(Path, Channel_SFX);
+    }
     Music             = AssetMgr->LoadSound("assets/Sounds/Music.wav", Channel_Music);
 
     // The music starts once here and repeats for the whole session, NewGame() doesn't restart it
@@ -114,7 +122,7 @@ void game::Update(f32 DeltaTime)
         DealRoom();
     }
 
-    UpdateDamageFlash(DeltaTime);
+    UpdateBackgroundFlash(DeltaTime);
     UpdateOverlay(DeltaTime); // After UpdateCards(), it reads CardsAreMoving
 
     // After the input, so the text always matches the state this frame is drawn with
@@ -153,41 +161,56 @@ void game::OnPlayerDamaged()
 {
     Audio->Play(DamageSound);
 
-    DamageFlashTimer.Start(DamageFlashDuration);
+    FlashBackground(DamageFlashColor);
     if(PlayerHealth <= 0)
     {
-        DamageFlashHeld = true;
+        BackgroundFlashHeld = true;
     }
 
     Log(Info, "game::OnPlayerDamaged() - Health: %d", PlayerHealth);
 }
 
-void game::UpdateDamageFlash(f32 DeltaTime)
+void game::OnPlayerHealed()
 {
-    DamageFlashTimer.Update(DeltaTime);
+    Audio->Play(HealthPotionSound);
+    FlashBackground(HealFlashColor);
 
-    f32 Elapsed = DamageFlashTimer.Elapsed;
+    Log(Info, "game::OnPlayerHealed() - Health: %d", PlayerHealth);
+}
+
+// A new flash replaces the one in progress, also when its color is different
+void game::FlashBackground(color Color)
+{
+    BackgroundFlashColor = Color;
+    BackgroundFlashTimer.Start(BackgroundFlashDuration);
+}
+
+void game::UpdateBackgroundFlash(f32 DeltaTime)
+{
+    BackgroundFlashTimer.Update(DeltaTime);
+
+    f32 Elapsed = BackgroundFlashTimer.Elapsed;
     f32 Amount = 0.0f;
-    if(DamageFlashTimer.IsActive())
+    if(BackgroundFlashTimer.IsActive())
     {
-        if(Elapsed < DamageFlashRiseDuration)
+        if(Elapsed < BackgroundFlashRiseDuration)
         {
-            Amount = Elapsed / DamageFlashRiseDuration;
+            Amount = Elapsed / BackgroundFlashRiseDuration;
         }
         else
         {
-            // Smoothstep, so the red goes away softly and does not stop with a visible step
-            Amount = 1.0f - glm::smoothstep(DamageFlashRiseDuration, DamageFlashDuration, Elapsed);
+            // Smoothstep, so the color goes away softly and does not stop with a visible step
+            Amount = 1.0f - glm::smoothstep(BackgroundFlashRiseDuration, BackgroundFlashDuration, Elapsed);
         }
     }
 
     // Also after the timer ends, its Elapsed then stays at the full duration
-    if(DamageFlashHeld && Elapsed >= DamageFlashRiseDuration)
+    if(BackgroundFlashHeld && Elapsed >= BackgroundFlashRiseDuration)
     {
         Amount = 1.0f;
     }
 
-    Renderer->BackgroundTint = {DamageFlashColor.r, DamageFlashColor.g, DamageFlashColor.b, Amount * DamageFlashMaxTint};
+    Renderer->BackgroundTint = {BackgroundFlashColor.r, BackgroundFlashColor.g, BackgroundFlashColor.b, Amount * BackgroundFlashMaxTint};
 }
 
 void game::UpdateCards(f32 DeltaTime)
@@ -206,6 +229,41 @@ void game::UpdateCards(f32 DeltaTime)
             {
                 CardsAreMoving = true;
             }
+        }
+    }
+
+    // The same clamped time as the cards, so a sound and the card move stay together after a long frame
+    UpdateDelayedSounds(DeltaTime);
+}
+
+void game::PlaySoundDelayed(u64 Sound, f32 Delay)
+{
+    if(DelayedSoundCount >= RoomSize)
+    {
+        Log(Warning, "game::PlaySoundDelayed() - The queue is full, the sound plays now");
+        Audio->Play(Sound);
+        return;
+    }
+
+    DelayedSounds[DelayedSoundCount++] = {Sound, Delay};
+}
+
+void game::UpdateDelayedSounds(f32 DeltaTime)
+{
+    u32 i = 0;
+    while(i < DelayedSoundCount)
+    {
+        DelayedSounds[i].TimeLeft -= DeltaTime;
+        if(DelayedSounds[i].TimeLeft <= 0.0f)
+        {
+            Audio->Play(DelayedSounds[i].Sound);
+
+            // The order in the queue does not matter, so the last entry fills the gap and i is checked again
+            DelayedSounds[i] = DelayedSounds[--DelayedSoundCount];
+        }
+        else
+        {
+            ++i;
         }
     }
 }
@@ -249,7 +307,7 @@ void game::ProcessInput()
         return;
     }
 
-    glm::vec3 RayDirection = ScreenToWorldRay(Mouse, Renderer, &Camera);
+    glm::vec3 RayDirection = ScreenToWorldRay(Mouse, &Camera);
     // A card can only be clicked once it is at its final position
     card *ClickedCard = PickCard(Camera.Position, RayDirection);
     if(!ClickedCard || ClickedCard->Animation.IsActive)
@@ -333,16 +391,17 @@ void game::NewGame()
         MoveCards(*Pile, Dungeon, (u32)Pile->size(), Pile_Dungeon);
     }
 
-    std::random_device RandomDevice;
-    std::mt19937 Generator(RandomDevice());
-    std::shuffle(Dungeon.begin(), Dungeon.end(), Generator);
+    // The game random generator, so the seed set in application::Init() also sets the card order
+    Shuffle(Dungeon.data(), (i32)Dungeon.size());
     StackDungeon();
 
-    if(DamageFlashHeld)
+    DelayedSoundCount = 0;
+
+    if(BackgroundFlashHeld)
     {
         // The held red fades out with the usual fall, not with a jump to the usual colors
-        DamageFlashHeld = false;
-        DamageFlashTimer.Start(DamageFlashDuration, DamageFlashRiseDuration);
+        BackgroundFlashHeld = false;
+        BackgroundFlashTimer.Start(BackgroundFlashDuration, BackgroundFlashRiseDuration);
     }
 
     State = Game_WaitingToStart;
@@ -383,11 +442,28 @@ void game::DealRoom()
     u32 Missing = RoomSize - (u32)KeptCount;
     MoveCards(Dungeon, Room, Missing, Pile_Room);
 
+    // A new order for each deal, and no sound two times in one deal. An avoided Room deals again, its old sounds must not play
+    static_assert(CardPlaceSoundCount >= RoomSize, "Each dealt card needs its own card place sound");
+    u64 PlaceSounds[CardPlaceSoundCount];
+    for(u32 i = 0; i < CardPlaceSoundCount; ++i)
+    {
+        PlaceSounds[i] = CardPlaceSounds[i];
+    }
+    Shuffle(PlaceSounds, (i32)CardPlaceSoundCount);
+    DelayedSoundCount = 0;
+
     for(size_t i = 0; i < Room.size(); ++i)
     {
         // The new cards leave the Dungeon one by one, a card kept from the last Room moves at once
-        f32 Delay = (i >= KeptCount) ? CardDealDelay * (f32)(i - KeptCount) : 0.0f;
+        if(i < KeptCount)
+        {
+            Room[i].Animation.Move(Room[i].Position, Room[i].Angle, RoomPositions[i], 0.0f, 0.0f);
+            continue;
+        }
+
+        f32 Delay = CardDealDelay * (f32)(i - KeptCount);
         Room[i].Animation.Move(Room[i].Position, Room[i].Angle, RoomPositions[i], 0.0f, Delay);
+        PlaySoundDelayed(PlaceSounds[i - KeptCount], Delay); // When the card leaves the Dungeon
     }
 
     CardsFacedThisRoom = 0;
@@ -467,20 +543,20 @@ void game::EquipWeapon(card NewWeapon)
 // Heals up to MaxHealth. Only the first potion of each Room heals, the rest are simply discarded
 void game::DrinkPotion(card Potion)
 {
+    // Every potion counts for the win bonus (full health and a potion as the last card), also one that healed nothing
+    LastCardWasPotion = true;
+    LastPotionValue = Potion.Value;
+
     if(!PotionUsedThisRoom)
     {
         i32 HealthBefore = PlayerHealth;
         PlayerHealth = glm::min(PlayerHealth + Potion.Value, MaxHealth);
         PotionUsedThisRoom = true;
 
-        // Only a potion that healed counts for the full health win bonus
-        LastCardWasPotion = true;
-        LastPotionValue = Potion.Value;
-
-        // No sound at full health, the potion healed nothing
+        // No sound and no flash at full health, the potion healed nothing
         if(PlayerHealth > HealthBefore)
         {
-            Audio->Play(HealthPotionSound);
+            OnPlayerHealed();
         }
 
         Log(Info, "game::DrinkPotion() - Healed %d, Health: %d", Potion.Value, PlayerHealth);
@@ -661,17 +737,21 @@ void game::DrawHealth()
         return;
     }
 
-    f32 Height = 1.7f; // Centimeters
-
-    char Text[128];
-    snprintf(Text, sizeof(Text), "Health: %d", PlayerHealth);
+    char Text[16];
+    snprintf(Text, sizeof(Text), "%d", PlayerHealth);
 
     f32 RoomBottom = RoomCardPosition1.y - CardSize.y * 0.5f;
     f32 LowerRowTop = DungeonPosition.y + CardSize.y * 0.5f + LabelGapAboveCard;
     f32 MidY = (RoomBottom + LowerRowTop) * 0.5f;
 
-    glm::vec3 TopLeft = glm::vec3(-TextWidth(Font, Height, Text) * 0.5f, MidY + Height * Font->Metrics.LineHeight * 0.5f, 0.0f);
-    Renderer->DrawText3D(MarcellusFont, TopLeft, Height, Text, RED);
+    // The heart and the number are centered together, so the pair stays centered when the number of digits changes
+    f32 TotalWidth = HealthIconSize + HealthIconGap + TextWidth(Font, HealthTextHeight, Text);
+    f32 Left = -TotalWidth * 0.5f;
+
+    Renderer->DrawTexture(HeartTexture, glm::vec3(Left + HealthIconSize * 0.5f, MidY, 0.0f), glm::vec2(HealthIconSize), 0.0f);
+
+    glm::vec3 TopLeft = glm::vec3(Left + HealthIconSize + HealthIconGap, MidY + HealthTextHeight * Font->Metrics.LineHeight * 0.5f, 0.0f);
+    Renderer->DrawText3D(MarcellusFont, TopLeft, HealthTextHeight, Text, RED);
 }
 
 f32 game::ScreenTextScale()

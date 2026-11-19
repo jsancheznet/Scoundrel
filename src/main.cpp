@@ -35,7 +35,10 @@ i32 main(i32 Argc, char **Argv)
     Keyboard.Init();
     Mouse.Init();
     Audio.Init();
-    Renderer.Init(Application.Window, 1366, 768);
+    i32 PixelWidth = 0;
+    i32 PixelHeight = 0;
+    SDL_GetWindowSizeInPixels(Application.Window, &PixelWidth, &PixelHeight);
+    Renderer.Init(Application.Window, PixelWidth, PixelHeight);
 
     Scoundrel.Init(&Renderer, &Audio, &Keyboard, &Mouse, &AssetMgr);
 

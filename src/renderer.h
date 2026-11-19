@@ -121,7 +121,8 @@ struct renderer
 
     void UpdateCameraBuffer(camera *Camera);
 
-    void UploadTexture(u8 *Data, i32 Width, i32 Height, u32 *ID, u64 *Handle);
+    // A distance field font atlas has no mipmaps, an averaged distance makes the glyph edges wrong
+    void UploadTexture(u8 *Data, i32 Width, i32 Height, u32 *ID, u64 *Handle, b32 UseMipmaps = true);
     void DestroyTexture(u32 *ID, u64 *Handle);
 
     void DrawTexture(u64 AssetHandle, vec3 Position, vec2 Scale, f32 Rotation, rect SrcRect = {0.0f, 0.0f, 1.0f, 1.0f}, glm::vec4 Tint = {1.0f, 1.0f, 1.0f, 0.0f});

@@ -74,13 +74,19 @@ void renderer::DrawScreenOverlay()
 void renderer::DrawSprites()
 {
     UseShader(SpriteShader);
+
+    // Blend for the transparent parts of the images, depth writes off so those parts don't hide what is drawn later
     glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    glEnable(GL_BLEND);
     glBindVertexArray(SpritesVAO);
     if(Sprites.size() != 0)
     {
         glNamedBufferSubData(SpritesVBO, 0, Sprites.size() * sizeof(sprite_instance), &Sprites[0]);
         glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, Sprites.size());
     }
+    glDisable(GL_BLEND);
+    glDepthMask(GL_TRUE);
     Sprites.clear();
 }
 
@@ -154,6 +160,11 @@ u64 renderer::CompileShader(const char *Filename)
 
     size_t Size;
     char *FileString = static_cast<char*>(SDL_LoadFile(Filename, &Size));
+    if(!FileString)
+    {
+        Log(Error, "renderer::CompileShader(%s) - Could not read the file: %s", Filename, SDL_GetError());
+        return 0;
+    }
 
     u32 VertexShader = glCreateShader(GL_VERTEX_SHADER);
     const char *VertexSource[2] = {"#version 460 core\n#define VERTEX_SHADER\n", FileString};
@@ -182,6 +193,7 @@ u64 renderer::CompileShader(const char *Filename)
         char ErrorMessage[1024];
         glGetShaderInfoLog(FragmentShader, 1024, &LogLength, ErrorMessage);
         fprintf(stderr, "%s-%s\n", Filename, ErrorMessage);
+        Log(Error, "renderer::CompileShader(%s) - %s", Filename, ErrorMessage);
         FragmentShader = 0;
     }
 
@@ -198,6 +210,7 @@ u64 renderer::CompileShader(const char *Filename)
         glGetProgramInfoLog(CompiledShader, MaxLogLength, &MaxLogLength, &InfoLog[0]);
         printf("%s: SHADER PROGRAM FAILED TO COMPILE/LINK\n", Filename);
         printf("%s\n", InfoLog);
+        Log(Error, "renderer::CompileShader(%s) - Link failed: %s", Filename, InfoLog);
         glDeleteProgram(CompiledShader);
         CompiledShader = 0;
     }
@@ -209,7 +222,7 @@ u64 renderer::CompileShader(const char *Filename)
     return CompiledShader;
 }
 
-void renderer::UploadTexture(u8 *Data, i32 Width, i32 Height, u32 *ID, u64 *Handle)
+void renderer::UploadTexture(u8 *Data, i32 Width, i32 Height, u32 *ID, u64 *Handle, b32 UseMipmaps)
 {
     Assert(Data && ID && Handle);
     Assert(Width > 0 && Height > 0);
@@ -218,14 +231,19 @@ void renderer::UploadTexture(u8 *Data, i32 Width, i32 Height, u32 *ID, u64 *Hand
 
     glTextureParameteri(*ID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTextureParameteri(*ID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(*ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(*ID, GL_TEXTURE_MIN_FILTER, UseMipmaps ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
     glTextureParameteri(*ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTextureStorage2D(*ID, 1, GL_RGBA8, Width, Height);
+    // The full mip chain, down to 1x1, so a texture drawn smaller than its size does not shimmer
+    i32 MipLevels = UseMipmaps ? 1 + (i32)glm::floor(glm::log2((f32)glm::max(Width, Height))) : 1;
+    glTextureStorage2D(*ID, MipLevels, GL_RGBA8, Width, Height);
 
     glTextureSubImage2D(*ID, 0, 0, 0, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, Data);
 
-    glGenerateTextureMipmap(*ID);
+    if(UseMipmaps)
+    {
+        glGenerateTextureMipmap(*ID);
+    }
 
     *Handle = glGetTextureHandleARB(*ID);
 
@@ -417,18 +435,6 @@ void renderer::ConfigureRenderer()
         Log(Error, "%s", Message);
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Scoundrel", Message, nullptr);
         exit(1);
-    }
-
-    if (0)
-    {
-        i32 ExtensionCount = 0;
-        glGetIntegerv(GL_NUM_EXTENSIONS, &ExtensionCount);
-        for (i32 i = 0; i < ExtensionCount; i++)
-        {
-            const GLubyte *Name = glGetStringi(GL_EXTENSIONS, i);
-            printf("%s ", Name);
-        }
-        printf("\n");
     }
 
     i32 MaxUniformBufferBindings = -1;

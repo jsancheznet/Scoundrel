@@ -40,10 +40,11 @@ constexpr f32 DamageShakeStrength = 0.45f; // Centimeters
 constexpr f32 DamageShakeDuration = 0.25f; // Seconds
 
 constexpr color DamageFlashColor = {0.55f, 0.04f, 0.05f, 1.0f};
-constexpr f32 DamageFlashMaxTint = 0.75f; // 1 = the background is fully the flash color
-constexpr f32 DamageFlashRiseDuration = 0.08f; // Seconds
-constexpr f32 DamageFlashFallDuration = 0.6f;  // Seconds
-constexpr f32 DamageFlashDuration = DamageFlashRiseDuration + DamageFlashFallDuration;
+constexpr color HealFlashColor   = {0.08f, 0.50f, 0.15f, 1.0f};
+constexpr f32 BackgroundFlashMaxTint = 0.75f; // 1 = the background is fully the flash color
+constexpr f32 BackgroundFlashRiseDuration = 0.08f; // Seconds
+constexpr f32 BackgroundFlashFallDuration = 0.6f;  // Seconds
+constexpr f32 BackgroundFlashDuration = BackgroundFlashRiseDuration + BackgroundFlashFallDuration;
 
 constexpr f32 WeaponHitDuration    = 0.3f; // Seconds
 constexpr f32 WeaponReturnDuration = 0.2f; // Seconds
@@ -60,6 +61,18 @@ constexpr f32 LabelShadowFollow   = 0.5f;  // 0 = still, 1 = moves with the labe
 constexpr f32 LabelShadowAlphaLow  = 0.6f;
 constexpr f32 LabelShadowAlphaHigh = 0.45f;
 
+constexpr f32 HealthTextHeight = 1.7f; // Centimeters
+constexpr f32 HealthIconSize   = 2.0f; // Centimeters
+constexpr f32 HealthIconGap    = 0.4f; // Centimeters, between the heart and the number
+
+constexpr u32 CardPlaceSoundCount = 4;
+
+struct delayed_sound
+{
+    u64 Sound;
+    f32 TimeLeft; // Seconds
+};
+
 enum game_state
 {
     Game_WaitingToStart,
@@ -74,7 +87,9 @@ struct game
     void Update(f32 DeltaTime);
     void ProcessInput();
     void UpdateCards(f32 DeltaTime);
-    void UpdateDamageFlash(f32 DeltaTime);
+    void PlaySoundDelayed(u64 Sound, f32 Delay); // Delay in seconds
+    void UpdateDelayedSounds(f32 DeltaTime);
+    void UpdateBackgroundFlash(f32 DeltaTime);
     void UpdateOverlay(f32 DeltaTime);
     b32 OverlayIsWanted();
     void Render();
@@ -90,6 +105,8 @@ struct game
     void DrinkPotion(card Potion);
     void CheckEndOfTurn();
     void OnPlayerDamaged();
+    void OnPlayerHealed();
+    void FlashBackground(color Color);
 
     static void OnWeaponHit(void *UserData);
 
@@ -112,6 +129,11 @@ struct game
     u64 DamageSound;
     u64 HealthPotionSound;
     u64 ErrorSound;
+    u64 CardPlaceSounds[CardPlaceSoundCount];
+
+    // Only the deal uses it, so it holds one sound for each card of a Room
+    delayed_sound DelayedSounds[RoomSize];
+    u32 DelayedSoundCount;
 
     u64 Music;
 
@@ -132,8 +154,9 @@ struct game
     b32 LastCardWasPotion;
     i32 LastPotionValue;
     b32 WeaponHitDamaged;
-    effect_timer DamageFlashTimer;
-    b32 DamageFlashHeld; // The killing hit keeps the red until a new game
+    effect_timer BackgroundFlashTimer;
+    color BackgroundFlashColor;
+    b32 BackgroundFlashHeld; // The killing hit keeps the red until a new game
 
     glm::vec3 DungeonPosition;
     glm::vec3 DiscardPosition;
@@ -158,6 +181,7 @@ private:
     asset_manager *AssetMgr;
 
     u64 CardBackTexture;
+    u64 HeartTexture;
 
     void MoveCards(std::vector<card> &Src, std::vector<card> &Dst, u32 Count, card_pile DstPile);
     void Discard(card Card);

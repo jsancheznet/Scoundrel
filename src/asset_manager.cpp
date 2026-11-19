@@ -135,6 +135,10 @@ u64 asset_manager::LoadTexture(const char *Filepath)
                            &Asset->Texture.ID,
                            &Asset->Texture.BindlessTextureHandle);
 
+    // The GPU has its own copy now, nothing reads the decoded pixels again
+    stbi_image_free(Asset->Texture.Data);
+    Asset->Texture.Data = nullptr;
+
     AssetCount++;
 
     return CreateHandle(Asset_Texture, Index, Asset->Header.Generation);
@@ -197,7 +201,9 @@ u64 asset_manager::LoadBitmapFont(const char *Image, const char *Json)
 
     bitmap_font *Font = &Asset->Font;
     Font->Texture = Texture;
-    Renderer.UploadTexture(Font->Texture.Data, Font->Texture.Width, Font->Texture.Height, &Font->Texture.ID, &Font->Texture.BindlessTextureHandle);
+    Renderer.UploadTexture(Font->Texture.Data, Font->Texture.Width, Font->Texture.Height, &Font->Texture.ID, &Font->Texture.BindlessTextureHandle, false);
+    stbi_image_free(Font->Texture.Data);
+    Font->Texture.Data = nullptr;
 
     const char *FontName = JsonGetString(RootObject, "name");
     std::snprintf(Font->Name, sizeof(Font->Name), "%s", FontName ? FontName : "");

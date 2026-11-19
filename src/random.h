@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "typedefs.h"
 
 // NOTE: The state lives inside an inline function, so every .cpp that includes this header shares the same one.
@@ -61,4 +63,16 @@ inline
 b32 RandomBool()
 {
     return RandomU32() % 2;
+}
+
+// Fisher-Yates, every order has the same chance
+template<typename T>
+inline
+void Shuffle(T *Items, i32 Count)
+{
+    for(i32 i = Count - 1; i > 0; --i)
+    {
+        i32 j = RandomBetween(0, i + 1);
+        std::swap(Items[i], Items[j]);
+    }
 }

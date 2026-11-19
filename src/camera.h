@@ -38,5 +38,5 @@ struct camera
 
 camera CreateCamera(glm::vec3 Position, glm::vec3 Target, glm::vec3 Up, f32 Near, f32 Far, f32 FoV);
 
-vec3 ScreenToWorldRay(mouse *Mouse, renderer *Renderer, camera *Camera);
+vec3 ScreenToWorldRay(mouse *Mouse, camera *Camera);
 b32 RayPlaneIntersection(vec3 RayOrigin, vec3 RayDirection, vec3 PlanePoint, vec3 PlaneNormal, vec3 *Hit);

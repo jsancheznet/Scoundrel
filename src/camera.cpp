@@ -68,11 +68,11 @@ void camera::Update()
     Renderer.UpdateCameraBuffer(this);
 }
 
-vec3 ScreenToWorldRay(mouse *Mouse, renderer *Renderer, camera *Camera)
+vec3 ScreenToWorldRay(mouse *Mouse, camera *Camera)
 {
-    // Step 1 - Mouse NDC Coords
-    f32 X_NDC = (Mouse->X * 2.0f) / Renderer->ViewportWidth - 1.0f;
-    f32 Y_NDC = 1.0f - (2.0f * Mouse->Y) / Renderer->ViewportHeight;
+    // Step 1 - Mouse NDC Coords. The mouse position is in window units, not in pixels, so the window size is used
+    f32 X_NDC = (Mouse->X * 2.0f) / (f32)Application.WindowWidth - 1.0f;
+    f32 Y_NDC = 1.0f - (2.0f * Mouse->Y) / (f32)Application.WindowHeight;
     f32 Z_NDC = 1.0f;
     glm::vec3 RayNDC = glm::vec3(X_NDC, Y_NDC, Z_NDC);
 

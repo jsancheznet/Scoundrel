@@ -13,6 +13,8 @@ extern keyboard Keyboard;
 void application::Init()
 {
     IsRunning = true;
+    TitleElapsed = 0.0;
+    TitleFrameCount = 0;
 
 #if defined(__linux__)
     // Wayland compositors enforce vsync at the compositor level and ignore SDL_GL_SetSwapInterval(0).
@@ -82,12 +84,18 @@ void application::ProcessEvents()
                     IsRunning = false;
                 }
             } break;
+            // The window size is in the same units as the mouse position, the pixel size is what OpenGL draws to.
+            // They are different on a scaled display
             case SDL_EVENT_WINDOW_RESIZED:
             {
                 WindowWidth = Event.window.data1;
                 WindowHeight = Event.window.data2;
-                Renderer.UpdateViewport(WindowWidth, WindowHeight);
                 Log(Info, "Window Resized, Width: %d, Height %d", WindowWidth, WindowHeight);
+            } break;
+            case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+            {
+                Renderer.UpdateViewport(Event.window.data1, Event.window.data2);
+                Log(Info, "Window Pixel Size Changed, Width: %d, Height %d", Event.window.data1, Event.window.data2);
             } break;
             default:
             {
@@ -156,10 +164,16 @@ void application::EndFrame()
     FrameEndTime = SDL_GetPerformanceCounter();
     DeltaTime = ((f64)FrameEndTime - (f64)FrameBeginTime) / (f64)SDL_GetPerformanceFrequency();
 
+    // A title change is a call to the window manager, so it is done a few times per second with the average frame rate
+    TitleElapsed += DeltaTime;
+    TitleFrameCount++;
+    if(TitleElapsed >= TitleUpdateInterval)
     {
-        char Buff[200];
-        snprintf(Buff, sizeof(Buff), "Scoundrel - %.0fps", 1.0f / DeltaTime);
-        const char *Ptr = &Buff[0];
-        SDL_SetWindowTitle(Window, Ptr);
+        char Title[64];
+        snprintf(Title, sizeof(Title), "Scoundrel - %.0ffps", (f64)TitleFrameCount / TitleElapsed);
+        SDL_SetWindowTitle(Window, Title);
+
+        TitleElapsed = 0.0;
+        TitleFrameCount = 0;
     }
 }

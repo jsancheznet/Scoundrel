@@ -7,7 +7,6 @@
 void mouse::Init()
 {
     Update();
-    b32 IsDragging = false;
 }
 
 void mouse::Update()

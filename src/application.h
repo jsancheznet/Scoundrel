@@ -8,6 +8,8 @@
 
 extern renderer Renderer;
 
+constexpr f64 TitleUpdateInterval = 0.5; // Seconds
+
 struct application
 {
     b32 IsRunning;
@@ -24,6 +26,9 @@ struct application
     u64 FrameBeginTime;
     u64 FrameEndTime;
     f64 DeltaTime;
+
+    f64 TitleElapsed; // Seconds
+    u32 TitleFrameCount;
 
     void Init();
     void CreateWindow(const char *Title, u32 Width, u32 Height);

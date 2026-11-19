@@ -20,6 +20,7 @@ void audio_system::Init()
         {
             Log(Info, "\tDevice %d: %s", i, SDL_GetAudioDeviceName(Devices[i]));
         }
+        SDL_free(Devices);
     }
 
 
@@ -68,11 +69,11 @@ void audio_system::Play(u64 Handle)
         {
             Index = i;
 
-            // If the stream is not null, it means it has a sound that has ended, so clear it so we do not leak.
+            // A stream here holds a sound that has ended. It is destroyed because a new stream replaces it below
             if(Sound->Streams[i] != nullptr)
             {
-                SDL_ClearAudioStream(Sound->Streams[i]);
-                SDL_UnbindAudioStream(Sound->Streams[i]);
+                SDL_DestroyAudioStream(Sound->Streams[i]);
+                Sound->Streams[i] = nullptr;
             }
 
             break;
