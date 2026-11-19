@@ -24,6 +24,7 @@ echo "BUILDING..."
 # Debug build
 # -fsanitize=address,undefined,integer
 clang++ -g -O0 -Wall -Wextra -Werror -Wno-unused-variable -Wno-unused-parameter -Wno-unused-value -fno-omit-frame-pointer\
+    ../src/main.cpp \
     ../src/scoundrel.cpp \
     ../src/log.cpp \
     ../src/application.cpp \
