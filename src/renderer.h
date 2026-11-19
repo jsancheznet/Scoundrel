@@ -78,6 +78,7 @@ struct renderer
     u32 ViewportHeight;
 
     color ClearColor = HOT_PINK;
+    color BackgroundTint = {0.0f, 0.0f, 0.0f, 0.0f}; // Alpha is the tint amount, 0 = usual colors
 
     // NOTE(Jsanchez): Should the VAO, VBO's that have anything to do with cards
     // be on the scoundrel file? Ideally the renderer should not know anything
@@ -106,6 +107,7 @@ struct renderer
     u32 BackgroundShader;
     i32 BackgroundTimeLocation;
     i32 BackgroundResolutionLocation;
+    i32 BackgroundTintLocation;
 
     std::vector<sprite_instance> Sprites;
     std::vector<character_glyph> Glyphs;

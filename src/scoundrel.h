@@ -28,6 +28,12 @@ constexpr f32 CameraHeight = 1.4f; // Centimeters
 constexpr f32 DamageShakeStrength = 0.45f; // Centimeters
 constexpr f32 DamageShakeDuration = 0.25f; // Seconds
 
+constexpr color DamageFlashColor = {0.55f, 0.04f, 0.05f, 1.0f};
+constexpr f32 DamageFlashMaxTint = 0.75f; // 1 = the background is fully the flash color
+constexpr f32 DamageFlashRiseDuration = 0.08f; // Seconds
+constexpr f32 DamageFlashFallDuration = 0.6f;  // Seconds
+constexpr f32 DamageFlashDuration = DamageFlashRiseDuration + DamageFlashFallDuration;
+
 constexpr f32 WeaponHitDuration    = 0.3f; // Seconds
 constexpr f32 WeaponReturnDuration = 0.2f; // Seconds
 
@@ -57,6 +63,7 @@ struct game
     void Update(f32 DeltaTime);
     void ProcessInput();
     void UpdateCards(f32 DeltaTime);
+    void UpdateDamageFlash(f32 DeltaTime);
     void Render();
 
     void LoadDungeon();
@@ -68,6 +75,7 @@ struct game
     void FightMonster(card Monster, b32 Barehanded);
     void DrinkPotion(card Potion);
     void CheckEndOfTurn();
+    void OnPlayerDamaged();
 
     static void OnWeaponHit(void *UserData);
 
@@ -103,6 +111,8 @@ struct game
     b32 LastCardWasPotion;
     i32 LastPotionValue;
     b32 WeaponHitDamaged;
+    effect_timer DamageFlashTimer;
+    b32 DamageFlashHeld; // The killing hit keeps the red until a new game
 
     glm::vec3 DungeonPosition;
     glm::vec3 DiscardPosition;

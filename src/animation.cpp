@@ -94,7 +94,7 @@ void animation_state::Update(f32 DeltaTime, glm::vec3 *NewPosition, f32 *NewAngl
             }
             else
             {
-                f32 Eased = T * T * (3.0f - 2.0f * T);
+                f32 Eased = glm::smoothstep(0.0f, 1.0f, T);
 
                 *NewPosition = glm::mix(StartPosition, TargetPosition, Eased);
                 NewPosition->z += Lift * glm::sin(glm::pi<f32>() * T);

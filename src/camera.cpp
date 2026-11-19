@@ -27,8 +27,7 @@ camera CreateCamera(glm::vec3 Position, glm::vec3 Target, glm::vec3 Up, f32 Near
     Camera.Orthographic = glm::ortho(0.0f, (f32)Application.WindowWidth, (f32)Application.WindowHeight, 0.0f);
 
     Camera.ShakeStrength = 0.0f;
-    Camera.ShakeDuration = 0.0f;
-    Camera.ShakeElapsed = 0.0f;
+    Camera.ShakeTimer = {};
 
     Log(Info, "CreateCamera() - Created Camera, Position: %.2f %.2f, %.2f, Target: %.2f %.2f, %.2f",
 	Camera.Position.x, Camera.Position.y, Camera.Position.z, Camera.Target.x, Camera.Target.y, Camera.Target.z);
@@ -39,8 +38,7 @@ camera CreateCamera(glm::vec3 Position, glm::vec3 Target, glm::vec3 Up, f32 Near
 void camera::Shake(f32 Strength, f32 Duration)
 {
     ShakeStrength = Strength;
-    ShakeDuration = Duration;
-    ShakeElapsed = 0.0f;
+    ShakeTimer.Start(Duration);
 
     Log(Info, "camera::Shake(%.2f, %.2f)", Strength, Duration);
 }
@@ -53,11 +51,11 @@ void camera::Update()
     // So there is nothing to restore when the shake ends, and the offset is a pure translation
     // that keeps the directions of ScreenToWorldRay() correct.
     vec3 ShakeOffset = vec3(0.0f);
-    if(ShakeElapsed < ShakeDuration)
+    if(ShakeTimer.IsActive())
     {
-        ShakeElapsed += (f32)Application.DeltaTime;
+        ShakeTimer.Update((f32)Application.DeltaTime);
 
-        f32 Falloff = glm::max(1.0f - ShakeElapsed / ShakeDuration, 0.0f);
+        f32 Falloff = 1.0f - ShakeTimer.Progress();
         vec3 Right = glm::normalize(glm::cross(Target - Position, Up));
 
         ShakeOffset = (Right * RandomBetween(-1.0f, 1.0f) + Up * RandomBetween(-1.0f, 1.0f)) * ShakeStrength * Falloff;

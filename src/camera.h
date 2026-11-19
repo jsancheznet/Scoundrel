@@ -7,6 +7,7 @@
 using namespace glm;
 
 #include "typedefs.h"
+#include "effect_timer.h"
 
 // Forward declarations, renderer.h includes camera.h
 struct renderer;
@@ -28,8 +29,7 @@ struct camera
     mat4 Orthographic;
 
     f32 ShakeStrength; // Centimeters, largest offset at the start of the shake
-    f32 ShakeDuration; // Seconds
-    f32 ShakeElapsed;  // Seconds
+    effect_timer ShakeTimer;
 
     void Shake(f32 Strength, f32 Duration); // Strength in centimeters, Duration in seconds
     void Update(); // Recomputes the matrices and uploads them to the GPU, call it every frame after moving the camera

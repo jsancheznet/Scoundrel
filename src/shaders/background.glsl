@@ -23,9 +23,12 @@ const float MistScale = 2.2;   // Larger = smaller patches of mist
 const float DriftSpeed = 0.035; // Larger = faster mist
 const float Brightness = 1.0;
 const float VignetteStrength = 0.55; // 0 = no dark edges
+const float TintMinBrightness = 0.35; // Brightness of the tint where the mist is darkest
+const float TintMistContrast = 3.0;   // Larger = the mist shapes show more in the tint
 
 uniform float Time; // Seconds
 uniform vec2 Resolution; // Pixels
+uniform vec4 Tint; // Alpha is the tint amount, 0 = usual colors
 
 in vec2 Uv;
 out vec4 FragmentColor;
@@ -81,6 +84,11 @@ void main()
 
     vec3 Color = mix(DeepColor, MistColor, smoothstep(0.15, 0.85, Mist));
     Color = mix(Color, GlowColor, smoothstep(0.55, 1.0, Mist) * length(Warp2) * 0.45);
+
+    // The brightness of the mist scales the tint color, so the mist shapes stay visible in the tint
+    float Luma = dot(Color, vec3(0.299, 0.587, 0.114));
+    vec3 Tinted = Tint.rgb * (TintMinBrightness + Luma * TintMistContrast);
+    Color = mix(Color, Tinted, Tint.a);
 
     float Vignette = 1.0 - VignetteStrength * smoothstep(0.25, 0.95, length(Centered) * 1.4);
     Color *= Vignette * Brightness;

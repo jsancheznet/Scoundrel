@@ -45,6 +45,7 @@ void renderer::DrawBackground()
     UseShader(BackgroundShader);
     glProgramUniform1f(BackgroundShader, BackgroundTimeLocation, (f32)SDL_GetTicks() / 1000.0f);
     glProgramUniform2f(BackgroundShader, BackgroundResolutionLocation, (f32)ViewportWidth, (f32)ViewportHeight);
+    glProgramUniform4f(BackgroundShader, BackgroundTintLocation, BackgroundTint.r, BackgroundTint.g, BackgroundTint.b, BackgroundTint.a);
 
     // No depth test also means no depth write, so everything else draws on top of the background
     glDisable(GL_DEPTH_TEST);
@@ -445,6 +446,7 @@ void renderer::LoadShaders()
     BackgroundShader = CompileShader("shaders/background.glsl");
     BackgroundTimeLocation = glGetUniformLocation(BackgroundShader, "Time");
     BackgroundResolutionLocation = glGetUniformLocation(BackgroundShader, "Resolution");
+    BackgroundTintLocation = glGetUniformLocation(BackgroundShader, "Tint");
 }
 
 void renderer::CreateQuadMesh()

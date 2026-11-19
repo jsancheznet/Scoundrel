@@ -21,6 +21,10 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
     Audio = AudioPtr;
     AssetMgr = AssetMgrPtr;
 
+    // Before NewGame(), which reads DamageFlashHeld
+    DamageFlashTimer = {};
+    DamageFlashHeld = false;
+
     MarcellusFont = AssetMgr->LoadBitmapFont("assets/Fonts/Marcellus_sc.png", "assets/Fonts/Marcellus_sc.json");
     CardBackTexture = AssetMgr->LoadTexture("assets/Textures/Scoundrel-Back.jpg");
 
@@ -98,9 +102,52 @@ void game::Update(f32 DeltaTime)
 
     // After the input, so a card that was just moved starts its animation this tick
     UpdateCards(DeltaTime);
+    UpdateDamageFlash(DeltaTime);
 
     // After the input, so the hint always matches the state this frame is drawn with
     UpdateActionHint();
+}
+
+// Health is already lowered when this runs: at the click when barehanded, before the hit with a weapon
+void game::OnPlayerDamaged()
+{
+    Audio->Play(DamageSound);
+
+    DamageFlashTimer.Start(DamageFlashDuration);
+    if(PlayerHealth <= 0)
+    {
+        DamageFlashHeld = true;
+    }
+
+    Log(Info, "game::OnPlayerDamaged() - Health: %d", PlayerHealth);
+}
+
+void game::UpdateDamageFlash(f32 DeltaTime)
+{
+    DamageFlashTimer.Update(DeltaTime);
+
+    f32 Elapsed = DamageFlashTimer.Elapsed;
+    f32 Amount = 0.0f;
+    if(DamageFlashTimer.IsActive())
+    {
+        if(Elapsed < DamageFlashRiseDuration)
+        {
+            Amount = Elapsed / DamageFlashRiseDuration;
+        }
+        else
+        {
+            // Smoothstep, so the red goes away softly and does not stop with a visible step
+            Amount = 1.0f - glm::smoothstep(DamageFlashRiseDuration, DamageFlashDuration, Elapsed);
+        }
+    }
+
+    // Also after the timer ends, its Elapsed then stays at the full duration
+    if(DamageFlashHeld && Elapsed >= DamageFlashRiseDuration)
+    {
+        Amount = 1.0f;
+    }
+
+    Renderer->BackgroundTint = {DamageFlashColor.r, DamageFlashColor.g, DamageFlashColor.b, Amount * DamageFlashMaxTint};
 }
 
 void game::UpdateCards(f32 DeltaTime)
@@ -227,6 +274,13 @@ void game::NewGame()
     std::mt19937 Generator(RandomDevice());
     std::shuffle(Dungeon.begin(), Dungeon.end(), Generator);
     StackDungeon();
+
+    if(DamageFlashHeld)
+    {
+        // The held red fades out with the usual fall, not with a jump to the usual colors
+        DamageFlashHeld = false;
+        DamageFlashTimer.Start(DamageFlashDuration, DamageFlashRiseDuration);
+    }
 
     State = Game_WaitingToStart;
     PlayerHealth = MaxHealth;
@@ -400,7 +454,7 @@ void game::FightMonster(card Monster, b32 Barehanded)
         Discard(Monster);
 
         Audio->Play(PunchSound);
-        Audio->Play(DamageSound);
+        OnPlayerDamaged();
         Camera.Shake(DamageShakeStrength, DamageShakeDuration);
 
         Log(Info, "game::FightMonster() - Fought a %d barehanded, Health: %d", Monster.Value, PlayerHealth);
@@ -414,7 +468,7 @@ void game::OnWeaponHit(void *UserData)
     Game->Audio->Play(Game->SlashSound);
     if(Game->WeaponHitDamaged)
     {
-        Game->Audio->Play(Game->DamageSound);
+        Game->OnPlayerDamaged();
     }
     Game->Camera.Shake(DamageShakeStrength, DamageShakeDuration);
 }
