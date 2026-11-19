@@ -85,6 +85,8 @@ struct renderer
 
     u32 QuadVBO;
 
+    u32 BackgroundVAO;
+
     u32 SpritesVAO;
     u32 SpritesVBO;
 
@@ -101,6 +103,9 @@ struct renderer
     u32 SpriteShader;
     u32 TextShader;
     u32 CardShader;
+    u32 BackgroundShader;
+    i32 BackgroundTimeLocation;
+    i32 BackgroundResolutionLocation;
 
     std::vector<sprite_instance> Sprites;
     std::vector<character_glyph> Glyphs;
@@ -132,6 +137,7 @@ struct renderer
     void CreateCameraUBO();
 
     void CreateQuadMesh();
+    void CreateBackgroundMesh();
     void CreateSpriteMesh();
     void CreateTextMesh();
     void CreateCardMesh();
@@ -139,6 +145,7 @@ struct renderer
     u64 CompileShader(const char *Filename);
     void UseShader(u32 Shader);
 
+    void DrawBackground();
     void DrawSprites();
     void DrawTexts();
     void DrawCards();

@@ -12,7 +12,6 @@ enum animation_type
 
 typedef void animation_callback(void *UserData);
 
-// Only calculates the values, the owner applies them to its own object
 struct animation_state
 {
     // Set by the owner of the animation

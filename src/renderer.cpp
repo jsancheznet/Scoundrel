@@ -20,6 +20,7 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
     ConfigureRenderer();
     LoadShaders();
     CreateQuadMesh();
+    CreateBackgroundMesh();
     CreateSpriteMesh();
     CreateTextMesh();
     CreateCardMesh();
@@ -37,6 +38,18 @@ void renderer::ClearScreen(color Color)
 {
     glClearColor(Color.r, Color.g, Color.b, Color.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void renderer::DrawBackground()
+{
+    UseShader(BackgroundShader);
+    glProgramUniform1f(BackgroundShader, BackgroundTimeLocation, (f32)SDL_GetTicks() / 1000.0f);
+    glProgramUniform2f(BackgroundShader, BackgroundResolutionLocation, (f32)ViewportWidth, (f32)ViewportHeight);
+
+    // No depth test also means no depth write, so everything else draws on top of the background
+    glDisable(GL_DEPTH_TEST);
+    glBindVertexArray(BackgroundVAO);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
 void renderer::DrawSprites()
@@ -99,6 +112,7 @@ void renderer::BeginFrame()
 
 void renderer::EndFrame()
 {
+    DrawBackground();
     DrawSprites();
     DrawCards();
     DrawTexts(); // Last, text is UI and goes on top of everything
@@ -427,6 +441,10 @@ void renderer::LoadShaders()
     SpriteShader = CompileShader("shaders/batched_texture.glsl");
     TextShader = CompileShader("shaders/text_sdf.glsl");
     CardShader = CompileShader("shaders/card.glsl");
+
+    BackgroundShader = CompileShader("shaders/background.glsl");
+    BackgroundTimeLocation = glGetUniformLocation(BackgroundShader, "Time");
+    BackgroundResolutionLocation = glGetUniformLocation(BackgroundShader, "Resolution");
 }
 
 void renderer::CreateQuadMesh()
@@ -444,6 +462,21 @@ void renderer::CreateQuadMesh()
     glCreateBuffers(1, &QuadVBO);
     glNamedBufferStorage(QuadVBO, sizeof(Vertices), Vertices, GL_DYNAMIC_STORAGE_BIT);
     Log(Info, "OPENGL, Allocating %zu bytes to QuadVBO", sizeof(Vertices));
+}
+
+void renderer::CreateBackgroundMesh()
+{
+    glCreateVertexArrays(1, &BackgroundVAO);
+
+    glVertexArrayVertexBuffer(BackgroundVAO, 0, QuadVBO, 0, sizeof(f32) * 5);
+
+    glEnableVertexArrayAttrib(BackgroundVAO, 0);
+    glVertexArrayAttribFormat(BackgroundVAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
+    glVertexArrayAttribBinding(BackgroundVAO, 0, 0);
+
+    glEnableVertexArrayAttrib(BackgroundVAO, 1);
+    glVertexArrayAttribFormat(BackgroundVAO, 1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 3);
+    glVertexArrayAttribBinding(BackgroundVAO, 1, 0);
 }
 
 void renderer::CreateSpriteMesh()
