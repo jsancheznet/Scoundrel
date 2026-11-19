@@ -25,6 +25,10 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
     DamageFlashTimer = {};
     DamageFlashHeld = false;
 
+    // The game opens on the start screen, so the first frame is already dark
+    OverlayAmount = 1.0f;
+    CardsAreMoving = false;
+
     MarcellusFont = AssetMgr->LoadBitmapFont("assets/Fonts/Marcellus_sc.png", "assets/Fonts/Marcellus_sc.json");
     CardBackTexture = AssetMgr->LoadTexture("assets/Textures/Scoundrel-Back.jpg");
 
@@ -102,10 +106,46 @@ void game::Update(f32 DeltaTime)
 
     // After the input, so a card that was just moved starts its animation this tick
     UpdateCards(DeltaTime);
-    UpdateDamageFlash(DeltaTime);
 
-    // After the input, so the hint always matches the state this frame is drawn with
-    UpdateActionHint();
+    // A deal started while the cards still fly to the Dungeon would send them to the Room from wherever they are
+    if(RoomDealPending && !CardsAreMoving)
+    {
+        RoomDealPending = false;
+        DealRoom();
+    }
+
+    UpdateDamageFlash(DeltaTime);
+    UpdateOverlay(DeltaTime); // After UpdateCards(), it reads CardsAreMoving
+
+    // After the input, so the text always matches the state this frame is drawn with
+    UpdateStateText();
+}
+
+// The state is already Won or Lost at the click, so the end screen waits for the last attack and moves to finish
+b32 game::OverlayIsWanted()
+{
+    if(State == Game_WaitingToStart)
+    {
+        return true;
+    }
+
+    return (State == Game_Won || State == Game_Lost) && !CardsAreMoving;
+}
+
+void game::UpdateOverlay(f32 DeltaTime)
+{
+    f32 Target = OverlayIsWanted() ? 1.0f : 0.0f;
+    f32 Step = DeltaTime / OverlayFadeDuration;
+    if(OverlayAmount < Target)
+    {
+        OverlayAmount = glm::min(OverlayAmount + Step, Target);
+    }
+    else
+    {
+        OverlayAmount = glm::max(OverlayAmount - Step, Target);
+    }
+
+    Renderer->ScreenOverlay = {0.0f, 0.0f, 0.0f, OverlayAmount * OverlayDarkness};
 }
 
 // Health is already lowered when this runs: at the click when barehanded, before the hit with a weapon
@@ -155,12 +195,17 @@ void game::UpdateCards(f32 DeltaTime)
     // A long frame (loading, a dragged window) must not make the cards jump to their targets
     DeltaTime = glm::min(DeltaTime, MaxAnimationDeltaTime);
 
+    CardsAreMoving = false;
     std::vector<card> *Piles[] = {&Dungeon, &Room, &Weapon, &SlainMonsters, &DiscardPile};
     for(std::vector<card> *Pile : Piles)
     {
         for(card &Card : *Pile)
         {
             Card.Update(DeltaTime);
+            if(Card.Animation.IsActive)
+            {
+                CardsAreMoving = true;
+            }
         }
     }
 }
@@ -170,12 +215,28 @@ void game::ProcessInput()
     if((State == Game_Won || State == Game_Lost) && Keyboard->IsReleased(SDL_SCANCODE_R))
     {
         NewGame();
+        StartPlaying();
         return;
     }
 
     b32 LeftClicked  = Mouse->IsButtonPressed(SDL_BUTTON_LEFT) && !Mouse->WasButtonPressed(SDL_BUTTON_LEFT);
     b32 RightClicked = Mouse->IsButtonPressed(SDL_BUTTON_RIGHT) && !Mouse->WasButtonPressed(SDL_BUTTON_RIGHT);
     if(!LeftClicked && !RightClicked)
+    {
+        return;
+    }
+
+    if(State == Game_WaitingToStart)
+    {
+        if(LeftClicked)
+        {
+            StartPlaying();
+        }
+        return;
+    }
+
+    // With no Room yet, a click on the Dungeon would try to avoid an empty Room
+    if(RoomDealPending)
     {
         return;
     }
@@ -197,17 +258,9 @@ void game::ProcessInput()
     }
 
     // NOTE: ClickedCard points into a pile, don't use it after the piles change
-    if(ClickedCard->Pile == Pile_Dungeon)
+    if(ClickedCard->Pile == Pile_Dungeon && State == Game_Playing)
     {
-        if(State == Game_WaitingToStart)
-        {
-            DealRoom();
-            State = Game_Playing;
-        }
-        else if(State == Game_Playing)
-        {
-            AvoidRoom();
-        }
+        AvoidRoom();
     }
     else if(ClickedCard->Pile == Pile_Room && State == Game_Playing)
     {
@@ -220,10 +273,20 @@ void game::Render()
 {
     Renderer->BeginFrame();
 
-    DrawHealth();
-    DrawActionHint();
     DrawCards();
-    DrawLabels();
+
+    if(!OverlayIsWanted())
+    {
+        DrawHealth();
+        DrawActionHint();
+        DrawLabels();
+    }
+
+    // Also while the overlay fades out, so its text fades with it
+    if(OverlayAmount > 0.0f)
+    {
+        DrawOverlayText();
+    }
 
     Renderer->EndFrame();
 }
@@ -283,6 +346,8 @@ void game::NewGame()
     }
 
     State = Game_WaitingToStart;
+    RoomDealPending = false;
+    CanAvoidRoom = false;
     PlayerHealth = MaxHealth;
     Score = 0;
 
@@ -292,6 +357,12 @@ void game::NewGame()
     LastCardWasPotion = false;
     LastPotionValue = 0;
     WeaponHitDamaged = false;
+}
+
+void game::StartPlaying()
+{
+    State = Game_Playing;
+    RoomDealPending = true;
 }
 
 void game::StackDungeon()
@@ -608,32 +679,59 @@ f32 game::ScreenTextScale()
     return (f32)Renderer->ViewportHeight / ReferenceWindowHeight;
 }
 
-void game::UpdateActionHint()
+void game::UpdateStateText()
 {
     switch(State)
     {
         case Game_WaitingToStart:
         {
-            snprintf(ActionHint, sizeof(ActionHint), "Click the Dungeon to enter");
+            snprintf(OverlayTitle, sizeof(OverlayTitle), "Scoundrel");
+            snprintf(OverlaySubtitle, sizeof(OverlaySubtitle), "Click to enter the Dungeon");
         } break;
         case Game_Playing:
         {
-            // NOTE: No trailing separator when the Room can't be avoided, it would push the centered text to the left
-            b32 CanAvoid = (CardsFacedThisRoom == 0 && !AvoidedLastRoom && Room.size() == RoomSize && !Dungeon.empty());
-            snprintf(ActionHint, sizeof(ActionHint), "Left click: face a card (monsters with your weapon)   Right click: fight barehanded%s",
-                     CanAvoid ? "   Click the Dungeon: avoid the Room" : "");
+            CanAvoidRoom = (CardsFacedThisRoom == 0 && !AvoidedLastRoom && Room.size() == RoomSize && !Dungeon.empty());
         } break;
         case Game_Won:
         {
-            snprintf(ActionHint, sizeof(ActionHint), "You made it through the Dungeon! Score: %d   Press R to play again", Score);
+            snprintf(OverlayTitle, sizeof(OverlayTitle), "You made it through the Dungeon!");
+            snprintf(OverlaySubtitle, sizeof(OverlaySubtitle), "Score: %d   Press R to play again", Score);
         } break;
         case Game_Lost:
         {
-            snprintf(ActionHint, sizeof(ActionHint), "You died. Score: %d   Press R to play again", Score);
+            snprintf(OverlayTitle, sizeof(OverlayTitle), "You died");
+            snprintf(OverlaySubtitle, sizeof(OverlaySubtitle), "Score: %d   Press R to play again", Score);
         } break;
     }
 }
 
+// Size is in pixels, Y is the top of the line in pixels
+f32 game::FitCenteredScreenText(bitmap_font *Font, const char *Text, f32 *Size)
+{
+    // The size follows the window height only, a long text in a narrow window would go out of the screen
+    f32 WidthAtSizeOne = TextWidth(Font, 1.0f, Text);
+    f32 MaxWidth = (f32)Renderer->ViewportWidth - ScreenTextMargin * ScreenTextScale() * 2.0f;
+    if(WidthAtSizeOne * *Size > MaxWidth)
+    {
+        *Size = MaxWidth / WidthAtSizeOne;
+    }
+
+    return ((f32)Renderer->ViewportWidth - WidthAtSizeOne * *Size) * 0.5f;
+}
+
+void game::DrawCenteredScreenText(const char *Text, f32 Size, f32 Y, color Color)
+{
+    bitmap_font *Font = AssetMgr->GetFont(MarcellusFont);
+    if(!Font)
+    {
+        return;
+    }
+
+    f32 X = FitCenteredScreenText(Font, Text, &Size);
+    Renderer->DrawText(MarcellusFont, X, Y, Size, Text, Color);
+}
+
+// The skip part is always in the line, faded when not available, so the centered line never changes width and never jumps
 void game::DrawActionHint()
 {
     bitmap_font *Font = AssetMgr->GetFont(MarcellusFont);
@@ -642,22 +740,37 @@ void game::DrawActionHint()
         return;
     }
 
-    f32 Scale = ScreenTextScale();
-    f32 Size = 28.0f * Scale;
-    f32 Margin = 16.0f * Scale;
+    char FullHint[128];
+    snprintf(FullHint, sizeof(FullHint), "%s%s", ActionHintCards, ActionHintSkip);
 
-    // The size follows the window height only, a long hint in a narrow window would go out of the screen
-    f32 WidthAtSizeOne = TextWidth(Font, 1.0f, ActionHint);
-    f32 MaxWidth = (f32)Renderer->ViewportWidth - Margin * 2.0f;
-    if(WidthAtSizeOne * Size > MaxWidth)
+    f32 Scale = ScreenTextScale();
+    f32 Size = ActionHintSize * Scale;
+    f32 Y = ScreenTextMargin * Scale;
+    f32 X = FitCenteredScreenText(Font, FullHint, &Size);
+
+    f32 SkipAlpha = CanAvoidRoom ? 1.0f : ActionHintUnavailableAlpha;
+    Renderer->DrawText(MarcellusFont, X, Y, Size, ActionHintCards, color{1.0f, 1.0f, 1.0f, 1.0f});
+    Renderer->DrawText(MarcellusFont, X + TextWidth(Font, Size, ActionHintCards), Y, Size, ActionHintSkip, color{1.0f, 1.0f, 1.0f, SkipAlpha});
+}
+
+void game::DrawOverlayText()
+{
+    bitmap_font *Font = AssetMgr->GetFont(MarcellusFont);
+    if(!Font)
     {
-        Size = MaxWidth / WidthAtSizeOne;
+        return;
     }
 
-    f32 X = ((f32)Renderer->ViewportWidth - WidthAtSizeOne * Size) * 0.5f;
-    f32 Y = Margin; // DrawText's Y is the top of the line
+    f32 Scale = ScreenTextScale();
+    f32 TitleSize = OverlayTitleSize * Scale;
+    f32 SubtitleSize = OverlaySubtitleSize * Scale;
+    f32 TitleLineHeight = TitleSize * Font->Metrics.LineHeight;
+    f32 BlockHeight = TitleLineHeight + SubtitleSize * Font->Metrics.LineHeight;
+    f32 Top = ((f32)Renderer->ViewportHeight - BlockHeight) * 0.5f;
 
-    Renderer->DrawText(MarcellusFont, X, Y, Size, ActionHint, color{1.0f, 1.0f, 1.0f, 1.0f});
+    color Color = {1.0f, 1.0f, 1.0f, OverlayAmount};
+    DrawCenteredScreenText(OverlayTitle, TitleSize, Top, Color);
+    DrawCenteredScreenText(OverlaySubtitle, SubtitleSize, Top + TitleLineHeight, Color);
 }
 
 void game::MoveCards(std::vector<card> &Src, std::vector<card> &Dst, u32 Count, card_pile DstPile)

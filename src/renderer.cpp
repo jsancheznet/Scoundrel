@@ -20,7 +20,7 @@ void renderer::Init(SDL_Window* SDLWindow, u32 Width, u32 Height)
     ConfigureRenderer();
     LoadShaders();
     CreateQuadMesh();
-    CreateBackgroundMesh();
+    CreateFullscreenMesh();
     CreateSpriteMesh();
     CreateTextMesh();
     CreateCardMesh();
@@ -49,8 +49,26 @@ void renderer::DrawBackground()
 
     // No depth test also means no depth write, so everything else draws on top of the background
     glDisable(GL_DEPTH_TEST);
-    glBindVertexArray(BackgroundVAO);
+    glBindVertexArray(FullscreenVAO);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+}
+
+void renderer::DrawScreenOverlay()
+{
+    if(ScreenOverlay.a <= 0.0f)
+    {
+        return;
+    }
+
+    UseShader(ScreenOverlayShader);
+    glProgramUniform4f(ScreenOverlayShader, ScreenOverlayColorLocation, ScreenOverlay.r, ScreenOverlay.g, ScreenOverlay.b, ScreenOverlay.a);
+
+    // No depth test, so the overlay covers every card whatever its depth
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBindVertexArray(FullscreenVAO);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    glDisable(GL_BLEND);
 }
 
 void renderer::DrawSprites()
@@ -116,6 +134,7 @@ void renderer::EndFrame()
     DrawBackground();
     DrawSprites();
     DrawCards();
+    DrawScreenOverlay(); // Before the text, so the text stays bright
     DrawTexts(); // Last, text is UI and goes on top of everything
     SDL_GL_SwapWindow(Window);
 }
@@ -447,6 +466,9 @@ void renderer::LoadShaders()
     BackgroundTimeLocation = glGetUniformLocation(BackgroundShader, "Time");
     BackgroundResolutionLocation = glGetUniformLocation(BackgroundShader, "Resolution");
     BackgroundTintLocation = glGetUniformLocation(BackgroundShader, "Tint");
+
+    ScreenOverlayShader = CompileShader("shaders/screen_overlay.glsl");
+    ScreenOverlayColorLocation = glGetUniformLocation(ScreenOverlayShader, "Color");
 }
 
 void renderer::CreateQuadMesh()
@@ -466,19 +488,19 @@ void renderer::CreateQuadMesh()
     Log(Info, "OPENGL, Allocating %zu bytes to QuadVBO", sizeof(Vertices));
 }
 
-void renderer::CreateBackgroundMesh()
+void renderer::CreateFullscreenMesh()
 {
-    glCreateVertexArrays(1, &BackgroundVAO);
+    glCreateVertexArrays(1, &FullscreenVAO);
 
-    glVertexArrayVertexBuffer(BackgroundVAO, 0, QuadVBO, 0, sizeof(f32) * 5);
+    glVertexArrayVertexBuffer(FullscreenVAO, 0, QuadVBO, 0, sizeof(f32) * 5);
 
-    glEnableVertexArrayAttrib(BackgroundVAO, 0);
-    glVertexArrayAttribFormat(BackgroundVAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
-    glVertexArrayAttribBinding(BackgroundVAO, 0, 0);
+    glEnableVertexArrayAttrib(FullscreenVAO, 0);
+    glVertexArrayAttribFormat(FullscreenVAO, 0, 3, GL_FLOAT, GL_FALSE, 0);
+    glVertexArrayAttribBinding(FullscreenVAO, 0, 0);
 
-    glEnableVertexArrayAttrib(BackgroundVAO, 1);
-    glVertexArrayAttribFormat(BackgroundVAO, 1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 3);
-    glVertexArrayAttribBinding(BackgroundVAO, 1, 0);
+    glEnableVertexArrayAttrib(FullscreenVAO, 1);
+    glVertexArrayAttribFormat(FullscreenVAO, 1, 2, GL_FLOAT, GL_FALSE, sizeof(f32) * 3);
+    glVertexArrayAttribBinding(FullscreenVAO, 1, 0);
 }
 
 void renderer::CreateSpriteMesh()

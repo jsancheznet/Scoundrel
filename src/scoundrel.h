@@ -21,6 +21,17 @@ constexpr f32 MaxAnimationDeltaTime = 0.05f; // Seconds, longer frames are cut t
 
 // Screen text sizes are given for this window height, they scale with the window like the table does
 constexpr f32 ReferenceWindowHeight = 768.0f;
+constexpr f32 ScreenTextMargin    = 16.0f; // Pixels
+constexpr f32 ActionHintSize      = 28.0f; // Pixels
+
+constexpr const char *ActionHintCards = "Left click: use card   Right click: fight barehanded";
+constexpr const char *ActionHintSkip  = "   Click Dungeon: skip Room";
+constexpr f32 ActionHintUnavailableAlpha = 0.35f;
+constexpr f32 OverlayTitleSize    = 64.0f; // Pixels
+constexpr f32 OverlaySubtitleSize = 30.0f; // Pixels
+
+constexpr f32 OverlayDarkness = 0.45f; // 1 = black
+constexpr f32 OverlayFadeDuration = 0.3f; // Seconds
 
 // The camera is above the center of the table, so the table is lower on the screen and the action hint fits above the Room label
 constexpr f32 CameraHeight = 1.4f; // Centimeters
@@ -64,10 +75,13 @@ struct game
     void ProcessInput();
     void UpdateCards(f32 DeltaTime);
     void UpdateDamageFlash(f32 DeltaTime);
+    void UpdateOverlay(f32 DeltaTime);
+    b32 OverlayIsWanted();
     void Render();
 
     void LoadDungeon();
     void NewGame();
+    void StartPlaying();
     void DealRoom();
     void AvoidRoom();
     void FaceRoomCard(u32 Index, b32 Barehanded);
@@ -82,8 +96,10 @@ struct game
     void DrawHealth();
     void DrawCards();
     void DrawLabels();
-    void UpdateActionHint();
+    void UpdateStateText();
     void DrawActionHint();
+    void DrawOverlayText();
+    void DrawCenteredScreenText(const char *Text, f32 Size, f32 Y, color Color);
 
     card *PickCard(glm::vec3 RayOrigin, glm::vec3 RayDirection);
 
@@ -103,7 +119,12 @@ struct game
     i32 PlayerHealth;
     i32 Score;
 
-    char ActionHint[256];
+    b32 CanAvoidRoom;
+    char OverlayTitle[64];
+    char OverlaySubtitle[128];
+    f32 OverlayAmount; // 0 = no overlay, 1 = full, follows the fade
+    b32 CardsAreMoving;
+    b32 RoomDealPending; // The first Room is dealt once the cards land in the Dungeon
 
     u32 CardsFacedThisRoom;
     b32 PotionUsedThisRoom;
@@ -143,4 +164,5 @@ private:
     void StackDungeon();
     void DrawFloatingLabel(glm::vec3 Center, const char *Text, f32 Wave);
     f32 ScreenTextScale();
+    f32 FitCenteredScreenText(bitmap_font *Font, const char *Text, f32 *Size); // Returns the left X in pixels, makes Size smaller if the text is wider than the window
 };

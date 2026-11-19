@@ -79,6 +79,7 @@ struct renderer
 
     color ClearColor = HOT_PINK;
     color BackgroundTint = {0.0f, 0.0f, 0.0f, 0.0f}; // Alpha is the tint amount, 0 = usual colors
+    color ScreenOverlay = {0.0f, 0.0f, 0.0f, 0.0f};  // Drawn over everything but the text, alpha 0 = not drawn
 
     // NOTE(Jsanchez): Should the VAO, VBO's that have anything to do with cards
     // be on the scoundrel file? Ideally the renderer should not know anything
@@ -86,7 +87,7 @@ struct renderer
 
     u32 QuadVBO;
 
-    u32 BackgroundVAO;
+    u32 FullscreenVAO;
 
     u32 SpritesVAO;
     u32 SpritesVBO;
@@ -108,6 +109,8 @@ struct renderer
     i32 BackgroundTimeLocation;
     i32 BackgroundResolutionLocation;
     i32 BackgroundTintLocation;
+    u32 ScreenOverlayShader;
+    i32 ScreenOverlayColorLocation;
 
     std::vector<sprite_instance> Sprites;
     std::vector<character_glyph> Glyphs;
@@ -139,7 +142,7 @@ struct renderer
     void CreateCameraUBO();
 
     void CreateQuadMesh();
-    void CreateBackgroundMesh();
+    void CreateFullscreenMesh();
     void CreateSpriteMesh();
     void CreateTextMesh();
     void CreateCardMesh();
@@ -148,6 +151,7 @@ struct renderer
     void UseShader(u32 Shader);
 
     void DrawBackground();
+    void DrawScreenOverlay();
     void DrawSprites();
     void DrawTexts();
     void DrawCards();
