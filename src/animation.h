@@ -10,7 +10,7 @@ enum animation_type
     Animation_Attack,
 };
 
-typedef void animation_callback(void *UserData);
+typedef void animation_callback(void *UserData, u64 Data);
 
 struct animation_state
 {
@@ -35,7 +35,13 @@ struct animation_state
     animation_callback *OnHit; // Called one time, on the update where an attack gets to its hit position. Can be nullptr
     void *OnHitUserData;
 
+    animation_callback *OnStart; // Called one time, on the update where the move starts (after the delay). Can be nullptr
+    void *OnStartUserData;
+    u64 OnStartData;
+    b32 StartDone;
+
     void Move(glm::vec3 FromPosition, f32 FromAngle, glm::vec3 ToPosition, f32 ToAngle, f32 StartDelay = 0.0f);
+    void SetOnStart(animation_callback *Callback, void *UserData, u64 Data); // Call it after Move(), Move() clears it
     void Attack(glm::vec3 FromPosition, glm::vec3 HitPosition, f32 HitDurationSeconds, f32 ReturnDurationSeconds,
                 animation_callback *OnHitCallback = nullptr, void *UserData = nullptr);
     void Update(f32 DeltaTime, glm::vec3 *NewPosition, f32 *NewAngle);

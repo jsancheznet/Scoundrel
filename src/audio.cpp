@@ -68,14 +68,6 @@ void audio_system::Play(u64 Handle)
         if(BytesLeft < 1)
         {
             Index = i;
-
-            // A stream here holds a sound that has ended. It is destroyed because a new stream replaces it below
-            if(Sound->Streams[i] != nullptr)
-            {
-                SDL_DestroyAudioStream(Sound->Streams[i]);
-                Sound->Streams[i] = nullptr;
-            }
-
             break;
         }
     }
@@ -86,17 +78,34 @@ void audio_system::Play(u64 Handle)
         return;
     }
 
-    Log(Info, "audio_system::Play() - Creating sound stream using index: %d", Index);
-
-    SDL_AudioSpec DeviceSpec;
-    SDL_GetAudioDeviceFormat(Channels[Sound->Channel], &DeviceSpec, NULL);
-    Sound->Streams[Index] = SDL_CreateAudioStream(&Sound->AudioSpec, &DeviceSpec);
-    SDL_PutAudioStreamData(Sound->Streams[Index], Sound->DataBuffer, Sound->DataBufferLength);
-    SDL_BindAudioStream(Channels[Sound->Channel], Sound->Streams[Index]);
-
-    if(Sound->Repeats)
+    // A stream that played this sound before has the right formats, so it is filled again and not made again
+    SDL_AudioStream *Stream = Sound->Streams[Index];
+    if(Stream == nullptr)
     {
-        SDL_SetAudioStreamGetCallback(Sound->Streams[Index], audio_system::AudioStreamGetCallback, Sound);
+        Log(Info, "audio_system::Play() - Creating sound stream using index: %d", Index);
+
+        SDL_AudioSpec DeviceSpec;
+        SDL_GetAudioDeviceFormat(Channels[Sound->Channel], &DeviceSpec, NULL);
+        Stream = SDL_CreateAudioStream(&Sound->AudioSpec, &DeviceSpec);
+        if(Stream == nullptr)
+        {
+            Log(Error, "audio_system::Play() - SDL_CreateAudioStream failed: %s", SDL_GetError());
+            return;
+        }
+        Sound->Streams[Index] = Stream;
+
+        if(Sound->Repeats)
+        {
+            SDL_SetAudioStreamGetCallback(Stream, audio_system::AudioStreamGetCallback, Sound);
+        }
+    }
+
+    SDL_PutAudioStreamData(Stream, Sound->DataBuffer, Sound->DataBufferLength);
+
+    // A new stream is not bound yet, and Pause() unbinds the old ones
+    if(SDL_GetAudioStreamDevice(Stream) == 0)
+    {
+        SDL_BindAudioStream(Channels[Sound->Channel], Stream);
     }
 }
 

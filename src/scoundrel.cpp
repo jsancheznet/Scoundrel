@@ -33,6 +33,8 @@ void game::Init(renderer *RendererPtr, audio_system *AudioPtr, keyboard *Keyboar
     MarcellusFont = AssetMgr->LoadBitmapFont("assets/Fonts/Marcellus_sc.png", "assets/Fonts/Marcellus_sc.json");
     CardBackTexture = AssetMgr->LoadTexture("assets/Textures/Scoundrel-Back.jpg");
     HeartTexture = AssetMgr->LoadTexture("assets/Textures/Heart.png");
+    // Checked one time here, a missing icon would log two warnings on every frame
+    HasHeartTexture = AssetMgr->GetTexture(HeartTexture) != nullptr;
 
     SlashSound        = AssetMgr->LoadSound("assets/Sounds/Slash.wav", Channel_SFX);
     PunchSound        = AssetMgr->LoadSound("assets/Sounds/Punch.wav", Channel_SFX);
@@ -115,11 +117,24 @@ void game::Update(f32 DeltaTime)
     // After the input, so a card that was just moved starts its animation this tick
     UpdateCards(DeltaTime);
 
-    // A deal started while the cards still fly to the Dungeon would send them to the Room from wherever they are
-    if(RoomDealPending && !CardsAreMoving)
+    // The deal waits until every card has landed (the faced card, a weapon attack, the cards flying back to the Dungeon
+    // on a restart), then a short pause, so the new cards never fly at the same time as the old ones
+    if(RoomDealPending)
     {
-        RoomDealPending = false;
-        DealRoom();
+        if(CardsAreMoving)
+        {
+            RoomDealWait = 0.0f;
+        }
+        else
+        {
+            RoomDealWait += DeltaTime;
+            if(RoomDealWait >= RoomDealPause)
+            {
+                RoomDealPending = false;
+                RoomDealWait = 0.0f;
+                DealRoom();
+            }
+        }
     }
 
     UpdateBackgroundFlash(DeltaTime);
@@ -231,41 +246,13 @@ void game::UpdateCards(f32 DeltaTime)
             }
         }
     }
-
-    // The same clamped time as the cards, so a sound and the card move stay together after a long frame
-    UpdateDelayedSounds(DeltaTime);
 }
 
-void game::PlaySoundDelayed(u64 Sound, f32 Delay)
+// Data is the sound handle
+void game::OnCardDealt(void *UserData, u64 Data)
 {
-    if(DelayedSoundCount >= RoomSize)
-    {
-        Log(Warning, "game::PlaySoundDelayed() - The queue is full, the sound plays now");
-        Audio->Play(Sound);
-        return;
-    }
-
-    DelayedSounds[DelayedSoundCount++] = {Sound, Delay};
-}
-
-void game::UpdateDelayedSounds(f32 DeltaTime)
-{
-    u32 i = 0;
-    while(i < DelayedSoundCount)
-    {
-        DelayedSounds[i].TimeLeft -= DeltaTime;
-        if(DelayedSounds[i].TimeLeft <= 0.0f)
-        {
-            Audio->Play(DelayedSounds[i].Sound);
-
-            // The order in the queue does not matter, so the last entry fills the gap and i is checked again
-            DelayedSounds[i] = DelayedSounds[--DelayedSoundCount];
-        }
-        else
-        {
-            ++i;
-        }
-    }
+    game *Game = (game *)UserData;
+    Game->Audio->Play(Data);
 }
 
 void game::ProcessInput()
@@ -293,7 +280,7 @@ void game::ProcessInput()
         return;
     }
 
-    // With no Room yet, a click on the Dungeon would try to avoid an empty Room
+    // While a deal waits, the Room is not complete: a click would face its last card or try to avoid it too early
     if(RoomDealPending)
     {
         return;
@@ -395,8 +382,6 @@ void game::NewGame()
     Shuffle(Dungeon.data(), (i32)Dungeon.size());
     StackDungeon();
 
-    DelayedSoundCount = 0;
-
     if(BackgroundFlashHeld)
     {
         // The held red fades out with the usual fall, not with a jump to the usual colors
@@ -406,6 +391,7 @@ void game::NewGame()
 
     State = Game_WaitingToStart;
     RoomDealPending = false;
+    RoomDealWait = 0.0f;
     CanAvoidRoom = false;
     PlayerHealth = MaxHealth;
     Score = 0;
@@ -442,15 +428,9 @@ void game::DealRoom()
     u32 Missing = RoomSize - (u32)KeptCount;
     MoveCards(Dungeon, Room, Missing, Pile_Room);
 
-    // A new order for each deal, and no sound two times in one deal. An avoided Room deals again, its old sounds must not play
+    // A new order for each deal, and no sound two times in one deal. The array order has no other use, so it is shuffled in place
     static_assert(CardPlaceSoundCount >= RoomSize, "Each dealt card needs its own card place sound");
-    u64 PlaceSounds[CardPlaceSoundCount];
-    for(u32 i = 0; i < CardPlaceSoundCount; ++i)
-    {
-        PlaceSounds[i] = CardPlaceSounds[i];
-    }
-    Shuffle(PlaceSounds, (i32)CardPlaceSoundCount);
-    DelayedSoundCount = 0;
+    Shuffle(CardPlaceSounds, (i32)CardPlaceSoundCount);
 
     for(size_t i = 0; i < Room.size(); ++i)
     {
@@ -463,7 +443,8 @@ void game::DealRoom()
 
         f32 Delay = CardDealDelay * (f32)(i - KeptCount);
         Room[i].Animation.Move(Room[i].Position, Room[i].Angle, RoomPositions[i], 0.0f, Delay);
-        PlaySoundDelayed(PlaceSounds[i - KeptCount], Delay); // When the card leaves the Dungeon
+        // The sound plays when the move starts, so it leaves the Dungeon with the card. A later Move() (an avoided Room) clears it
+        Room[i].Animation.SetOnStart(OnCardDealt, this, CardPlaceSounds[i - KeptCount]);
     }
 
     CardsFacedThisRoom = 0;
@@ -608,7 +589,7 @@ void game::FightMonster(card Monster, b32 Barehanded)
     }
 }
 
-void game::OnWeaponHit(void *UserData)
+void game::OnWeaponHit(void *UserData, u64 Data)
 {
     game *Game = (game *)UserData;
 
@@ -664,7 +645,7 @@ void game::CheckEndOfTurn()
 
         if(!Dungeon.empty())
         {
-            DealRoom();
+            RoomDealPending = true;
         }
         else
         {
@@ -745,12 +726,16 @@ void game::DrawHealth()
     f32 MidY = (RoomBottom + LowerRowTop) * 0.5f;
 
     // The heart and the number are centered together, so the pair stays centered when the number of digits changes
-    f32 TotalWidth = HealthIconSize + HealthIconGap + TextWidth(Font, HealthTextHeight, Text);
+    f32 IconWidth = HasHeartTexture ? HealthIconSize + HealthIconGap : 0.0f;
+    f32 TotalWidth = IconWidth + TextWidth(Font, HealthTextHeight, Text);
     f32 Left = -TotalWidth * 0.5f;
 
-    Renderer->DrawTexture(HeartTexture, glm::vec3(Left + HealthIconSize * 0.5f, MidY, 0.0f), glm::vec2(HealthIconSize), 0.0f);
+    if(HasHeartTexture)
+    {
+        Renderer->DrawTexture(HeartTexture, glm::vec3(Left + HealthIconSize * 0.5f, MidY, 0.0f), glm::vec2(HealthIconSize), 0.0f);
+    }
 
-    glm::vec3 TopLeft = glm::vec3(Left + HealthIconSize + HealthIconGap, MidY + HealthTextHeight * Font->Metrics.LineHeight * 0.5f, 0.0f);
+    glm::vec3 TopLeft = glm::vec3(Left + IconWidth, MidY + HealthTextHeight * Font->Metrics.LineHeight * 0.5f, 0.0f);
     Renderer->DrawText3D(MarcellusFont, TopLeft, HealthTextHeight, Text, RED);
 }
 

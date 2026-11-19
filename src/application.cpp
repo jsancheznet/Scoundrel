@@ -46,10 +46,15 @@ void application::CreateWindow(const char *Title, u32 Width, u32 Height)
 {
     Window = SDL_CreateWindow(Title, Width, Height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
     GLContext = SDL_GL_CreateContext(Window);
-    WindowWidth = Width;
-    WindowHeight = Height;
 
-    Log(Info, "application::CreateWindow() - Created Window, Width: %d, Height: %d", Width, Height);
+    // The system can give the window a different size than the one asked for (a small screen, a tiling window manager)
+    i32 ActualWidth = (i32)Width;
+    i32 ActualHeight = (i32)Height;
+    SDL_GetWindowSize(Window, &ActualWidth, &ActualHeight);
+    WindowWidth = (u32)ActualWidth;
+    WindowHeight = (u32)ActualHeight;
+
+    Log(Info, "application::CreateWindow() - Created Window, Width: %d, Height: %d", WindowWidth, WindowHeight);
 
     i32 Interval = 1;
     bool VSyncConfigured = SDL_GL_SetSwapInterval(Interval);

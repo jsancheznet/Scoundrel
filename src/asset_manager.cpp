@@ -122,6 +122,21 @@ u64 asset_manager::LoadTexture(const char *Filepath)
         return InvalidHandle();
     }
 
+    // Premultiplied alpha, so the mipmaps do not mix the color of the transparent pixels into the edges (a dark halo).
+    // Images with no alpha channel (the card JPGs) are already the same in both forms
+    if(Texture.ChannelCount == 4)
+    {
+        i32 PixelCount = Texture.Width * Texture.Height;
+        for(i32 Pixel = 0; Pixel < PixelCount; ++Pixel)
+        {
+            u8 *Rgba = Texture.Data + Pixel * 4;
+            u32 Alpha = Rgba[3];
+            Rgba[0] = (u8)((Rgba[0] * Alpha + 127) / 255);
+            Rgba[1] = (u8)((Rgba[1] * Alpha + 127) / 255);
+            Rgba[2] = (u8)((Rgba[2] * Alpha + 127) / 255);
+        }
+    }
+
     texture_asset *Asset = &Textures[Index];
 
     Asset->Header.Used = true;

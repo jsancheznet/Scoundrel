@@ -66,12 +66,7 @@ constexpr f32 HealthIconSize   = 2.0f; // Centimeters
 constexpr f32 HealthIconGap    = 0.4f; // Centimeters, between the heart and the number
 
 constexpr u32 CardPlaceSoundCount = 4;
-
-struct delayed_sound
-{
-    u64 Sound;
-    f32 TimeLeft; // Seconds
-};
+constexpr f32 RoomDealPause = 0.0625f; // Seconds, after the last card lands and before the next Room is dealt
 
 enum game_state
 {
@@ -87,8 +82,6 @@ struct game
     void Update(f32 DeltaTime);
     void ProcessInput();
     void UpdateCards(f32 DeltaTime);
-    void PlaySoundDelayed(u64 Sound, f32 Delay); // Delay in seconds
-    void UpdateDelayedSounds(f32 DeltaTime);
     void UpdateBackgroundFlash(f32 DeltaTime);
     void UpdateOverlay(f32 DeltaTime);
     b32 OverlayIsWanted();
@@ -108,7 +101,8 @@ struct game
     void OnPlayerHealed();
     void FlashBackground(color Color);
 
-    static void OnWeaponHit(void *UserData);
+    static void OnWeaponHit(void *UserData, u64 Data);
+    static void OnCardDealt(void *UserData, u64 Data);
 
     void DrawHealth();
     void DrawCards();
@@ -129,11 +123,7 @@ struct game
     u64 DamageSound;
     u64 HealthPotionSound;
     u64 ErrorSound;
-    u64 CardPlaceSounds[CardPlaceSoundCount];
-
-    // Only the deal uses it, so it holds one sound for each card of a Room
-    delayed_sound DelayedSounds[RoomSize];
-    u32 DelayedSoundCount;
+    u64 CardPlaceSounds[CardPlaceSoundCount]; // The order changes on each deal
 
     u64 Music;
 
@@ -146,7 +136,8 @@ struct game
     char OverlaySubtitle[128];
     f32 OverlayAmount; // 0 = no overlay, 1 = full, follows the fade
     b32 CardsAreMoving;
-    b32 RoomDealPending; // The first Room is dealt once the cards land in the Dungeon
+    b32 RoomDealPending; // The next Room is dealt once all cards have landed and RoomDealPause has passed
+    f32 RoomDealWait;    // Seconds
 
     u32 CardsFacedThisRoom;
     b32 PotionUsedThisRoom;
@@ -182,6 +173,7 @@ private:
 
     u64 CardBackTexture;
     u64 HeartTexture;
+    b32 HasHeartTexture;
 
     void MoveCards(std::vector<card> &Src, std::vector<card> &Dst, u32 Count, card_pile DstPile);
     void Discard(card Card);

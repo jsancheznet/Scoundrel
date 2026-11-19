@@ -24,7 +24,7 @@ camera CreateCamera(glm::vec3 Position, glm::vec3 Target, glm::vec3 Up, f32 Near
 
     Camera.AspectRatio = (f32)Application.WindowWidth / (f32)Application.WindowHeight;
     Camera.Perspective = glm::perspective(glm::radians(Camera.Fov), Camera.AspectRatio, Camera.Near, Camera.Far);
-    Camera.Orthographic = glm::ortho(0.0f, (f32)Application.WindowWidth, (f32)Application.WindowHeight, 0.0f);
+    Camera.Orthographic = glm::ortho(0.0f, (f32)Renderer.ViewportWidth, (f32)Renderer.ViewportHeight, 0.0f);
 
     Camera.ShakeStrength = 0.0f;
     Camera.ShakeTimer = {};
@@ -63,7 +63,8 @@ void camera::Update()
 
     View = glm::lookAt(Position + ShakeOffset, Target + ShakeOffset, Up);
     Perspective = glm::perspective(glm::radians(Fov), AspectRatio, Near, Far);
-    Orthographic = glm::ortho(0.0f, (f32)Application.WindowWidth, (f32)Application.WindowHeight, 0.0f);
+    // In pixels, the same units as the screen text layout. The window size is different on a scaled display
+    Orthographic = glm::ortho(0.0f, (f32)Renderer.ViewportWidth, (f32)Renderer.ViewportHeight, 0.0f);
 
     Renderer.UpdateCameraBuffer(this);
 }

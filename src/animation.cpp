@@ -25,6 +25,10 @@ void animation_state::Move(glm::vec3 FromPosition, f32 FromAngle, glm::vec3 ToPo
     TargetAngle = ToAngle;
     Lift = glm::min(MaxLift, Distance * 0.5f); // Short moves stay close to the table
 
+    // A new move replaces the start callback of the old one, so a canceled deal does not play its sound later
+    OnStart = nullptr;
+    StartDone = false;
+
     // Only the height changes (a pile was stacked again), there is nothing to see.
     // The next Update() gives the target values at once
     b32 SamePlace = Distance < 0.001f && glm::abs(ToAngle - FromAngle) < 0.001f;
@@ -33,6 +37,13 @@ void animation_state::Move(glm::vec3 FromPosition, f32 FromAngle, glm::vec3 ToPo
         Delay = 0.0f;
         Elapsed = Duration;
     }
+}
+
+void animation_state::SetOnStart(animation_callback *Callback, void *UserData, u64 Data)
+{
+    OnStart = Callback;
+    OnStartUserData = UserData;
+    OnStartData = Data;
 }
 
 void animation_state::Attack(glm::vec3 FromPosition, glm::vec3 HitPosition, f32 HitDurationSeconds, f32 ReturnDurationSeconds,
@@ -51,6 +62,8 @@ void animation_state::Attack(glm::vec3 FromPosition, glm::vec3 HitPosition, f32 
     HitDone = false;
     OnHit = OnHitCallback;
     OnHitUserData = UserData;
+    OnStart = nullptr;
+    StartDone = false;
     Lift = glm::min(MaxLift, Distance * 0.5f);
 }
 
@@ -74,6 +87,15 @@ void animation_state::Update(f32 DeltaTime, glm::vec3 *NewPosition, f32 *NewAngl
         // The time left of this tick after the delay ended goes to the move
         DeltaTime = -Delay;
         Delay = 0.0f;
+    }
+
+    if(!StartDone)
+    {
+        StartDone = true;
+        if(OnStart)
+        {
+            OnStart(OnStartUserData, OnStartData);
+        }
     }
 
     Elapsed += DeltaTime;
@@ -118,7 +140,7 @@ void animation_state::Update(f32 DeltaTime, glm::vec3 *NewPosition, f32 *NewAngl
                     HitDone = true;
                     if(OnHit)
                     {
-                        OnHit(OnHitUserData);
+                        OnHit(OnHitUserData, 0);
                     }
                 }
 

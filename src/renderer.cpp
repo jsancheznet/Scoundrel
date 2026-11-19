@@ -79,12 +79,14 @@ void renderer::DrawSprites()
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); // The textures have premultiplied alpha, see asset_manager::LoadTexture()
     glBindVertexArray(SpritesVAO);
     if(Sprites.size() != 0)
     {
         glNamedBufferSubData(SpritesVBO, 0, Sprites.size() * sizeof(sprite_instance), &Sprites[0]);
         glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, Sprites.size());
     }
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_BLEND);
     glDepthMask(GL_TRUE);
     Sprites.clear();
@@ -235,7 +237,16 @@ void renderer::UploadTexture(u8 *Data, i32 Width, i32 Height, u32 *ID, u64 *Hand
     glTextureParameteri(*ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // The full mip chain, down to 1x1, so a texture drawn smaller than its size does not shimmer
-    i32 MipLevels = UseMipmaps ? 1 + (i32)glm::floor(glm::log2((f32)glm::max(Width, Height))) : 1;
+    // Integer math, a float log2 can be a bit below a whole number and lose a level
+    i32 MipLevels = 1;
+    if(UseMipmaps)
+    {
+        i32 LargestSide = glm::max(Width, Height);
+        while(LargestSide >> MipLevels)
+        {
+            MipLevels++;
+        }
+    }
     glTextureStorage2D(*ID, MipLevels, GL_RGBA8, Width, Height);
 
     glTextureSubImage2D(*ID, 0, 0, 0, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, Data);
@@ -448,11 +459,11 @@ void renderer::ConfigureRenderer()
 
     glViewport(0, 0, ViewportWidth, ViewportHeight);
 
-    // PERF: Opaque sprites draw with blending OFF (the card JPGs have no alpha) and with
-    // depth testing ON, so occluded fragments are discarded by early-Z instead of being
+    // PERF: The cards draw with blending OFF (the card JPGs have no alpha) and with depth testing
+    // and depth writes ON, so occluded fragments are discarded by early-Z instead of being
     // read-modify-written. This collapses the per-pixel overdraw from ~hundreds down to ~1.
-    // The blend func stays configured; re-enable GL_BLEND per-batch for translucent sprites /
-    // SDF text, drawn after the opaque pass (ideally with glDepthMask(GL_FALSE)).
+    // Blending is off by default; each translucent pass turns it on with depth writes off:
+    // the sprites (premultiplied alpha, they set their own blend func), the screen overlay and the SDF text.
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_BLEND);
 
